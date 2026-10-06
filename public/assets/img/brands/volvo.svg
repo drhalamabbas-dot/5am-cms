@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 42" fill="none">
+  <circle cx="18" cy="21" r="11" fill="none" stroke="#1E293B" stroke-width="3"/>
+  <path d="M25 14 L31 8 M26 8 L31 8 L31 13" stroke="#1E293B" stroke-width="2.5" stroke-linecap="square"/>
+  <text x="38" y="27" font-family="'Archivo', 'Arial Black', sans-serif" font-weight="800" font-size="18" fill="#0F172A" letter-spacing="0.06em">VOLVO</text>
+</svg>

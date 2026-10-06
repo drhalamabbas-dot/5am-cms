@@ -1,0 +1,7 @@
+# 5A&M — https://www.5a-eg.com
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://www.5a-eg.com/sitemap.xml

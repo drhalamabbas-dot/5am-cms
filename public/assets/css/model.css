@@ -1,0 +1,85 @@
+/* ==========================================================================
+   5A&M — Single Product Detail (PDP) Styles
+   Product gallery, Spec table, Downloads, Technical plate fallbacks
+   ========================================================================== */
+
+/* ---------- 1. Product Detail PDP Layout ---------- */
+.pdp{ display:grid; grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr); gap:44px; align-items:start; }
+.pdp__gallery{ position:sticky; top:calc(var(--header-h) + 20px); }
+.pdp__main{ border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; background:var(--paper); aspect-ratio:4/3; }
+.pdp__main img{ width:100%; height:100%; object-fit:cover; image-rendering:auto; }
+.pdp__thumbs button{
+  border:1px solid var(--line); background:var(--paper); padding:0; aspect-ratio:4/3; overflow:hidden;
+  border-radius:2px; cursor:pointer;
+}
+.pdp__thumbs button.is-on{ border-color:var(--brand); }
+.pdp__thumbs img{ width:100%; height:100%; object-fit:cover; }
+.pdp h1{ font-size:clamp(25px,3vw,36px); text-transform:uppercase; letter-spacing:-.025em; margin-top:6px; }
+.pdp__brandrow{ display:flex; align-items:center; gap:12px; }
+.pdp__brandrow img{ height:26px; width:auto; }
+.pdp__over{ font-size:15px; margin-top:16px; }
+
+/* ---------- 2. Technical Specification Table ---------- */
+.spec{ width:100%; border-collapse:collapse; border:1px solid var(--line); }
+.spec th,.spec td{ text-align:left; padding:11px 14px; font-size:13px; border-bottom:1px solid var(--line); }
+.spec th{ width:44%; font-weight:600; color:var(--ink); background:var(--paper); font-family:var(--text); }
+.spec td{ color:var(--body); }
+.spec tr:last-child th,.spec tr:last-child td{ border-bottom:0; }
+
+.blockhead{
+  font-family:var(--display); font-weight:800; font-size:13px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink); margin:34px 0 14px; padding-left:11px; border-left:3px solid var(--brand);
+}
+.ticklist li{ display:flex; gap:10px; padding:7px 0; font-size:13.5px; color:#3B4753; align-items:flex-start; }
+.ticklist svg{ color:var(--brand); flex:0 0 auto; margin-top:4px; }
+
+.dl{ display:flex; flex-direction:column; gap:8px; }
+.dl a, .dl span{
+  display:flex; gap:10px; align-items:center; padding:12px 14px; border:1px solid var(--line);
+  border-radius:var(--radius); font-size:13px; color:#3B4753; background:#fff;
+}
+.dl a:hover{ border-color:var(--brand-strong); color:var(--brand-strong); }
+.dl span{ color:var(--muted); background:var(--paper); }
+
+.note{
+  display:flex; gap:10px; padding:12px 14px; border-left:3px solid var(--brand); background:var(--brand-tint);
+  font-size:12.5px; color:var(--brand-brown); border-radius:0 var(--radius) var(--radius) 0;
+}
+.note svg{ flex:0 0 auto; margin-top:2px; color:var(--brand); }
+
+/* ---------- 3. Technical Plate (Awaiting Photo Fallback) ---------- */
+.card__fig--plate{
+  display:grid; place-items:center; gap:10px; padding:18px;
+  background:
+    linear-gradient(180deg, #FFFFFF 0%, #F1F3F6 100%),
+    repeating-linear-gradient(0deg, rgba(14,27,46,.05) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(90deg, rgba(14,27,46,.05) 0 1px, transparent 1px 22px);
+  background-blend-mode:normal, multiply, multiply;
+  border-bottom:1px solid var(--line);
+}
+.card__fig--plate::before{
+  content:""; position:absolute; left:18px; right:18px; top:18px; bottom:18px;
+  border:1px solid rgba(14,27,46,.09);
+}
+.plate__logo{ max-height:30px; width:auto; object-fit:contain; opacity:.9; position:relative; }
+.plate__word{ font-family:var(--display); font-weight:800; font-size:15px; color:#5B6774; letter-spacing:.04em; position:relative; }
+.plate__name{ font-family:var(--display); font-weight:800; font-size:17px; color:var(--ink); text-align:center; line-height:1.15; letter-spacing:-.01em; position:relative; }
+.pdp__main--plate{
+  display:grid; place-items:center; gap:14px;
+  background:
+    linear-gradient(180deg,#FFFFFF 0%, #EFF1F4 100%),
+    repeating-linear-gradient(0deg, rgba(14,27,46,.05) 0 1px, transparent 1px 30px),
+    repeating-linear-gradient(90deg, rgba(14,27,46,.05) 0 1px, transparent 1px 30px);
+  background-blend-mode:normal, multiply, multiply;
+}
+.pdp__main--plate img{ max-height:54px; width:auto; object-fit:contain; }
+.pdp__main--plate b{ font-family:var(--display); font-size:26px; color:var(--ink); }
+.pdp__main--plate small{ font-size:12px; color:var(--muted); }
+
+/* ---------- 4. Responsive & RTL ---------- */
+@media (max-width:1080px){
+  /* minmax(0,…): a plain 1fr track grows to the photo's natural width (1920px) and pushes the gallery off-screen */
+  .pdp{ grid-template-columns:minmax(0,1fr); gap:28px; }
+  .pdp__gallery{ position:static; }
+}
+[lang="ar"] .spec b, [lang="ar"] .spec span, [lang="ar"] .plate__name, [lang="ar"] .plate__word{ direction:ltr; unicode-bidi:isolate; }

@@ -1,0 +1,548 @@
+[
+ {
+  "slug": "about",
+  "crumb_ar": "من نحن",
+  "crumb_en": "About us",
+  "parent_slug": null,
+  "title_en": "About — 5A&M for Import, Export and Contracting",
+  "description_en": "5A&M is an Egyptian company established in 2022, specialised in power generation and industrial equipment — our vision, mission, values and story.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": null,
+  "related": null,
+  "hero": {
+   "img": "assets/img/photos/genset-workshop.jpg",
+   "title": {
+    "ar": "من نحن",
+    "en": "About us"
+   }
+  }
+ },
+ {
+  "slug": "aftersales",
+  "crumb_ar": "خدمات ما بعد البيع",
+  "crumb_en": "After-sales services",
+  "parent_slug": null,
+  "title_en": "After-sales services — 5A&M",
+  "description_en": "After-sales and field service teams, emergency breakdown response and warranty support.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": "service",
+  "related": [
+   "parts",
+   "maintenance"
+  ],
+  "hero": {
+   "img": "assets/img/photos/genset-workshop.jpg",
+   "lede": {
+    "ar": "فريق ما بعد بيع مدرَّب، وقطع غيار أصلية من المخزون، وصيانة في الموقع بعقود صيانة، وضمان قوي على كل مولد نسلّمه.",
+    "en": "A trained after-sales team, genuine spare parts from stock, on-site maintenance under contract, and a solid warranty on every generator we deliver."
+   },
+   "title": {
+    "ar": "خدمات ما بعد البيع",
+    "en": "After-sales services"
+   },
+   "kicker": {
+    "ar": "دعم يستمر بعد التسليم",
+    "en": "Support beyond delivery"
+   }
+  }
+ },
+ {
+  "slug": "contact",
+  "crumb_ar": "التواصل",
+  "crumb_en": "Contact",
+  "parent_slug": null,
+  "title_en": "Contact — 5A&M",
+  "description_en": "Head office and workshop in the 5th Settlement, New Cairo. Phone, email and directions.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": null,
+  "related": null,
+  "hero": {
+   "img": "assets/img/photos/field-service.jpg",
+   "lede": {
+    "ar": "اتصل بنا، أو راسلنا، أو زُرنا في مقرنا الرئيسي بالقاهرة الجديدة أو مركز الخدمة في مسطرد.",
+    "en": "Call us, email us, or visit our head office in New Cairo and our service center in Mostorod."
+   },
+   "title": {
+    "ar": "تواصل مع 5A&M",
+    "en": "Contact 5A&M"
+   }
+  }
+ },
+ {
+  "slug": "environment",
+  "crumb_ar": "حلول البيئة",
+  "crumb_en": "Environmental Solutions",
+  "parent_slug": null,
+  "title_en": "Environmental Solutions — 5A&M",
+  "description_en": "Elgin, Vactor and Guzzler equipment supplied in Egypt by 5A&M, the exclusive authorized dealer for Federal Signal Environmental Solutions Group.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": "environmental",
+  "related": null,
+  "hero": {
+   "img": "assets/img/range/env-vactor.jpg",
+   "lede": {
+    "ar": "شركة 5A&M هي الوكيل الحصري المعتمد في مصر لعلامات رائدة ضمن مجموعة Federal Signal Environmental Solutions (Elgin, Vactor, Guzzler).",
+    "en": "5A&M is the Exclusive Authorized Dealer in Egypt for leading brands within Federal Signal Environmental Solutions Group (Elgin, Vactor, Guzzler)."
+   },
+   "title": {
+    "ar": "حلول البيئة",
+    "en": "Environmental Solutions"
+   },
+   "kicker": {
+    "ar": "وكيل حصري معتمد — مصر",
+    "en": "Exclusive authorized dealer — Egypt"
+   }
+  }
+ },
+ {
+  "slug": "equipment",
+  "crumb_ar": "المعدات",
+  "crumb_en": "Equipment",
+  "parent_slug": null,
+  "title_en": "Equipment we supply — 5A&M",
+  "description_en": "The equipment 5A&M supplies and supports in Egypt: Elgin, Vactor and Guzzler environmental machines, diesel generator sets from 10 to 2500 kVA built in-house, and genuine spare parts.",
+  "og_image": null,
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": null,
+  "related": null,
+  "hero": {
+   "img": "assets/img/photos/genset-workshop.jpg",
+   "lede": {
+    "ar": "⁦5A&M⁩ هي الوكيل الحصري المعتمد في مصر لمجموعة Federal Signal Environmental Solutions، وبتبني مولداتها بنفسها من 10 إلى ⁦2500 kVA⁩، وبتحتفظ بقطع غيار أصلية لكل ما توردّه. كل ماكينة تحت بتتحدد مواصفتها حسب التطبيق قبل ما يتقدّم أي عرض.",
+    "en": "5A&M is the exclusive authorised dealer in Egypt for Federal Signal Environmental Solutions Group, builds its own generator sets from 10 to 2500 kVA, and holds genuine parts for what it sells. Every machine below is specified against the application before it is quoted."
+   },
+   "title": {
+    "ar": "المعدات اللي بنوردّها، وبنقف وراها",
+    "en": "The equipment we supply, and stand behind"
+   }
+  }
+ },
+ {
+  "slug": "fabrication",
+  "crumb_ar": "أعمال الصناعة والتركيبات",
+  "crumb_en": "Fabrication & installation",
+  "parent_slug": "power",
+  "title_en": "Fabrication & installation — 5A&M",
+  "description_en": "Generator canopies, electrical panels, fuel tanks and on-site installation by the 5A&M team.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": "engineering",
+  "related": null,
+  "hero": {
+   "img": "assets/img/photos/card-installation.jpg",
+   "lede": {
+    "ar": "أعمال الصاج وأعمال الموقع بفريقنا: كبائن المولدات، واللوحات الكهربائية، وتانكات الوقود ومشتملاتها، وتركيب المولدات وتجهيزها للعمل.",
+    "en": "Sheet metal works and site works by our own team: generator canopies, electrical panels, fuel tanks and accessories, and the installation that puts a generator to work."
+   },
+   "title": {
+    "ar": "أعمال الصناعة والتركيبات",
+    "en": "Fabrication & installation"
+   },
+   "kicker": {
+    "ar": "حلول الطاقة",
+    "en": "Power Solutions"
+   }
+  }
+ },
+ {
+  "slug": "generators",
+  "crumb_ar": "بيع وإيجار المولدات",
+  "crumb_en": "Generator sales & rental",
+  "parent_slug": "power",
+  "title_en": "Generator sales & rental — 5A&M",
+  "description_en": "Diesel generator sets from 10 to 2500 kVA, built with genuine Perkins, Cummins, Hyundai and Volvo engines.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": "power",
+  "related": null,
+  "hero": {
+   "img": "assets/img/range/genset-canopy.jpg",
+   "title": {
+    "ar": "بيع وإيجار المولدات",
+    "en": "Generator sales & rental"
+   },
+   "kicker": {
+    "ar": "حلول الطاقة",
+    "en": "Power Solutions"
+   }
+  }
+ },
+ {
+  "slug": "index",
+  "crumb_ar": "الرئيسية",
+  "crumb_en": "Home",
+  "parent_slug": null,
+  "title_en": "5A&M for Import, Export and Contracting — Power Generation & Environmental Solutions in Egypt",
+  "description_en": "5A&M supplies Elgin, Vactor and Guzzler environmental equipment and diesel generator sets from 10 to 2500 kVA across Egypt, backed by engineering, spare parts and after-sales service.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": null,
+  "related": null,
+  "hero": null
+ },
+ {
+  "slug": "maintenance",
+  "crumb_ar": "صيانة المواقع وعقود الصيانة",
+  "crumb_en": "Site maintenance & maintenance contracts",
+  "parent_slug": "aftersales",
+  "title_en": "Site maintenance & maintenance contracts — 5A&M",
+  "description_en": "Periodic, preventive and corrective maintenance at your site, on contract.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": "service",
+  "related": [
+   "parts",
+   "aftersales"
+  ],
+  "hero": {
+   "img": "assets/img/photos/site-installation.jpg",
+   "lede": {
+    "ar": "فريق خدمة ميدانية ذو خبرة في موقعك، وعقد صيانة يُبقي معداتك في رعايتنا طوال عمرها التشغيلي.",
+    "en": "An experienced field service team at your site, and a maintenance contract that keeps your equipment in our care for its whole operating life."
+   },
+   "title": {
+    "ar": "صيانة المواقع وعقود الصيانة",
+    "en": "Site maintenance & maintenance contracts"
+   },
+   "kicker": {
+    "ar": "خدمات ما بعد البيع",
+    "en": "After-sales services"
+   }
+  }
+ },
+ {
+  "slug": "model",
+  "crumb_ar": "المعدات",
+  "crumb_en": "Equipment",
+  "parent_slug": null,
+  "title_en": "Equipment specification — 5A&M",
+  "description_en": "Specification, features and applications for equipment supplied and supported by 5A&M in Egypt.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": null,
+  "related": null,
+  "hero": null
+ },
+ {
+  "slug": "overhaul",
+  "crumb_ar": "أعمال رفع الكفاءة",
+  "crumb_en": "Efficiency upgrades & overhauls",
+  "parent_slug": "power",
+  "title_en": "Efficiency upgrades & overhauls — 5A&M",
+  "description_en": "Replace the old engine with a new one and reuse the tested alternator, control and chassis.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": "repowering",
+  "related": null,
+  "hero": {
+   "img": "assets/img/photos/genset-workshop.jpg",
+   "lede": {
+    "ar": "طريقتان لإعادة المولد الحالي إلى كامل أدائه: محرك جديد على نفس المولد، أو عمرة شاملة للمحرك الموجود.",
+    "en": "Two ways to bring an existing generator back to full performance: a new engine on the same set, or a full overhaul of the engine it already has."
+   },
+   "title": {
+    "ar": "أعمال رفع الكفاءة",
+    "en": "Efficiency upgrades & overhauls"
+   },
+   "kicker": {
+    "ar": "حلول الطاقة",
+    "en": "Power Solutions"
+   }
+  }
+ },
+ {
+  "slug": "parts",
+  "crumb_ar": "قطع الغيار الأصلية",
+  "crumb_en": "Genuine spare parts",
+  "parent_slug": "aftersales",
+  "title_en": "Genuine spare parts — 5A&M",
+  "description_en": "Genuine parts and filters for generators, heavy equipment and environmental units.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": "parts",
+  "related": [
+   "aftersales",
+   "maintenance"
+  ],
+  "hero": {
+   "img": "assets/img/photos/card-overhaul.jpg",
+   "title": {
+    "ar": "قطع الغيار الأصلية",
+    "en": "Genuine spare parts"
+   },
+   "kicker": {
+    "ar": "خدمات ما بعد البيع",
+    "en": "After-sales services"
+   }
+  }
+ },
+ {
+  "slug": "power",
+  "crumb_ar": "حلول الطاقة",
+  "crumb_en": "Power Solutions",
+  "parent_slug": null,
+  "title_en": "Power Solutions — 5A&M",
+  "description_en": "Generator sales and rental, overhauls, fabrication, installation, spare parts and maintenance by 5A&M.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": "power",
+  "related": null,
+  "hero": {
+   "img": "assets/img/range/genset-canopy.jpg",
+   "lede": {
+    "ar": "بيع وإيجار المولدات، وأعمال رفع الكفاءة والعمرات الشاملة، وأعمال الصناعة والتركيبات بفريقنا.",
+    "en": "Generator sales and rental, efficiency upgrades and full overhauls, and fabrication and installation by our own team."
+   },
+   "title": {
+    "ar": "حلول الطاقة",
+    "en": "Power Solutions"
+   },
+   "kicker": {
+    "ar": "نطاق العمل",
+    "en": "Scope of work"
+   }
+  }
+ },
+ {
+  "slug": "projects",
+  "crumb_ar": "المشروعات",
+  "crumb_en": "Projects",
+  "parent_slug": null,
+  "title_en": "Projects — 5A&M",
+  "description_en": "Generator installation, repowering, canopy fabrication, fuel systems, control panels and field service delivered by 5A&M.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": null,
+  "related": null,
+  "hero": {
+   "img": "assets/img/photos/site-installation.jpg",
+   "lede": {
+    "ar": "أعمالنا في ثلاثة قطاعات: التنمية الزراعية، والبترول، والصناعة — وإيجار المولدات في مختلف القطاعات.",
+    "en": "Our work in three sectors — agricultural development, oil & gas and industry — and generator rental across all of them."
+   },
+   "title": {
+    "ar": "حلول حقيقية. أثر حقيقي.",
+    "en": "Real solutions. Real impact."
+   },
+   "kicker": {
+    "ar": "مشروعاتنا",
+    "en": "Our projects"
+   }
+  }
+ },
+ {
+  "slug": "quote",
+  "crumb_ar": "اطلب عرض سعر",
+  "crumb_en": "Request a quote",
+  "parent_slug": null,
+  "title_en": "Request a quote — 5A&M",
+  "description_en": "Send us the load, the site and the operating conditions, and our team will come back with a quotation.",
+  "og_image": null,
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": null,
+  "related": null,
+  "hero": {
+   "img": "assets/img/photos/site-installation.jpg",
+   "lede": {
+    "ar": "تفاصيل بسيطة تساعد فريقنا على فهم احتياجك من المعدات أو خدمات الموقع.",
+    "en": "A few details help our team understand your equipment, project or service needs."
+   },
+   "title": {
+    "ar": "اطلب عرض سعر أو خدمة",
+    "en": "Request a quote or service"
+   }
+  }
+ },
+ {
+  "slug": "rental",
+  "crumb_ar": "إيجار المولدات",
+  "crumb_en": "Generator rental",
+  "parent_slug": "power",
+  "title_en": "Generator rental — 5A&M",
+  "description_en": "Rental power generators from 20 kVA up to 1000 kVA, delivered, installed and supported by 5A&M.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": "rental",
+  "related": null,
+  "hero": {
+   "img": "assets/img/range/genset-rental.jpg",
+   "lede": {
+    "ar": "مولدات للإيجار من 20 حتى 1000 kVA.",
+    "en": "Rental power generators from 20 kVA up to 1000 kVA."
+   },
+   "title": {
+    "ar": "إيجار المولدات",
+    "en": "Generator rental"
+   },
+   "kicker": {
+    "ar": "حلول الطاقة",
+    "en": "Power Solutions"
+   }
+  }
+ },
+ {
+  "slug": "sector-agri",
+  "crumb_ar": "قطاع التنمية الزراعية",
+  "crumb_en": "Agricultural development",
+  "parent_slug": "sectors",
+  "title_en": "Agricultural development — 5A&M",
+  "description_en": "Power generation for farms, irrigation and pumping.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": null,
+  "related": [
+   "generators",
+   "overhaul",
+   "parts",
+   "maintenance"
+  ],
+  "hero": {
+   "img": "assets/img/photos/card-sector-agri.jpg",
+   "lede": {
+    "ar": "حلول توليد الطاقة للمزارع والري والضخ والعمليات الزراعية — وهو القطاع الذي بدأت منه 5A&M بتوريد قطع الغيار قبل المولدات.",
+    "en": "Power generation solutions for farms, irrigation, pumping and agricultural operations — the sector 5A&M started in, supplying spare parts before it supplied generators."
+   },
+   "title": {
+    "ar": "قطاع التنمية الزراعية",
+    "en": "Agricultural development"
+   },
+   "kicker": {
+    "ar": "القطاعات",
+    "en": "Sectors"
+   }
+  }
+ },
+ {
+  "slug": "sector-industry",
+  "crumb_ar": "قطاع الصناعة",
+  "crumb_en": "Industry",
+  "parent_slug": "sectors",
+  "title_en": "Industry — 5A&M",
+  "description_en": "Power generation, panels and industrial cleaning equipment for plants and facilities.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": null,
+  "related": [
+   "generators",
+   "fabrication",
+   "maintenance"
+  ],
+  "hero": {
+   "img": "assets/img/photos/genset-workshop.jpg",
+   "lede": {
+    "ar": "أعمال التنظيف الثقيل وتطبيقات الشفط ومعدات توليد الطاقة للمنشآت الصناعية والمواقع التجارية والمؤسسات.",
+    "en": "Heavy-duty cleaning, vacuum applications and power generation equipment for industrial facilities, commercial sites and institutions."
+   },
+   "title": {
+    "ar": "قطاع الصناعة",
+    "en": "Industry"
+   },
+   "kicker": {
+    "ar": "القطاعات",
+    "en": "Sectors"
+   }
+  }
+ },
+ {
+  "slug": "sector-oil",
+  "crumb_ar": "قطاع البترول",
+  "crumb_en": "Oil & gas",
+  "parent_slug": "sectors",
+  "title_en": "Oil & gas — 5A&M",
+  "description_en": "Vacuum equipment and power generation for oil & gas field and facility operations.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": null,
+  "related": [
+   "generators",
+   "rental",
+   "environment",
+   "maintenance"
+  ],
+  "hero": {
+   "img": "assets/img/range/guzzler-guzzcavator.jpg",
+   "lede": {
+    "ar": "معدات شفط للتعامل مع المخلفات الصلبة والرواسب في مواقع البترول والغاز، إلى جانب توليد الطاقة بالديزل والغاز لعمليات الحقول والمنشآت.",
+    "en": "Vacuum equipment for solid waste and residue handling at oil & gas sites, plus diesel and gas power generation for field and facility operations."
+   },
+   "title": {
+    "ar": "قطاع البترول",
+    "en": "Oil & gas"
+   },
+   "kicker": {
+    "ar": "القطاعات",
+    "en": "Sectors"
+   }
+  }
+ },
+ {
+  "slug": "sectors",
+  "crumb_ar": "القطاعات",
+  "crumb_en": "Sectors",
+  "parent_slug": null,
+  "title_en": "Sectors — 5A&M",
+  "description_en": "Oil & gas, agricultural development and industry — the sectors 5A&M serves across Egypt.",
+  "og_image": "https://www.5a-eg.com/assets/img/photos/genset-5am-canopy.jpg",
+  "noindex": 0,
+  "published": 1,
+  "quote_solution": null,
+  "related": null,
+  "hero": {
+   "img": "assets/img/photos/site-installation.jpg",
+   "lede": {
+    "ar": "نفس الثلاثة: المعدة، والتركيب، والخدمة — مصمّمة حسب طبيعة تشغيل كل قطاع.",
+    "en": "The same three things — equipment, installation and service — shaped around what each sector actually runs."
+   },
+   "title": {
+    "ar": "القطاعات التي نخدمها",
+    "en": "Sectors we serve"
+   },
+   "kicker": {
+    "ar": "الأسواق",
+    "en": "Markets"
+   }
+  }
+ },
+ {
+  "slug": "social-media-management",
+  "crumb_ar": "سوشيل ميديا",
+  "crumb_en": "social-media-management",
+  "parent_slug": null,
+  "title_en": null,
+  "description_en": null,
+  "og_image": null,
+  "noindex": 0,
+  "published": 0,
+  "quote_solution": null,
+  "related": null,
+  "hero": {
+   "title": {
+    "ar": "سوشيل ميديا",
+    "en": "social-media-management"
+   }
+  }
+ }
+]

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 42" fill="none">
+  <rect x="4" y="10" width="22" height="22" rx="2" fill="#0284C7"/>
+  <path d="M9 24 L14 15 L17 21 L22 13" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="34" y="27" font-family="'Archivo', 'Arial Black', sans-serif" font-weight="900" font-size="19" fill="#0F172A" letter-spacing="0.04em">STAMFORD</text>
+</svg>

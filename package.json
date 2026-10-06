@@ -1,0 +1,37 @@
+{
+  "name": "5am-cms",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "check": "node scripts/check-server.mjs",
+    "dump": "node scripts/dump-db.mjs",
+    "verify": "node scripts/verify.mjs",
+    "user": "node scripts/add-user.mjs",
+    "test": "node scripts/test-site.mjs",
+    "test:features": "node scripts/test-features.mjs"
+  },
+  "engines": {
+    "node": "24.x"
+  },
+  "dependencies": {
+    "@vladmandic/face-api": "^1.7.15",
+    "bcryptjs": "^3.0.3",
+    "jose": "^6.2.12",
+    "mysql2": "^3.24.5",
+    "next": "16.3.7",
+    "nodemailer": "^10.0.14",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/nodemailer": "^8.0.2",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
+  }
+}

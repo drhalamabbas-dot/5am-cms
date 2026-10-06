@@ -1,0 +1,93 @@
+/* =============================================================================
+   أزرار التحرير على الموقع — لصاحب الموقع وحده.
+
+   هذا الملف لا يُحمَّل للزائر أصلًا، فلا يزن عليه شيئًا. وقواعده كلها على
+   عناصر مبدوءة بـ ux-edit، فلا تمسّ شيئًا من تصميم الموقع.
+============================================================================= */
+
+/* ---------------------------------------------- الشريط العائم أسفل الشاشة */
+.ux-editbar{
+  position:fixed; inset-inline:0; bottom:0; z-index:90;
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  padding:9px 18px;
+  background:#0f1b2d; color:#dbe4f0;
+  font-family:'IBM Plex Sans Arabic',system-ui,sans-serif; font-size:14px;
+  box-shadow:0 -2px 14px rgba(8,14,24,.3);
+}
+.ux-editbar__who{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.ux-editbar__draft{
+  display:inline-block; background:#b45309; color:#fff; font-size:12px; font-weight:700;
+  padding:1px 8px; border-radius:99px; margin-inline-end:8px;
+}
+.ux-editbar__go,
+.ux-editbar__out{
+  flex:0 0 auto; border-radius:7px; padding:7px 14px; font-weight:600;
+  text-decoration:none; font-size:13.5px; line-height:1.4;
+}
+.ux-editbar__go{background:#c2410c; color:#fff}
+.ux-editbar__go:hover{background:#9a3412; color:#fff}
+.ux-editbar__out{background:#1e2d45; color:#cdd8e8}
+.ux-editbar__out:hover{background:#2a3c58; color:#fff}
+
+/* الشريط يغطّي آخر الصفحة، فيُفسح له مكان */
+body:has(.ux-editbar){padding-bottom:58px}
+/* وشريط التواصل السريع يرتفع فوقه كي لا يتراكبا */
+body:has(.ux-editbar) .ux-contact-dock{bottom:58px}
+
+/* ------------------------------------------- شريط الأدوات فوق كل قسم
+   ارتفاعه صفر في تدفّق الصفحة: يطفو فوق أول القسم الذي يليه بلا أن يزحزحه،
+   فتبقى الصفحة لصاحبها بالشكل الذي يراه الزائر. */
+.ux-edittools{
+  position:relative; z-index:40; height:0;
+  display:flex; justify-content:center;
+  font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  scroll-margin-top:120px;
+}
+.ux-edittools__bar{
+  display:inline-flex; align-items:stretch; height:32px;
+  transform:translateY(10px);
+  border-radius:8px; overflow:hidden;
+  box-shadow:0 2px 10px rgba(8,14,24,.25);
+}
+.ux-edittools__bar > a,
+.ux-edittools__bar > b,
+.ux-edittools button{
+  display:inline-flex; align-items:center; gap:6px; height:32px;
+  background:#0f1b2d; color:#e6edf6; border:0; margin:0;
+  padding:0 11px; font:inherit; font-size:12.5px; font-weight:600;
+  text-decoration:none; cursor:pointer; white-space:nowrap;
+  border-inline-start:1px solid #24344d;
+  opacity:.55; transition:opacity .15s, background .15s;
+}
+.ux-edittools form{display:contents}
+.ux-edittools__bar > :first-child{border-inline-start:0}
+/* الشريط كله يبرز معًا عند الاقتراب منه، لا زرًّا زرًّا */
+.ux-edittools__bar:hover > a, .ux-edittools__bar:hover > b, .ux-edittools__bar:hover button,
+.ux-edittools__bar:focus-within > a, .ux-edittools__bar:focus-within > b, .ux-edittools__bar:focus-within button{opacity:1}
+.ux-edittools__bar > a:hover, .ux-edittools button:hover{background:#1e2d45; color:#fff}
+.ux-edittools__main{background:#c2410c !important; color:#fff !important}
+.ux-edittools__main:hover{background:#9a3412 !important}
+.ux-edittools__main span{max-width:240px; overflow:hidden; text-overflow:ellipsis}
+.ux-edittools .ux-edittools__del:hover{background:#b42318; color:#fff}
+.ux-edittools button:disabled{opacity:.25 !important; cursor:default; background:#0f1b2d}
+.ux-edittools a:focus-visible, .ux-edittools button:focus-visible{outline:2px solid #fbbf24; outline-offset:1px; opacity:1}
+
+/* قسم مخفي عن الزائر: الشريط بلون مختلف، وعلامة تقول ذلك */
+.ux-edittools__flag{background:#b45309 !important; color:#fff !important; opacity:1 !important; cursor:default}
+.ux-edittools.is-hidden + *{opacity:.55; outline:2px dashed #b45309; outline-offset:-2px}
+
+/* على الشاشات الضيّقة: القلم والأسهم والحذف، بلا أسماء */
+@media(max-width:720px){
+  .ux-edittools__main span{display:none}
+  .ux-edittools__bar > a, .ux-edittools__bar > b, .ux-edittools button{padding:0 9px; font-size:12px}
+  .ux-edittools__flag{display:none !important}
+  .ux-editbar{font-size:13px; gap:10px; padding:8px 12px}
+  .ux-editbar__out{display:none}
+}
+
+@media print{ .ux-editbar, .ux-edittools{display:none} }
+
+/* ------------------------------------------- داخل المحرّر المرئي
+   علامة مخفية قبل كل قسم يعرف بها المحرّر أيّ قسم ضُغط. لا تشغل مكانًا. */
+.ux-mark{display:none}
+.ux-mark.is-hidden + *{opacity:.45; outline:2px dashed #b45309; outline-offset:-2px}

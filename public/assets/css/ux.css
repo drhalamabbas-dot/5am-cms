@@ -1,0 +1,994 @@
+/* Usability refinement, shared by the complete bilingual website. */
+:root{--ux-line:#dfe5ec;--ux-shadow:0 12px 36px rgb(6 11 20 / 8%)}
+html{scroll-padding-top:150px}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--brand-on-dark)!important;outline-offset:4px}
+button,input,select,textarea{font:inherit}
+input,select,textarea{font-size:16px!important}
+a,button{-webkit-tap-highlight-color:transparent}
+.btn{min-height:46px;border-radius:5px;letter-spacing:0}
+.iconbtn,.lang,.ux-nav-toggle{min-height:44px;min-width:44px}
+.hdr__in{gap:14px}.hdr__nav{gap:4px}.hdr__link{padding-inline:9px}
+.ux-nav-pair{display:flex;align-items:center;gap:0}
+.ux-nav-pair .hdr__link{padding-inline-end:4px}
+.ux-nav-toggle{display:grid;place-items:center;background:transparent;color:#cbd5e1;border:0;cursor:pointer;min-width:28px;padding:0}
+.ux-nav-toggle[aria-expanded=true]{color:var(--brand-on-dark);background:#ffffff0a}
+.ux-nav-toggle[aria-expanded=true] svg{transform:rotate(180deg)}
+.hdr__link.is-active{color:var(--brand-on-dark)}.hdr__link[aria-current=page]{text-decoration:underline;text-underline-offset:8px}
+.mega{max-height:calc(100dvh - 100px);overflow:auto}.mega__in{gap:24px}
+.mega__col a{padding:10px 0;line-height:1.55;font-size:14px}.mega__col h4{font-size:14px}
+.hdr:focus-within{transform:none!important}
+.mnav{padding-bottom:32px;overscroll-behavior:contain}
+.ux-mobile-group{padding-block:12px}.ux-mobile-group>b{display:block;color:var(--brand-on-dark);font-size:13px;margin-bottom:6px}
+.mnav .mnav__sub a{padding:12px 14px!important;min-height:44px;font-size:15px}
+.mnav summary,.mnav>a.mnav__top{font-size:17px;padding-block:18px}
+.ux-dialog-open{overflow:hidden}.ux-menu-open .ux-contact-dock{display:none}
+.sec{padding-block:64px}.lead__title{font-size:clamp(28px,3.2vw,42px)!important;line-height:1.35!important}
+.lead__lede{max-width:760px;line-height:1.85}.lead--row{gap:24px}
+.vhero__title{font-size:clamp(38px,4.8vw,68px)!important;line-height:1.3!important}
+.vhero__title span{color:var(--brand-on-dark)}.vhero__sub{max-width:580px;font-size:17px!important;line-height:1.85!important;color:#f1f5f9!important}
+.vhero__cta{gap:12px}.ux-intents{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:20px;color:#cbd5e1;font-size:14px}
+.ux-intents a{display:inline-flex;align-items:center;min-height:42px;padding:7px 13px;border:1px solid #ffffff35;border-radius:5px;background:#060b1459;color:#fff}
+.ux-intents a:hover{border-color:var(--brand-on-dark);background:#060b14c9}
+.vhero__lede{max-width:580px;font-size:17px!important;line-height:1.85!important;color:#f1f5f9!important}
+.ux-intents{padding-inline-start:26px}
+.ux-thumbnails{display:flex;gap:10px;margin-top:12px;overflow-x:auto;padding:4px}
+.ux-thumbnails button{width:88px;height:68px;flex-shrink:0;padding:3px;border:2px solid transparent;border-radius:5px;background:#f1f5f9;cursor:pointer}
+.ux-thumbnails button[aria-pressed=true]{border-color:var(--brand-strong)}.ux-thumbnails img{width:100%;height:100%;object-fit:cover}
+.logostrip__track{animation:none!important;transform:none!important;width:100%}
+.logostrip__group{display:grid!important;grid-template-columns:repeat(11,minmax(0,1fr));width:100%;gap:22px}
+.logostrip__group[aria-hidden=true]{display:none!important}.logostrip__marquee{width:100%;mask-image:none!important;-webkit-mask-image:none!important}
+.logostrip__item{width:auto!important;min-width:0!important;flex:initial!important;padding:8px 0!important}.logostrip__item img{max-width:100%;height:28px;object-fit:contain;filter:none!important;opacity:1!important}
+.logostrip__in{display:block!important}.logostrip__label{margin-bottom:20px}.logostrip{padding-block:26px}
+.fscard,.pgcard{border-radius:8px;overflow:hidden;border-color:var(--ux-line);box-shadow:0 3px 10px rgb(6 11 20 / 3%)}
+.fscard:hover,.pgcard:hover{box-shadow:var(--ux-shadow);transform:translateY(-3px)}
+.fscard__in{padding:22px}.fscard__head{min-height:0;margin-bottom:10px}
+.fscard__h{font-size:21px!important;line-height:1.5!important}.fscard__d{font-size:15px!important;line-height:1.8!important;min-height:0!important}
+.fscard__sub{font-size:12px!important}.fscard__foot{margin-top:auto;padding-top:18px;min-height:0}.fscard__cta-link{font-size:14px!important}
+.fscards{gap:22px}#fabCards{grid-template-columns:repeat(4,minmax(0,1fr))}#fabCards .fscard__in{padding:18px}#fabCards .fscard__h{font-size:18px!important}
+.pgcards{gap:24px}.pgcard__body{padding:24px}.pgcard__d{line-height:1.8}.pgcard__go{margin-top:16px}
+.phero__in{padding-block:38px 48px}.phero h1{font-size:clamp(30px,4vw,52px);line-height:1.4}.phero p{max-width:780px;line-height:1.85}
+.ux-hero-actions{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-top:24px}
+.ux-hero-call{display:inline-flex;align-items:center;gap:9px;color:white;min-height:44px;border-bottom:1px solid #ffffff60}
+.ux-jump{position:sticky;top:var(--header-h);z-index:30;background:#fff;border-bottom:1px solid var(--ux-line);box-shadow:0 3px 10px #060b1405}
+.ux-jump .wrap{display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin;padding-block:10px}
+.ux-jump a{white-space:nowrap;padding:10px 16px;font-size:14px;border-radius:5px;min-height:44px;display:flex;align-items:center}
+.ux-jump a:hover,.ux-jump a.is-active{background:#fff1e7;color:var(--brand-600)}
+.ux-related-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:24px}
+.ux-related-grid>a{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:24px;background:#f7f9fc;border:1px solid var(--ux-line);border-radius:8px;font-size:17px;font-weight:700}
+.ux-related-grid>a:hover{border-color:var(--brand-strong);background:var(--brand-tint)}.ux-related-grid small{display:block;font-size:14px;font-weight:400;line-height:1.7;margin-top:8px;color:#475569;overflow-wrap:anywhere}
+.ux-contact-dock{display:none}.pdp__main{position:relative}.ux-zoom{position:absolute;inset-inline-end:12px;bottom:12px;display:flex;align-items:center;gap:8px;background:white;border:1px solid var(--ux-line);border-radius:5px;padding:10px 14px;min-height:44px;font-size:14px;cursor:pointer;box-shadow:0 4px 16px #0001}
+dialog{color:#172133;border:1px solid var(--ux-line);border-radius:12px;padding:28px;box-shadow:0 30px 100px #0005;max-height:86dvh}
+dialog::backdrop{background:#060b14b3;backdrop-filter:blur(4px)}
+.ux-search{width:min(680px,calc(100vw - 32px));margin:7vh auto;overflow:auto}
+.ux-dialog-head{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:24px}.ux-dialog-head h2{font-size:23px}
+.ux-close{min-width:44px;height:44px;border:1px solid var(--ux-line);border-radius:6px;background:#fff;font-size:26px;cursor:pointer}
+.ux-search input{width:100%;padding:15px 16px;border:1px solid #8290a3;border-radius:6px;background:#f8fafc}
+.ux-search-count{font-size:14px;color:#475569;margin:18px 0 8px}.ux-search-results>a{display:flex;align-items:center;justify-content:space-between;padding:16px 8px;border-bottom:1px solid var(--ux-line);gap:16px}.ux-search-results>a:hover{background:var(--brand-tint)}.ux-search-results small{display:block;font-size:12px;color:#64748b;margin-top:5px}
+.ux-lightbox{width:min(1000px,94vw);margin:auto;position:fixed}.ux-lightbox>img{display:block;max-height:72vh;object-fit:contain;margin:auto}.ux-lightbox .ux-close{display:block;margin-inline-start:auto;margin-bottom:12px}
+/* Clear, honest request preparation for a static site without a mail server. */
+.ux-quote-intro{grid-column:1/-1;padding:22px;background:#f1f5f9;border-radius:8px;border-inline-start:3px solid var(--brand-strong);margin-bottom:4px}
+.ux-quote-intro h2{font-size:22px;margin-bottom:6px}.ux-quote-intro p{font-size:15px;line-height:1.8;color:#475569}
+.ux-form{display:grid;grid-template-columns:1fr 1fr;gap:22px}.ux-form .field{min-width:0}.ux-form input,.ux-form select,.ux-form textarea{width:100%;border:1px solid #9ba8b8;border-radius:5px;background:#fff;padding:12px;min-height:48px;color:#152133}
+.ux-form textarea{min-height:130px;resize:vertical}.ux-form label{display:block;margin-bottom:8px;font-weight:600;font-size:15px}.ux-form input[type=tel],.ux-form input[type=email]{direction:ltr;text-align:start}
+.ux-form .field--full{grid-column:1/-1}.ux-form .hint{font-size:13px;line-height:1.8;margin-top:6px;color:#59677a}.ux-form .err{display:none;color:#b42318;font-size:13px;margin-top:6px}.ux-form .is-bad .err{display:block}.ux-form .is-bad input,.ux-form .is-bad select{border:2px solid #b42318}
+.ux-form details{border:1px solid var(--ux-line);border-radius:8px;padding:18px}.ux-form summary{cursor:pointer;min-height:32px;font-weight:700;color:#172133}.ux-optional-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px}
+.ux-review{border:1px solid #9aafc2;background:#f8fafc;padding:24px;border-radius:8px;scroll-margin-top:110px}.ux-review h2{font-size:24px}.ux-review pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:15px;line-height:1.85;border-block:1px solid var(--ux-line);padding-block:18px;margin-block:18px}.ux-review-actions{display:flex;gap:12px;flex-wrap:wrap}.ux-review-note{line-height:1.8;margin-top:16px;color:#475569;font-size:14px}
+.ux-form .formmsg:not(.is-err):not(.is-ok){display:none}.ux-form .formmsg{grid-column:1/-1}.qlayout{align-items:start}.qlayout aside{position:sticky;top:115px}
+/* Avoid hiding substantive content behind reveal animations. */
+[data-reveal],[data-stagger]{opacity:1!important;visibility:visible!important;transform:none!important}
+@media(min-width:1081px) and (max-width:1250px){.hdr__link,[lang=ar] .hdr__link{font-size:14px!important;padding-inline:6px}.hdr__tools{gap:5px}.hdr__logo img{height:52px}.hdr__tools .btn--sm{padding-inline:12px}}
+@media(max-width:1080px){#fabCards{grid-template-columns:repeat(2,minmax(0,1fr))}.logostrip__group{grid-template-columns:repeat(6,minmax(0,1fr));gap:18px}.ux-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ux-jump{top:var(--header-h)}.qlayout aside{position:static}}
+@media(max-width:760px){
+  html{scroll-padding-top:150px}.sec{padding-block:40px}.wrap{padding-inline:20px}
+  body:has(.ux-contact-dock){padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+  .hdr__tools>.btn{display:none}.hdr__in{gap:8px}.hdr__tools{gap:6px}.hdr__logo img{height:42px}.lang{padding-inline:8px}.lang svg{display:none}
+  .lang .lang__code{display:inline!important;letter-spacing:0;font-size:12px}
+  .vhero{min-height:0;padding-block:48px 26px}.vhero__facts{display:none!important}.vhero__foot{margin-top:24px;padding-top:18px}
+  .vhero__tabs{grid-template-columns:repeat(3,minmax(0,1fr))!important}.vhero__tab{padding:10px 8px;min-height:44px}
+  .vhero__scrim,[dir=rtl] .vhero__scrim{background:linear-gradient(180deg,#060b14e6,#060b14a1 65%,#060b14ed)}
+  .vhero__lede{font-size:16px!important}.ux-intents{padding-inline-start:20px}
+  .lead--row{align-items:flex-start;flex-direction:column;gap:14px}.lead__title{font-size:28px!important}.lead__eyebrow{font-size:12px}
+  .vhero__title{font-size:38px!important;line-height:1.4!important}.vhero__sub{font-size:16px!important;line-height:1.8!important}.vhero__cta{margin-top:22px}.vhero__cta .btn{width:100%;justify-content:center}
+  .vhero__proof{display:none!important}.vhero__copy{padding-top:24px}.ux-intents{font-size:13px;gap:7px}.ux-intents>a{padding-inline:10px}
+  .logostrip__group{grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}.logostrip__item img{height:24px}
+  .fscards,#fabCards{grid-template-columns:1fr;gap:18px;max-width:none}.fscard__fig{aspect-ratio:16/9}.fscard__in{padding:20px}.fscard__h{font-size:21px!important}.fscard__foot{padding-top:14px}
+  .phero__in{padding-block:28px 36px}.phero h1{font-size:32px}.phero p{font-size:16px}.ux-hero-actions{gap:14px}.ux-hero-actions .btn{width:100%;justify-content:center}.ux-hero-call{margin-inline:auto}
+  .ux-jump .wrap{padding-inline:16px}.ux-jump a{font-size:13px;padding-inline:12px}.ux-related-grid{grid-template-columns:1fr}.ux-related-grid>a{padding:20px}
+  .ux-contact-dock{position:fixed;bottom:0;inset-inline:0;z-index:100;display:grid;grid-template-columns:1fr 1.4fr;gap:10px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--ux-line);box-shadow:0 -5px 20px #060b140a}
+  .ux-contact-dock a{display:flex;justify-content:center;align-items:center;gap:9px;min-height:46px;border:1px solid var(--ux-line);border-radius:5px;font-size:15px;font-weight:700}.ux-contact-dock .ux-dock-primary{background:var(--brand-strong);color:#fff;border-color:var(--brand-strong)}
+  .ux-search{padding:20px;margin-top:3vh}.ux-dialog-head h2{font-size:20px}.ux-quote-intro{padding:18px}.ux-form,.ux-optional-grid{grid-template-columns:1fr}.ux-review{padding:18px}.ux-review-actions>*{width:100%;justify-content:center}
+  .ftr__in--lean{gap:28px}.crumbs{font-size:12px;flex-wrap:wrap}.spec{font-size:13px}.spec th,.spec td{overflow-wrap:anywhere}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+@media print{.ux-contact-dock,.ux-jump,.ux-intents,.ux-zoom,dialog{display:none!important}body{padding:0!important}}
+
+/* Final visual polish: a calmer, more premium surface while preserving the
+   architectural navy/orange identity. */
+.hdr__link{border-radius:7px;transition:color .2s var(--ease),background-color .2s var(--ease),transform .2s var(--ease)}
+.hdr__link:hover{transform:translateY(-1px)}
+.hdr__link.is-active::after{left:14px;right:14px;border-radius:999px}
+.btn{border-radius:8px;box-shadow:0 4px 12px rgb(15 23 42 / 8%);transition:background-color .2s var(--ease),border-color .2s var(--ease),box-shadow .2s var(--ease),transform .2s var(--ease)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgb(15 23 42 / 14%)}
+.vhero__copy{max-width:760px}
+.vhero__eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid #ffffff2e;border-radius:999px;background:#060b1459;backdrop-filter:blur(8px)}
+.vhero__eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--brand-on-dark);box-shadow:0 0 0 4px color-mix(in srgb, var(--brand-on-dark) 18.04%, transparent)}
+.fscard,.pgcard{border-radius:12px;box-shadow:0 5px 18px rgb(6 11 20 / 5%);transition:box-shadow .25s var(--ease),transform .25s var(--ease),border-color .25s var(--ease)}
+.fscard:hover,.pgcard:hover{box-shadow:0 16px 34px rgb(6 11 20 / 12%)}
+.fscard__fig{border-radius:12px 12px 0 0}
+.ux-related-grid>a{border-radius:12px;transition:transform .2s var(--ease),box-shadow .2s var(--ease),border-color .2s var(--ease),background-color .2s var(--ease)}
+.ux-related-grid>a:hover{transform:translateY(-3px);box-shadow:0 12px 24px rgb(6 11 20 / 8%)}
+.ux-top{position:fixed;inset-inline-end:24px;bottom:24px;z-index:90;width:46px;height:46px;border:1px solid var(--ux-line);border-radius:50%;background:#fff;color:#172133;display:grid;place-items:center;box-shadow:0 8px 22px rgb(6 11 20 / 12%);opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .2s var(--ease),visibility .2s,transform .2s var(--ease),background-color .2s var(--ease),color .2s var(--ease);cursor:pointer}
+.ux-top.is-visible{opacity:1;visibility:visible;transform:translateY(0)}
+.ux-top:hover{background:var(--brand-strong);color:#fff;border-color:var(--brand-strong)}
+.ux-top svg{width:18px;height:18px}
+@media(max-width:760px){.ux-top{inset-inline-end:16px;bottom:86px;width:42px;height:42px}.vhero__eyebrow{font-size:11px}.vhero__copy{max-width:none}}
+
+/* ==========================================================================
+   GUI pass — Sep 2026: dark footer, card chips, mobile swipe rows
+   ========================================================================== */
+
+/* ---------- Footer: continues the dark contact band — logo + five link columns */
+.ftr{ background:#0A1320; border-top:1px solid rgba(255,255,255,.08); color:#C3CEDB; padding:56px 0 0; }
+.ftr__in--lean{ grid-template-columns:1.3fr repeat(5,minmax(0,1fr)) !important; gap:28px; align-items:start; }
+.ftr__logo img{ height:44px; }
+.ftr__about{ color:#AEBACA; font-size:14.5px; line-height:1.8; }
+.ftr .ftr__h{ color:#fff; font-size:14px; margin-bottom:14px; }
+.ftr li a{ color:#C3CEDB; font-size:14px; padding:6px 0; }
+.ftr li a:hover{ color:var(--brand-on-dark); }
+.ftr__contact li, .ftr__contact li a{ color:#C3CEDB; font-size:14px; }
+.ftr__contact svg{ color:var(--brand-on-dark); }
+.ftr__bar{ background:#060B14; border-top:1px solid rgba(255,255,255,.08); margin-top:40px !important; }
+@media (max-width:1240px){ .ftr__in--lean{ grid-template-columns:repeat(5,minmax(0,1fr)) !important; } .ftr__in--lean > div:first-child{ grid-column:1 / -1; } }
+@media (max-width:1080px){ .ftr__in--lean{ grid-template-columns:repeat(3,minmax(0,1fr)) !important; } }
+@media (max-width:760px){
+  .ftr__in--lean{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:28px 20px; }
+  .ftr__in--lean > div:first-child{ grid-column:1 / -1; }
+}
+
+/* ---------- Card chips and the "who is responsible" line */
+.fscard__lines{ display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; min-height:0 !important; }
+.fscard__lines i{
+  font-style:normal; font-size:12.5px; line-height:1.4; color:#334155; background:#F4F6F9;
+  border:1px solid var(--ux-line); border-radius:999px; padding:5px 11px;
+}
+.fscard__foot{ align-items:center; border-top:1px solid var(--ux-line); margin-top:auto; }
+.fscard__n{ font-size:12.5px !important; color:#526176; line-height:1.55; max-width:60%; }
+.fscard__in{ display:flex; flex-direction:column; flex:1; }
+.fscard{ display:flex; flex-direction:column; }
+.fscard__fig img{ transition:transform .7s var(--ease); }
+.fscard:hover .fscard__fig img{ transform:scale(1.04); }
+
+/* ---------- Section heads: a little more air, one rhythm everywhere */
+.lead{ margin-bottom:6px; }
+.lead--row{ align-items:flex-end; padding-bottom:18px; border-bottom:1px solid var(--ux-line); }
+.sec--dark .lead--row{ border-bottom-color:rgba(255,255,255,.12); }
+
+/* ---------- Phones: card rows become swipeable rows with a peek of the next card */
+@media (max-width:760px){
+  #fsCards, #powerCards, #fabCards, #afterCards, #sectorCards, #projCards{
+    display:grid !important; grid-auto-flow:column; grid-template-columns:none !important;
+    grid-auto-columns:84%; gap:14px !important;
+    overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory;
+    margin-inline:calc(var(--gut) * -1); padding:4px var(--gut) 18px; scroll-padding-inline:var(--gut);
+    scrollbar-width:none;
+  }
+  #fsCards::-webkit-scrollbar, #powerCards::-webkit-scrollbar, #fabCards::-webkit-scrollbar,
+  #afterCards::-webkit-scrollbar, #sectorCards::-webkit-scrollbar, #projCards::-webkit-scrollbar{ display:none; }
+  #fsCards > *, #powerCards > *, #fabCards > *, #afterCards > *, #sectorCards > *, #projCards > *{ scroll-snap-align:start; }
+  .fscard:hover{ transform:none; }
+  .ux-swipe-hint{ display:flex; align-items:center; gap:8px; margin-top:4px; font-size:13px; color:#526176; }
+  .ux-swipe-hint svg{ width:14px; height:14px; }
+  [dir="rtl"] .ux-swipe-hint svg{ transform:scaleX(-1); }
+  .lead--row{ align-items:flex-start; }
+}
+@media (min-width:761px){ .ux-swipe-hint{ display:none; } }
+/* Swipe rows bleed to the screen edge; never let that widen the page. */
+@media (max-width:760px){ main{ overflow-x:clip; } }
+.fscard__lines i{ text-transform:none !important; letter-spacing:0 !important; font-weight:600; }
+
+/* Content-page grids: no lone card on its own row */
+@media (min-width:1081px){
+  .pgcards{ grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
+  .pgcards:has(> :nth-child(2):last-child){ grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  .pgcards:has(> :nth-child(4):last-child){ grid-template-columns:repeat(4,minmax(0,1fr)) !important; }
+}
+@media (min-width:761px) and (max-width:1080px){ .pgcards{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; } }
+
+/* ===== GUI pass 3 — hero readability ===== */
+.vhero__scrim{
+  background:
+    linear-gradient(90deg, rgba(6,11,20,.95) 0%, rgba(6,11,20,.88) 30%, rgba(6,11,20,.62) 46%, rgba(6,11,20,.18) 66%, rgba(6,11,20,.30) 100%),
+    linear-gradient(0deg, rgba(6,11,20,.92) 0%, rgba(6,11,20,0) 30%),
+    linear-gradient(180deg, rgba(6,11,20,.55) 0%, rgba(6,11,20,0) 22%) !important;
+}
+[dir="rtl"] .vhero__scrim{
+  background:
+    linear-gradient(270deg, rgba(6,11,20,.96) 0%, rgba(6,11,20,.90) 30%, rgba(6,11,20,.64) 46%, rgba(6,11,20,.18) 66%, rgba(6,11,20,.30) 100%),
+    linear-gradient(0deg, rgba(6,11,20,.92) 0%, rgba(6,11,20,0) 30%),
+    linear-gradient(180deg, rgba(6,11,20,.55) 0%, rgba(6,11,20,0) 22%) !important;
+}
+.vhero__copy{ max-width:620px; }
+.vhero__title{ text-shadow:0 2px 30px rgba(0,0,0,.6); }
+.vhero__lede{ max-width:520px !important; color:#E8EEF5 !important; text-shadow:0 1px 12px rgba(0,0,0,.7); text-wrap:pretty; }
+.ux-intents > a, .vhero__cta .btn--onDark{ background:rgba(6,11,20,.55); backdrop-filter:blur(6px); }
+@media (max-width:760px){
+  .vhero__scrim,[dir=rtl] .vhero__scrim{ background:linear-gradient(180deg,rgba(6,11,20,.9),rgba(6,11,20,.72) 55%,rgba(6,11,20,.95)) !important; }
+  .vhero__copy{ max-width:none; }
+  .vhero__lede{ max-width:none !important; }
+  .vhero__foot{ flex-wrap:nowrap !important; gap:10px; }
+  .vhero__tabs{ flex:1 1 auto; min-width:0; gap:6px !important; }
+  .vhero__tab{ min-width:0; padding:8px 6px !important; justify-content:center; }
+  .vhero__tab-sub{ display:none !important; }
+  .vhero__tab-idx{ display:none !important; }
+  .vhero__tab-title{ font-size:12.5px !important; letter-spacing:.04em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .vhero__tab-info{ min-width:0; text-align:center; }
+  .vhero__pause{ flex:0 0 40px; width:40px; height:40px; }
+}
+.vhero__img{ image-rendering:auto !important; }
+.fscard__lines{ margin-bottom:20px; }
+a[href^="tel:"]:not(.btn):not(.ux-contact-dock a):not(:has(span)), .ltr-num{ direction:ltr; unicode-bidi:isolate; display:inline-block; }
+.about2__copy .lead__eyebrow{ color:var(--brand-strong) !important; }
+/* Centre the last, incomplete row of 3-column grids */
+@media (min-width:1081px){
+  .pgcards, .projgrid{ grid-template-columns:repeat(6,minmax(0,1fr)) !important; }
+  .pgcards > *, .projgrid > *{ grid-column:span 2; }
+  .pgcards > :last-child:nth-child(3n+1), .projgrid > :last-child:nth-child(3n+1){ grid-column:3 / span 2; }
+  .pgcards > :nth-last-child(2):nth-child(3n+1), .projgrid > :nth-last-child(2):nth-child(3n+1){ grid-column:2 / span 2; }
+  /* exactly 2 or 4 cards: plain even columns */
+  .pgcards > :first-child:nth-last-child(2), .pgcards > :first-child:nth-last-child(2) ~ *{ grid-column:span 3 !important; }
+  .pgcards > :first-child:nth-last-child(4), .pgcards > :first-child:nth-last-child(4) ~ *{ grid-column:auto !important; }
+  .pgcards:has(> :first-child:nth-last-child(4)){ grid-template-columns:repeat(4,minmax(0,1fr)) !important; }
+}
+@media (min-width:1081px){ .pgcards:has(> :first-child:nth-last-child(2)){ grid-template-columns:repeat(6,minmax(0,1fr)) !important; } }
+
+/* ===== Header quality pass ===== */
+.hdr{
+  background:rgba(9,14,25,.86) !important;
+  -webkit-backdrop-filter:saturate(150%) blur(16px); backdrop-filter:saturate(150%) blur(16px);
+  border-bottom:1px solid rgba(255,255,255,.07) !important;
+}
+.hdr::before{ /* thin brand accent along the top edge */
+  content:""; position:absolute; inset-inline:0; top:0; height:2px; pointer-events:none;
+  background:linear-gradient(90deg, transparent, var(--brand) 25%, var(--brand-light) 50%, var(--brand) 75%, transparent);
+  opacity:.85;
+}
+.hdr.hdr--compact, .hdr.is-stuck{ box-shadow:0 10px 30px -12px rgba(0,0,0,.55) !important; background:rgba(9,14,25,.94) !important; }
+.hdr__logo{ display:flex; align-items:center; flex:0 0 auto; }
+.hdr__logo img{ image-rendering:auto; filter:drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
+.hdr--compact .hdr__logo img{ height:44px !important; }
+
+/* nav links */
+.hdr__link{ color:#E2E8F0 !important; font-weight:600; border-radius:8px; position:relative; }
+.hdr__link:hover, .hdr__link[aria-expanded="true"]{ color:#fff !important; background:rgba(255,255,255,.07) !important; transform:none !important; }
+.hdr__link[aria-current=page]{ text-decoration:none !important; }
+.hdr__link.is-active, .hdr__link[aria-current=page]{ color:var(--brand-hi) !important; }
+.hdr__link.is-active::after, .hdr__link[aria-current=page]::after{
+  content:""; position:absolute; bottom:4px; left:14px; right:14px; height:2px;
+  background:linear-gradient(90deg,var(--brand),var(--brand-light)); border-radius:999px;
+}
+.hdr__link .caret{ opacity:.6; }
+
+/* tools: one consistent height and shape */
+.hdr__tools{ gap:10px !important; }
+.hdr__tools .iconbtn, .hdr__tools .lang{
+  height:44px; min-height:44px; border-radius:10px !important;
+  background:rgba(255,255,255,.04) !important; border:1px solid rgba(255,255,255,.14) !important; color:#E2E8F0 !important;
+  transition:background-color .2s, border-color .2s, color .2s;
+}
+.hdr__tools .iconbtn{ width:44px; padding:0; display:inline-flex; align-items:center; justify-content:center; }
+.hdr__tools .lang{ padding-inline:14px; display:inline-flex; align-items:center; gap:8px; font-weight:700; }
+.hdr__tools .iconbtn:hover, .hdr__tools .lang:hover{ background:rgba(255,255,255,.1) !important; border-color:rgba(255,255,255,.28) !important; color:#fff !important; }
+.hdr__tools .btn--sm{
+  height:44px; display:inline-flex; align-items:center; gap:8px; border-radius:10px !important;
+  background:linear-gradient(180deg,var(--brand-grad-a),var(--brand-grad-b)) !important; border:1px solid rgba(255,255,255,.12) !important;
+  box-shadow:0 6px 18px -8px color-mix(in srgb, var(--brand) 80%, transparent), inset 0 1px 0 rgba(255,255,255,.18);
+}
+.hdr__tools .btn--sm:hover{ filter:brightness(1.07); }
+.hdr__tools :focus-visible, .hdr__link:focus-visible{ outline:2px solid var(--brand-light); outline-offset:2px; }
+
+@media (max-width:1080px){
+  .hdr__tools .iconbtn, .hdr__tools .lang{ height:42px; min-height:42px; }
+  .hdr__tools .iconbtn{ width:42px; }
+  .hdr--compact .hdr__logo img{ height:38px !important; }
+}
+@media (max-width:600px){
+  .hdr__tools{ gap:6px !important; }
+  .hdr__tools .iconbtn, .hdr__tools .lang{ height:40px; min-height:40px; }
+  .hdr__tools .iconbtn{ width:40px; }
+  .hdr__tools .lang{ padding-inline:10px; }
+  .hdr--compact .hdr__logo img{ height:34px !important; }
+}
+.hdr{ background:rgba(7,11,20,.94) !important; }
+.hdr.hdr--compact{ background:rgba(7,11,20,.97) !important; }
+@media (min-width:1081px){ .hdr__tools .burger{ display:none !important; } }
+@media (max-width:760px){ .hdr__tools > .btn, .hdr__tools > .btn--sm{ display:none !important; } }
+@media (min-width:1081px) and (max-width:1520px){
+  html:not([lang="ar"]) .hdr__link{ font-size:13px !important; padding-inline:10px !important; letter-spacing:.02em; }
+  html:not([lang="ar"]) .hdr__tools .btn--sm{ padding-inline:16px !important; }
+  .hdr__in{ gap:12px !important; }
+}
+html:not([lang="ar"]) .hdr__link{ text-transform:none !important; letter-spacing:0 !important; font-size:14.5px !important; }
+.mega{ background:#0A101C !important; border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.08); box-shadow:0 30px 60px -20px rgba(0,0,0,.7) !important; }
+.mega__col a{ border-radius:8px; transition:color .2s, background-color .2s, padding .2s; }
+.mega__col a:hover{ color:#fff !important; background:rgba(255,255,255,.05); }
+.mega__promo{ background:linear-gradient(160deg,#121B2D,#0C1322) !important; border-color:color-mix(in srgb, var(--brand) 25%, transparent) !important; border-radius:14px; }
+/* Sticky section tabs follow the header: no gap when it shrinks or hides */
+/* يتبع الهيدر فورًا: لو تدرّج بينما قفز الهيدر، بانت فجوة بينهما طوال التدرّج. */
+.ux-jump{ top:var(--header-h) !important; background:rgba(255,255,255,.96) !important; -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
+body:has(.hdr.hdr--compact) .ux-jump{ top:var(--header-h-compact) !important; }
+@media (prefers-reduced-motion: no-preference){ body:has(.hdr.hdr--hidden) .ux-jump{ top:0 !important; box-shadow:0 6px 18px -10px rgba(6,11,20,.35) !important; } }
+/* The header is injected into #site-header; without this the wrapper (89px tall)
+   is the sticky container, so the header scrolled away with the page. */
+#site-header{ display:contents; }
+body{ overflow-x:clip !important; overflow-y:visible !important; }
+
+/* The hero copy was removed, so an empty spacer carries the section's height
+   and pushes .vhero__foot down to the bottom edge of the image. */
+.vhero__spacer{ flex:1 1 auto; min-height:0; }
+
+/* The play/pause control sits directly beside the product cards instead of
+   being pushed to the far edge of the bar. The card row scrolls horizontally
+   only when the nine cards do not fit; the button stays pinned beside it. */
+.vhero__foot{ justify-content:flex-start !important; gap:12px !important; flex-wrap:nowrap; }
+.vhero__tabs{
+  flex:0 1 auto; min-width:0; flex-wrap:nowrap;
+  overflow-x:auto; overscroll-behavior-x:contain;
+  scroll-snap-type:x proximity; scroll-padding-inline:4px;
+  -ms-overflow-style:none; scrollbar-width:none; padding-bottom:2px;
+}
+.vhero__tabs::-webkit-scrollbar{ display:none; }
+.vhero__tab{ flex:0 0 auto; min-width:128px !important; scroll-snap-align:start; }
+
+/* The play/pause control was replaced by a prev/next pair that steps through
+   the product cards and scrolls the strip so the new card is fully visible. */
+.vhero__nav{ flex:0 0 auto; display:flex; gap:8px; align-self:center; margin-inline-start:2px; }
+.vhero__navbtn{
+  width:42px; height:42px; flex:0 0 42px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.24); background:rgba(6,11,20,.65); color:#fff;
+  display:grid; place-items:center; cursor:pointer; -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+  transition:background .2s var(--ease), border-color .2s var(--ease), transform .2s var(--ease);
+}
+.vhero__navbtn:hover{ background:var(--brand-strong); border-color:var(--brand-strong); transform:scale(1.06); }
+.vhero__navbtn:focus-visible{ outline:2px solid var(--brand-light); outline-offset:2px; }
+.vhero__navbtn svg{ display:block; }
+/* the chevrons follow the reading direction */
+[dir="rtl"] .vhero__navbtn svg{ transform:scaleX(-1); }
+
+/* The dwell can be as short as 3s, so the crossfade is tightened to match. */
+.vhero__slide{ transition-duration:.9s !important; }
+
+@media (max-width:760px){
+  .vhero__tab{ min-width:116px !important; padding:8px 10px 10px !important; }
+  .vhero__tab-idx{ display:none !important; }
+  .vhero__tab-sub{ display:block !important; }
+  .vhero__navbtn{ flex:0 0 38px; width:38px; height:38px; }
+  .vhero__nav{ gap:6px; }
+}
+
+/* A taller hero: it now fills the screen instead of stopping at 88vh. The
+   photos are 16:9, so the extra height also means object-fit crops less of
+   them. svh keeps it steady on mobile when the browser chrome slides away. */
+.vhero{
+  min-height:clamp(740px, 100vh, 1120px) !important;
+  min-height:clamp(740px, 100svh, 1120px) !important;
+}
+@media (max-width:760px){
+  .vhero{
+    min-height:clamp(560px, 88vh, 760px) !important;
+    min-height:clamp(560px, 88svh, 760px) !important;
+  }
+}
+
+/* No hairline under the header — the hero's own top falloff separates them. */
+.hdr{ border-bottom:0 !important; }
+
+/* Cinematic top-and-bottom vignette. The old side wash is gone; what is left
+   is a deep letterbox falloff — many stops so the alpha eases out instead of
+   ramping linearly, which is what stops the banding across a flat sky. The
+   middle of the frame stays clear so the product is never dimmed. */
+.vhero__scrim,
+[dir="rtl"] .vhero__scrim{
+  background:
+    /* bottom — carries the card strip */
+    linear-gradient(0deg,
+      rgba(6,11,20,.94) 0%,
+      rgba(6,11,20,.86) 5%,
+      rgba(6,11,20,.74) 11%,
+      rgba(6,11,20,.60) 18%,
+      rgba(6,11,20,.45) 25%,
+      rgba(6,11,20,.31) 32%,
+      rgba(6,11,20,.19) 39%,
+      rgba(6,11,20,.10) 46%,
+      rgba(6,11,20,.04) 52%,
+      rgba(6,11,20,0)   58%),
+    /* top — carries the header */
+    linear-gradient(180deg,
+      rgba(6,11,20,.82) 0%,
+      rgba(6,11,20,.70) 4%,
+      rgba(6,11,20,.56) 9%,
+      rgba(6,11,20,.42) 15%,
+      rgba(6,11,20,.29) 21%,
+      rgba(6,11,20,.18) 27%,
+      rgba(6,11,20,.09) 33%,
+      rgba(6,11,20,.03) 39%,
+      rgba(6,11,20,0)   45%) !important;
+}
+@media (max-width:760px){
+  /* the hero is shorter here, so the two falloffs meet sooner */
+  .vhero__scrim,[dir="rtl"] .vhero__scrim{
+    background:linear-gradient(180deg,
+      rgba(6,11,20,.86) 0%,
+      rgba(6,11,20,.62) 8%,
+      rgba(6,11,20,.38) 17%,
+      rgba(6,11,20,.18) 26%,
+      rgba(6,11,20,.05) 35%,
+      rgba(6,11,20,0)   44%,
+      rgba(6,11,20,.05) 54%,
+      rgba(6,11,20,.18) 63%,
+      rgba(6,11,20,.38) 73%,
+      rgba(6,11,20,.62) 85%,
+      rgba(6,11,20,.90) 100%) !important;
+  }
+}
+
+/* ===== One card shape across the whole site =====
+   Card media was drawn at five different ratios (16/10, 1/1, 4/3, 3/2, 16/9),
+   so grids of cards never lined up and every photo was cropped differently.
+   All the product photography is 16:9, so every card figure is now 16:9 too:
+   the image fills its frame edge to edge with nothing cut off, and a card is
+   the same shape wherever it appears. The map keeps its own ratio — it is an
+   embed, not a photo. */
+.pgcard__fig,
+.pcard__fig-wrap,
+.tile__fig,
+.pggallery figure,
+.pdp__main:not(.pdp__main--plate),
+.ba,
+.sec--authority .about2__media{ aspect-ratio:16/9 !important; }
+.prow__media > picture > img,
+.prow__media > img{ aspect-ratio:16/9 !important; }
+
+/* the photo covers its frame completely — no letterboxing, no white gaps.
+   .pdp__main--plate is excluded: it holds a brand logo, which must stay
+   contained rather than be cropped to fill. */
+.pgcard__fig img, .pcard__fig-wrap img, .tile__fig img, .pggallery img,
+.pdp__main:not(.pdp__main--plate) img, .ba img,
+.about2__media img, .fscard__fig img{
+  width:100% !important; height:100% !important; object-fit:cover !important; display:block;
+}
+/* thumbnails follow the same shape as the main image */
+.pdp__thumbs button{ aspect-ratio:16/9 !important; }
+
+/* every card in a row is the full height of that row */
+.pgcards, .tiles, .fscards, .scopegrid, .projgrid, .pggallery{ align-items:stretch; }
+.pgcards > *, .tiles > *, .fscards > *, .scopegrid > *, .projgrid > *{
+  height:100%; display:flex; flex-direction:column;
+}
+
+@media (max-width:760px){
+  /* .ba was 3/2 then 4/3 at narrow widths — keep it on the one shape too */
+  .ba{ aspect-ratio:16/9 !important; }
+}
+
+/* Environmental Solutions: each block is headed by the brand's own logo rather
+   than its name set in small caps. White marks on a light section need no
+   inversion — these are the supplied full-colour PNGs. */
+.prow__brand{ margin:0 0 14px; }
+.prow__brand img{
+  display:block; height:30px; width:auto; max-width:200px;
+  object-fit:contain; object-position:left center;
+}
+[dir="rtl"] .prow__brand img{ object-position:right center; margin-inline-start:0; margin-inline-end:auto; }
+@media (max-width:760px){ .prow__brand img{ height:26px; } }
+
+/* The copy beside each brand photo was set at the size used for card blurbs,
+   which reads as fine print next to a full-width image. Scoped to this page so
+   the rest of the site keeps its own scale. */
+/* A section that absorbed another one keeps the old section's anchor alive, so
+   links and redirects that still point at it land in the right place. */
+.anchor-alias{ display:block; block-size:0; scroll-margin-block-start:96px; }
+
+:is([data-page="environment"],[data-page="power"],[data-page="generators"],[data-page="overhaul"],[data-page="fabrication"]) .prow__brand img{ height:38px; max-width:250px; }
+:is([data-page="environment"],[data-page="power"],[data-page="generators"],[data-page="overhaul"],[data-page="fabrication"]) .prow__copy h2,
+:is([data-page="environment"],[data-page="power"],[data-page="generators"],[data-page="overhaul"],[data-page="fabrication"]) .prow__copy h3{ font-size:clamp(30px,3.2vw,42px); line-height:1.15; }
+:is([data-page="environment"],[data-page="power"],[data-page="generators"],[data-page="overhaul"],[data-page="fabrication"]) .prow__copy p:not(.prow__brand):not(.prow__kicker){
+  font-size:17.5px; line-height:1.85; margin-top:18px; max-width:52ch;
+}
+:is([data-page="environment"],[data-page="power"],[data-page="generators"],[data-page="overhaul"],[data-page="fabrication"]) .prow__copy .tlink{ font-size:14px; margin-top:26px; }
+:is([data-page="environment"],[data-page="power"],[data-page="generators"],[data-page="overhaul"],[data-page="fabrication"]) .prow__meta-k{ font-size:11.5px; }
+:is([data-page="environment"],[data-page="power"],[data-page="generators"],[data-page="overhaul"],[data-page="fabrication"]) .prow__meta-v{ font-size:14.5px; }
+@media (max-width:760px){
+  :is([data-page="environment"],[data-page="power"],[data-page="generators"],[data-page="overhaul"],[data-page="fabrication"]) .prow__brand img{ height:30px; }
+  :is([data-page="environment"],[data-page="power"],[data-page="generators"],[data-page="overhaul"],[data-page="fabrication"]) .prow__copy p:not(.prow__brand):not(.prow__kicker){ font-size:16px; }
+}
+
+/* ===== "You may also need" — cards instead of text rows =====
+   model.html loads only base/model/ux/motion, none of which carry the card
+   styles used elsewhere, so this card is self-contained rather than borrowing
+   .pgcard or .card. Shape matches the rest of the site: white, hairline
+   border, 16:9 photo, lift on hover. */
+.relcards{
+  display:grid; gap:22px;
+  grid-template-columns:repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  align-items:stretch;
+}
+.relcard{
+  display:flex; flex-direction:column; position:relative;
+  background:#fff; border:1px solid var(--line, #E2E8F0); border-radius:2px;
+  overflow:hidden; color:inherit; text-decoration:none; height:100%;
+  box-shadow:0 1px 3px rgba(15,23,42,.04);
+  transition:transform .3s var(--ease, ease), box-shadow .3s var(--ease, ease), border-color .3s var(--ease, ease);
+}
+.relcard:hover{ transform:translateY(-5px); border-color:#CBD5E1; box-shadow:0 16px 34px rgba(15,23,42,.10); }
+.relcard:focus-visible{ outline:2px solid var(--brand-light); outline-offset:2px; }
+
+.relcard .card__fig{
+  display:block; position:relative; aspect-ratio:16/9;
+  overflow:hidden; background:#F1F5F9;
+}
+.relcard .card__fig img{
+  width:100%; height:100%; object-fit:cover; display:block;
+  transition:transform .7s var(--ease, ease);
+}
+.relcard:hover .card__fig img{ transform:scale(1.05); }
+/* products with no photo fall back to the brand plate — keep that contained */
+.relcard .card__fig--plate{ display:grid; place-items:center; gap:6px; padding:18px; }
+.relcard .card__fig--plate img{
+  width:auto !important; height:auto !important;
+  max-height:38px; max-width:70%; object-fit:contain !important;
+}
+
+.relcard__body{ display:flex; flex-direction:column; gap:6px; padding:18px 20px; flex:1; }
+.relcard__brand{
+  font-family:var(--display); font-weight:700; font-size:10.5px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--brand-strong, #C2410C);
+}
+.relcard__name{
+  font-family:var(--display); font-weight:800; font-size:17px;
+  line-height:1.25; letter-spacing:-.02em; color:var(--ink, #0F172A);
+}
+.relcard__type{ font-size:13.5px; line-height:1.6; color:var(--body, #475569); flex:1; }
+.relcard__foot{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin-top:12px; padding-top:12px; border-top:1px solid var(--line, #E2E8F0);
+}
+.relcard__cta{
+  font-family:var(--display); font-weight:800; font-size:11.5px;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--brand-strong, #C2410C);
+}
+.relcard__go{
+  width:32px; height:32px; flex:0 0 32px; border-radius:50%;
+  display:grid; place-items:center; border:1px solid var(--line, #E2E8F0);
+  color:var(--brand-strong, #C2410C); background:#F8FAFC;
+  transition:background .24s var(--ease, ease), border-color .24s var(--ease, ease);
+}
+.relcard:hover .relcard__go{ background:var(--brand-strong, #C2410C); border-color:var(--brand-strong, #C2410C); color:#fff; }
+[dir="rtl"] .relcard__go svg{ transform:scaleX(-1); }
+
+
+/* ===== Product media: photography and video on the datasheet =====
+   An editorial layout rather than a wall of equal tiles — the first frame runs
+   large and the rest sit beside it, which is how a machinery catalogue leads
+   with its best shot. Borders, radius and hover lift are the page's own, so
+   the section belongs to the datasheet it sits in. */
+.mshots{
+  display:grid; gap:10px;
+  grid-template-columns:repeat(4, minmax(0,1fr));
+  grid-auto-rows:1fr;
+}
+/* the lead frame takes a 2×2 block; everything else falls in beside it */
+.mshots .mshot--lead{ grid-column:span 2; grid-row:span 2; }
+
+.mshot{
+  position:relative; display:block; padding:0; cursor:zoom-in; inline-size:100%;
+  aspect-ratio:16/10; overflow:hidden; background:#0E1B2E;
+  border:1px solid var(--line,#E2E8F0); border-radius:2px;
+  transition:border-color .26s var(--ease,ease), box-shadow .26s var(--ease,ease), transform .26s var(--ease,ease);
+}
+.mshot--lead{ aspect-ratio:auto; }
+.mshot img{
+  position:absolute; inset:0; inline-size:100%; block-size:100%;
+  object-fit:cover; display:block; transition:transform .7s var(--ease,ease);
+}
+.mshot__veil{
+  position:absolute; inset:0; opacity:0;
+  background:linear-gradient(to top, rgba(8,16,28,.55), rgba(8,16,28,0) 55%);
+  transition:opacity .26s var(--ease,ease);
+}
+.mshot__zoom{
+  position:absolute; inset-block-end:10px; inset-inline-end:10px;
+  inline-size:34px; block-size:34px; display:grid; place-items:center; border-radius:50%;
+  background:rgba(8,16,28,.72); color:#fff; border:1px solid rgba(255,255,255,.26);
+  opacity:0; transform:scale(.86) translateY(4px);
+  transition:opacity .26s var(--ease,ease), transform .26s var(--ease,ease);
+}
+.mshot__zoom svg{ inline-size:17px; block-size:17px; }
+.mshot:hover{ border-color:var(--brand-strong,#C2410C); transform:translateY(-3px); box-shadow:0 18px 38px rgba(15,23,42,.13); }
+.mshot:hover img{ transform:scale(1.06); }
+.mshot:hover .mshot__veil{ opacity:1; }
+.mshot:hover .mshot__zoom, .mshot:focus-visible .mshot__zoom{ opacity:1; transform:scale(1) translateY(0); }
+.mshot:focus-visible{ outline:2px solid var(--brand-light); outline-offset:2px; }
+
+/* When there are more photos than tiles, the last tile carries the count and
+   still opens the viewer at that point. */
+.mshot__more{
+  position:absolute; inset:0; display:grid; place-items:center;
+  background:rgba(8,16,28,.72); color:#fff;
+  font-family:var(--display,inherit); font-weight:800; font-size:22px; letter-spacing:-.01em;
+  transition:background .26s var(--ease,ease);
+}
+.mshot:hover .mshot__more{ background:rgba(8,16,28,.62); }
+.mshot__more small{ display:block; font-size:11px; font-weight:700; letter-spacing:.08em; opacity:.85; margin-top:2px; }
+
+
+/* ---- videos ---- */
+/* ===== Video slider =====
+   One clip on screen, stepped with an arrow either side. A dark band under the
+   photo gallery so the clips read as a screening rather than more tiles. */
+.vfilm{
+  margin-top:clamp(30px,4.5vh,52px);
+  padding:clamp(22px,3vw,36px);
+  border-radius:3px;
+  background:linear-gradient(170deg,#101C2E,#0A1220 60%);
+  border:1px solid rgba(255,255,255,.07);
+}
+.vfilm__head{
+  display:flex; align-items:flex-end; justify-content:space-between; gap:16px;
+  margin-bottom:clamp(14px,2vh,20px);
+}
+.vfilm__eyebrow{
+  display:flex; align-items:center; gap:9px; margin:0 0 6px;
+  font-weight:800; font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--brand-light);
+}
+.vfilm__eyebrow::before{ content:""; inline-size:20px; block-size:2px; background:var(--brand,#E2571C); flex:0 0 20px; }
+.vfilm__title{
+  margin:0; color:#fff; font-family:var(--display,inherit); font-weight:800;
+  font-size:clamp(20px,2.3vw,28px); letter-spacing:-.02em; line-height:1.2;
+}
+.vfilm__count{
+  font-size:13px; font-weight:700; color:#8FA0B6; white-space:nowrap;
+  font-variant-numeric:tabular-nums; direction:ltr; padding-bottom:5px;
+}
+.vfilm__at{ color:#fff; font-size:16px; }
+
+/* the arrows sit half over the frame edges, as on a lightbox */
+.vslider{ position:relative; }
+/* direction:ltr is load-bearing: the track is N*100% wide inside this
+   overflow:hidden box, and an RTL parent would anchor that overflow to the
+   right edge -- pushing slide 1 off-screen and leaving an empty frame. */
+.vslider__view{ overflow:hidden; border-radius:2px; direction:ltr; }
+/* laid out left-to-right whatever the page direction, so the step is always -100% */
+.vslider__track{
+  display:flex; direction:ltr;
+  inline-size:calc(var(--n) * 100%);
+  transform:translateX(calc(var(--at,0) * -100% / var(--n)));
+  transition:transform .5s cubic-bezier(.4,0,.2,1);
+}
+.vslide{
+  margin:0; flex:0 0 calc(100% / var(--n));
+  position:relative; aspect-ratio:16/9; background:#060C15;
+}
+.vslide__hit,
+.vslide__player,
+.vslide iframe{
+  position:absolute; inset:0; inline-size:100%; block-size:100%;
+  display:block; padding:0; border:0; background:#060C15;
+}
+.vslide__hit{ cursor:pointer; text-decoration:none; }
+.vslide__hit img{
+  position:absolute; inset:0; inline-size:100%; block-size:100%; object-fit:cover; display:block;
+  transition:transform .8s var(--ease,ease);
+}
+.vslide__hit:hover img{ transform:scale(1.04); }
+.vslide__hit:focus-visible{ outline:2px solid var(--brand-light); outline-offset:-3px; }
+.vslide__shade{
+  position:absolute; inset:0;
+  background:radial-gradient(60% 60% at 50% 50%, rgba(6,12,21,0) 0%, rgba(6,12,21,.42) 100%);
+}
+.vslide__play{
+  position:absolute; inset-block-start:50%; inset-inline-start:50%; transform:translate(-50%,-50%);
+  inline-size:84px; block-size:84px; display:grid; place-items:center; border-radius:50%;
+  background:rgba(226,87,28,.95); color:#fff; box-shadow:0 18px 40px -14px rgba(0,0,0,.9);
+  transition:transform .28s var(--ease,ease), background .28s var(--ease,ease);
+}
+/* a play glyph points right in every language; only the optical offset flips */
+.vslide__play svg{ inline-size:36px; block-size:36px; margin-inline-start:4px; }
+[dir="rtl"] .vslide__play svg{ margin-inline-start:0; margin-inline-end:4px; }
+.vslide__hit:hover .vslide__play{ transform:translate(-50%,-50%) scale(1.07); background:var(--brand,#E2571C); }
+.vslide__brand{
+  position:absolute; inset-block-start:12px; inset-inline-start:12px;
+  padding:3px 8px; border-radius:2px; background:rgba(6,12,21,.8); color:#fff;
+  font-size:9px; font-weight:800; letter-spacing:.11em; text-transform:uppercase;
+  border:1px solid rgba(255,255,255,.18);
+}
+/* The centre play/pause control: same disc as the YouTube facade, so both
+   kinds of slide read as one component. It sits above the player but clear of
+   the native control bar at the bottom. */
+.vslide__toggle{
+  position:absolute; inset-block-start:50%; inset-inline-start:50%; transform:translate(-50%,-50%);
+  z-index:2; inline-size:84px; block-size:84px; padding:0; border:0; cursor:pointer;
+  display:grid; place-items:center; border-radius:50%;
+  background:rgba(226,87,28,.95); color:#fff; box-shadow:0 18px 40px -14px rgba(0,0,0,.9);
+  transition:transform .28s var(--ease,ease), background .28s var(--ease,ease), opacity .28s var(--ease,ease);
+}
+.vslide__toggle:hover{ transform:translate(-50%,-50%) scale(1.07); background:var(--brand,#E2571C); }
+.vslide__toggle:focus-visible{ outline:2px solid #fff; outline-offset:3px; }
+.vslide__ico{ grid-area:1/1; inline-size:36px; block-size:36px; }
+/* a play glyph points right in every language; only the optical offset flips */
+.vslide__ico--play{ margin-inline-start:4px; }
+[dir="rtl"] .vslide__ico--play{ margin-inline-start:0; margin-inline-end:4px; }
+.vslide__ico--pause{ display:none; }
+.vslide.is-playing .vslide__ico--play{ display:none; }
+.vslide.is-playing .vslide__ico--pause{ display:block; }
+/* out of the way while it plays, back on hover, focus, or a tap on the frame */
+.vslide.is-playing .vslide__toggle{ opacity:0; }
+.vslide.is-playing:hover .vslide__toggle,
+.vslide.is-playing .vslide__toggle:focus-visible{ opacity:1; }
+@media (prefers-reduced-motion:reduce){
+  .vslide__toggle{ transition:none; }
+  .vslide.is-playing .vslide__toggle{ opacity:.35; }
+}
+/* shown in place of a YouTube frame that the file:// origin would block */
+.vslide__note{
+  position:absolute; inset:0; display:grid; place-content:center; justify-items:center;
+  gap:14px; padding:28px; text-align:center; background:#0A1220; color:#C6D3E4;
+}
+.vslide__note svg{ inline-size:34px; block-size:34px; color:var(--brand,#E2571C); }
+.vslide__note p{ margin:0; max-inline-size:46ch; font-size:14.5px; line-height:1.75; }
+.vslide__player{ object-fit:cover; outline:none; }
+.vslide__player:focus-visible{ outline:2px solid var(--brand-light); outline-offset:-3px; }
+/* a slide that is off screen must not be reachable by keyboard or screen reader */
+.vslide[aria-hidden="true"]{ visibility:hidden; }
+
+.vslider__nav{
+  position:absolute; inset-block-start:50%; transform:translateY(-50%); z-index:3;
+  inline-size:52px; block-size:52px; display:grid; place-items:center; cursor:pointer;
+  border-radius:50%; border:1px solid rgba(255,255,255,.26);
+  background:rgba(6,12,21,.74); color:#fff; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  transition:background .22s var(--ease,ease), border-color .22s var(--ease,ease), transform .22s var(--ease,ease);
+}
+.vslider__nav:hover{ background:var(--brand,#E2571C); border-color:var(--brand,#E2571C); transform:translateY(-50%) scale(1.06); }
+.vslider__nav:focus-visible{ outline:2px solid var(--brand-light); outline-offset:2px; }
+.vslider__nav svg{ inline-size:24px; block-size:24px; }
+.vslider__nav--prev{ inset-inline-start:-14px; }
+.vslider__nav--next{ inset-inline-end:-14px; }
+/* the chevrons follow the reading direction */
+[dir="rtl"] .vslider__nav svg{ transform:scaleX(-1); }
+
+.vslider__bar{
+  display:flex; align-items:center; justify-content:space-between; gap:18px;
+  margin-top:16px;
+}
+.vslider__caption{ margin:0; position:relative; min-inline-size:0; flex:1; }
+.vslider__cap{
+  display:none; align-items:center; gap:10px;
+  color:#fff; font-weight:700; font-size:15.5px; line-height:1.5;
+}
+.vslider__cap.is-on{ display:flex; }
+.vslider__len{
+  flex:0 0 auto; font-style:normal; font-size:11.5px; font-weight:700;
+  font-variant-numeric:tabular-nums; direction:ltr;
+  padding:3px 8px; border-radius:2px; color:#C7D2E0;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14);
+}
+.vslider__dots{ display:flex; gap:7px; flex:0 0 auto; }
+.vslider__dot{
+  inline-size:9px; block-size:9px; padding:0; border-radius:50%; cursor:pointer;
+  border:1px solid rgba(255,255,255,.34); background:transparent;
+  transition:background .22s var(--ease,ease), border-color .22s var(--ease,ease), transform .22s var(--ease,ease);
+}
+.vslider__dot:hover{ background:rgba(255,255,255,.4); }
+.vslider__dot.is-on{ background:var(--brand,#E2571C); border-color:var(--brand,#E2571C); transform:scale(1.25); }
+.vslider__dot:focus-visible{ outline:2px solid var(--brand-light); outline-offset:2px; }
+
+@media (max-width:760px){
+  .vfilm{ padding:16px; }
+  .vslide__play,
+  .vslide__toggle{ inline-size:62px; block-size:62px; }
+  .vslide__play svg,
+  .vslide__ico{ inline-size:27px; block-size:27px; }
+  .vslider__nav{ inline-size:42px; block-size:42px; }
+  .vslider__nav svg{ inline-size:20px; block-size:20px; }
+  /* no room to hang outside the frame at this width */
+  .vslider__nav--prev{ inset-inline-start:8px; }
+  .vslider__nav--next{ inset-inline-end:8px; }
+  .vslider__bar{ flex-direction:column; align-items:flex-start; gap:12px; }
+  .vslider__cap{ font-size:14px; }
+}
+
+/* PDF rows get a download arrow without changing their shape */
+.dl a[download]{ position:relative; }
+.dl a[download]::after{
+  content:""; inline-size:13px; block-size:13px; flex:0 0 13px; margin-inline-start:auto;
+  background:currentColor; opacity:.5;
+  --dl-ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v11'/%3E%3Cpath d='m7.5 10.5 4.5 4 4.5-4'/%3E%3Cpath d='M4 18v2h16v-2'/%3E%3C/svg%3E");
+  -webkit-mask:var(--dl-ico) center/contain no-repeat; mask:var(--dl-ico) center/contain no-repeat;
+}
+.dl a[download]:hover::after{ opacity:1; }
+
+/* ---- full-size photo viewer ---- */
+.plb{ position:fixed; inset:0; z-index:200; display:grid; place-items:center; padding:clamp(14px,3vw,40px); }
+.plb[hidden]{ display:none; }
+.plb__scrim{ position:absolute; inset:0; background:rgba(6,11,20,.94); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+.plb__box{ position:relative; z-index:1; inline-size:min(1180px,100%); display:flex; flex-direction:column; gap:12px; }
+.plb__img{ inline-size:100%; max-block-size:78vh; object-fit:contain; display:block; border-radius:2px; background:#08101C; }
+.plb__bar{ display:flex; align-items:center; justify-content:space-between; gap:14px; }
+.plb__num{ color:#8FA0B6; font-size:12.5px; font-variant-numeric:tabular-nums; direction:ltr; }
+.plb__nav{ display:flex; gap:8px; }
+.plb__btn{
+  inline-size:44px; block-size:44px; display:grid; place-items:center; cursor:pointer; border-radius:50%;
+  border:1px solid rgba(255,255,255,.24); background:rgba(255,255,255,.08); color:#fff;
+  transition:background .2s var(--ease,ease), border-color .2s var(--ease,ease);
+}
+.plb__btn:hover{ background:var(--brand-strong,#C2410C); border-color:var(--brand-strong,#C2410C); }
+.plb__btn:focus-visible{ outline:2px solid var(--brand-light); outline-offset:2px; }
+.plb__btn svg{ inline-size:20px; block-size:20px; }
+.plb__close{ position:absolute; inset-block-start:-54px; inset-inline-end:0; }
+
+@media (max-width:900px){
+  .mshots{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .mshots .mshot--lead{ grid-column:span 2; grid-row:span 1; aspect-ratio:16/9; }
+}
+@media (max-width:560px){
+  .mshots{ gap:8px; }
+  .plb__close{ inset-block-start:-48px; }
+}
+
+/* Few photos: no oversized lead, just an even row of equal tiles. */
+.mshots--even{ grid-template-columns:repeat(auto-fill, minmax(min(230px, 100%), 1fr)); }
+
+/* ===== "You may also need" — scaled up =====
+   The related models are the last thing on the page and the most likely next
+   click, so the cards are given room: a wider column, a larger frame and type
+   that holds its own against the gallery above. */
+.relcards{
+  grid-template-columns:repeat(auto-fit, minmax(min(360px, 100%), 1fr)) !important;
+  gap:26px !important;
+}
+.relcard .card__fig{ aspect-ratio:16/10 !important; }
+.relcard__body{ padding:24px 26px 22px !important; gap:8px !important; }
+.relcard__brand{ font-size:11px !important; letter-spacing:.16em !important; }
+.relcard__name{ font-size:27px !important; line-height:1.15 !important; letter-spacing:-.025em !important; }
+.relcard__type{ font-size:15px !important; line-height:1.75 !important; }
+.relcard__foot{ margin-top:16px !important; padding-top:16px !important; }
+.relcard__cta{ font-size:12.5px !important; }
+.relcard__go{ inline-size:38px !important; block-size:38px !important; flex:0 0 38px !important; }
+.relcard__go svg{ inline-size:18px; block-size:18px; }
+.relcard:hover{ transform:translateY(-6px) !important; box-shadow:0 22px 46px rgba(15,23,42,.13) !important; }
+
+/* Product cards on a content page with only one or two models: keep the width
+   of a full row of three instead of stretching across the page. auto-fill keeps
+   the empty columns, so a lone card sits where the first of three would. Three
+   or more cards, and the related models on product pages, are untouched. */
+@media (min-width:821px){
+  .relcards--section:has(> .relcard:only-child),
+  .relcards--section:has(> .relcard:nth-child(2):last-child){
+    grid-template-columns:repeat(auto-fill, minmax(min(360px, 100%), 1fr)) !important;
+  }
+}
+
+/* the section heading grows with the cards it introduces */
+#relatedSec .shead__title{ font-size:clamp(24px,2.9vw,36px) !important; }
+
+@media (max-width:820px){
+  .relcards{ grid-template-columns:1fr !important; gap:18px !important; }
+  .relcard__name{ font-size:23px !important; }
+  .relcard__body{ padding:20px 22px !important; }
+}
+
+
+/* ===== Before / after comparison =====
+   The component was styled in services.css, which no page loads any more.
+   ux.css is on every page, so the slider works wherever a section asks for it. */
+.ba{ grid-column:1/-1; }
+.ba{ position:relative; overflow:hidden; border-radius:var(--radius); background:var(--navy); aspect-ratio:16/10; min-height:300px; user-select:none; touch-action:pan-y; }
+.ba img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 58%; }
+.ba__after{ position:absolute; inset:0; clip-path:inset(0 0 0 50%); }
+
+.ba__handle{ position:absolute; top:0; bottom:0; left:50%; width:3px; margin-left:-1.5px; background:#fff; z-index:4; cursor:ew-resize; box-shadow:0 0 0 1px rgba(9,17,29,.28), 0 0 22px rgba(9,17,29,.4); }
+.ba__handle::after{ content:""; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:54px; height:54px; border-radius:50%; background:var(--brand); border:3px solid #fff; box-shadow:0 6px 22px rgba(0,0,0,.45); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6 4 12l5 6M15 6l5 6-5 6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:center; transition:transform .2s var(--ease); }
+.ba:hover .ba__handle::after{ transform:translate(-50%,-50%) scale(1.06); }
+.ba.is-dragging .ba__handle::after{ transform:translate(-50%,-50%) scale(.94); }
+
+.ba__label{ position:absolute; bottom:16px; z-index:5; background:rgba(6,11,20,.85); color:#fff; font-family:var(--display); font-weight:800; font-size:11px; letter-spacing:.1em; padding:8px 14px; text-transform:uppercase; backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.15); border-radius:2px; }
+.ba__label small{ display:block; font-weight:500; font-size:10.5px; letter-spacing:.02em; color:var(--muted); text-transform:none; }
+.ba__label--l{ left:16px; } .ba__label--r{ right:16px; background:var(--brand-strong); color:#fff; }
+
+.ba__hint{ position:absolute; top:16px; left:50%; transform:translateX(-50%); z-index:5; display:inline-flex; align-items:center; gap:8px; white-space:nowrap; background:rgba(9,17,29,.72); color:#fff; border:1px solid rgba(255,255,255,.22); font-family:var(--display); font-weight:700; font-size:11px; letter-spacing:.1em; text-transform:uppercase; padding:8px 14px; border-radius:22px; backdrop-filter:blur(6px); transition:opacity .3s var(--ease), transform .3s var(--ease); }
+.ba.is-touched .ba__hint{ opacity:0; transform:translateX(-50%) translateY(-6px); pointer-events:none; }
+.ba__range{ position:absolute; inset:0; z-index:6; opacity:0; cursor:ew-resize; width:100%; height:100%; margin:0; }
+/* the page-wide 16/9 rule above already reshapes .ba; this keeps it tall enough
+   on a phone for the two photographs to stay readable */
+@media (max-width:640px){ .ba{ min-height:240px; } }
+
+
+/* the comparison is the proof on this page, so it gets room to breathe */
+[data-page="overhaul"] .ba{ aspect-ratio:16/8 !important; }
+@media (max-width:640px){ [data-page="overhaul"] .ba{ aspect-ratio:4/3 !important; } }
+/* aspect-ratio + min-height made the slider wider than the phone (320px in a 288px column) */
+.ba{ max-width:100%; }
+
+/* The line that tells a visitor which of two services is theirs. Set apart from
+   the description above it so it reads as an answer, not more prose. */
+.prow__when{
+  margin-block-start:20px; padding-block-start:18px;
+  border-block-start:1px solid var(--line,#E4E8EE);
+  max-inline-size:52ch; font-size:15.5px; line-height:1.8; color:var(--body);
+}
+.prow__when b{
+  display:block; margin-block-end:6px; font-family:var(--display); font-weight:800;
+  font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink);
+}
+@media (max-width:760px){ .prow__when{ font-size:14.5px; } }
+
+
+
+/* a card without its own page is information, not a button */
+.pgcard.pgcard--static, .pgcard.pgcard--static:hover{ transform:none !important; box-shadow:0 3px 10px rgb(6 11 20 / 3%) !important; cursor:default; }
+.pgcard.pgcard--static:hover .pgcard__fig img{ transform:none !important; }
+
+/* ---------- Very small phones (≤380px, e.g. iPhone SE at 320/375)
+   Logo + search + language + menu did not fit at 320px and pushed the page
+   sideways. Everything shrinks a step so the bar always fits in one line. */
+@media (max-width:380px){
+  .hdr__in{ gap:6px !important; }
+  .hdr__logo img, .hdr--compact .hdr__logo img{ height:32px !important; }
+  .hdr__tools{ gap:4px !important; }
+  .hdr__tools .iconbtn, .hdr__tools .burger{ width:38px !important; min-width:38px !important; height:38px !important; min-height:38px !important; }
+  .hdr__tools .lang{ height:38px !important; min-height:38px !important; min-width:38px !important; padding-inline:7px !important; }
+  .wrap{ padding-inline:16px; }
+}
+
+/* ===== Whole pictures across the site (hero sections left as they are) =====
+   Content photos used to be cropped to fill fixed frames (16:9, 16:10, 4:3),
+   and zoomed further on hover and on scroll. Now a photo sets its own height
+   from its own proportions, so nothing is cut off. Where a layout needs a
+   fixed tile (galleries, thumbnails, video posters, the before/after slider)
+   the whole photo sits inside the tile on a dark ground instead. The hero
+   sections (.vhero, .phero) and the faded .ctaband backdrop are untouched.
+   "html body" outranks the equally !important hover zooms in motion.css. */
+html body :is(.prow__media, .story__media, .about2__media, .pdp__main:not(.pdp__main--plate)){
+  aspect-ratio:auto !important; height:auto !important; min-height:0 !important;
+}
+html body :is(.prow__media, .story__media, .about2__media, .pdp__main:not(.pdp__main--plate)) picture{ display:block; }
+html body :is(.prow__media, .story__media, .about2__media, .pdp__main:not(.pdp__main--plate)) img{
+  position:static !important; inset:auto !important;
+  width:100% !important; height:auto !important; max-height:none !important;
+  aspect-ratio:auto !important; object-fit:contain !important;
+  transform:none !important; scale:1 !important; animation:none !important;
+}
+/* cards that sit side by side keep one frame so their titles line up: a 16:9
+   frame (the shape of most photos here) with the whole photo inside it on a
+   dark ground — a 16:10 or 3:2 photo shows a thin band instead of being cut */
+html body :is(.pgcard__fig, .fscard__fig, .pcard__fig-wrap, .tile__fig, .pggallery figure,
+  .relcard .card__fig:not(.card__fig--plate)){
+  aspect-ratio:16/9 !important; height:auto !important; background:#0E1B2E !important; overflow:hidden;
+}
+html body :is(.pgcard__fig, .fscard__fig, .pcard__fig-wrap, .tile__fig, .pggallery figure,
+  .relcard .card__fig:not(.card__fig--plate)) picture{ display:block; width:100%; height:100%; }
+html body :is(.pgcard__fig, .fscard__fig, .pcard__fig-wrap, .tile__fig, .pggallery figure,
+  .relcard .card__fig:not(.card__fig--plate)) img{
+  width:100% !important; height:100% !important; object-fit:contain !important; object-position:center !important;
+  transform:none !important; scale:1 !important;
+}/* the story photo no longer opens from a clipped frame or zooms while scrolling */
+html body .story__media{ animation:none !important; clip-path:none !important; }
+
+/* fixed tiles: the whole photo, centred on dark */
+html body :is(.mshot, .ux-thumbnails button, .pdp__thumbs button, .vslide__hit){ background:#0E1B2E; }
+html body :is(.mshot, .ux-thumbnails button, .pdp__thumbs button, .vslide__hit) img{
+  object-fit:contain !important; transform:none !important; scale:1 !important;
+}
+html body .ba img{ object-fit:contain !important; object-position:center !important; }
+/* the before/after pair is shot 4:3 — the slider takes that shape so both fill it */
+html body .ba, html body [data-page="overhaul"] .ba{ aspect-ratio:4/3 !important; min-height:0 !important; }
+
+/* hover and scroll zooms cropped the edges of an otherwise whole photo */
+html body :is(.pgcard, .fscard, .projgrid > *, .relcard, .tile, .mshot, .vslide__hit):hover img{
+  transform:none !important; scale:1 !important;
+}
+/* ===== Line breaks typed in the dashboard =====
+   A description written with Enter between lines (a list of overhaul types, two
+   paragraphs) showed as one run-on line. Text from the original site has no line
+   breaks at all, so this only affects text written in the dashboard. */
+main :is(p, li, dd, blockquote, figcaption){ white-space:pre-line; }

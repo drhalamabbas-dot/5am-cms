@@ -1,0 +1,41 @@
+/* ==========================================================================
+   5A&M — Quote Request & Contact Form Styles
+   Two-column form layout, Input fields, Drag-and-drop file upload, Feedback msgs
+   ========================================================================== */
+
+/* ---------- 1. Form Layout ---------- */
+.qlayout{ display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:48px; align-items:start; }
+.form{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.field{ display:flex; flex-direction:column; gap:6px; }
+.field--full{ grid-column:1 / -1; }
+.field label{ font-size:12px; font-weight:600; color:var(--ink); letter-spacing:.01em; }
+.field label .req{ color:var(--brand-strong); }
+.field input,.field select,.field textarea{
+  font-family:var(--text); font-size:14px; color:var(--ink); background:#fff;
+  border:1px solid var(--line); border-radius:var(--radius); padding:11px 13px; width:100%;
+  transition:border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none; border-color:var(--brand); box-shadow:0 0 0 3px color-mix(in srgb, var(--brand) 13%, transparent);
+}
+.field textarea{ resize:vertical; min-height:118px; }
+.field .hint{ font-size:11.5px; color:var(--muted); }
+.field.is-bad input,.field.is-bad select,.field.is-bad textarea{ border-color:#D1453B; }
+.field .err{ font-size:11.5px; color:#D1453B; display:none; }
+.field.is-bad .err{ display:block; }
+
+.formmsg{ grid-column:1/-1; padding:14px 16px; border-radius:var(--radius); font-size:13.5px; display:none; }
+.formmsg.is-ok{ display:block; background:#ECF7F0; border-left:3px solid #2E8B57; color:#1F6340; }
+.formmsg.is-err{ display:block; background:#FDECEA; border-left:3px solid #D1453B; color:#96261D; }
+
+.drop{
+  border:1px dashed #C6CFD9; border-radius:var(--radius); padding:20px; text-align:center;
+  background:var(--paper); cursor:pointer; transition:border-color .2s var(--ease), background .2s var(--ease);
+}
+.drop:hover,.drop.is-over{ border-color:var(--brand); background:var(--brand-tint); }
+.drop b{ font-family:var(--display); font-size:13px; color:var(--ink); display:block; }
+.drop span{ font-size:11.5px; color:var(--muted); }
+
+/* ---------- 2. Responsive Overrides ---------- */
+@media (max-width:1080px){ .qlayout{ grid-template-columns:minmax(0,1fr); } }
+@media (max-width:760px){ .form{ grid-template-columns:1fr; } }

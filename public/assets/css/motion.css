@@ -1,0 +1,223 @@
+/* ==========================================================================
+   5A&M — motion.css   (loads after ux.css)
+   Transitions, hero motion and the refined header. Every animation sits
+   inside prefers-reduced-motion: no-preference.
+   ========================================================================== */
+
+:root{ --mo-ease:cubic-bezier(.22,.61,.36,1); --mo-ease-out:cubic-bezier(.16,1,.3,1); }
+
+/* ------------------------------------------------------------------ 1. Header */
+.hdr{ transition:background-color .35s var(--mo-ease), box-shadow .35s var(--mo-ease), border-color .35s var(--mo-ease) !important; }
+/* الارتفاع لا يُحرَّك: تحريكه يعيد تخطيط الصفحة كلها في كل إطار من الحركة،
+   فيظهر ارتجافًا. التغيّر يقع مرة واحدة، والظلّ واللون وحدهما يتدرّجان. */
+.hdr__in{ transition:height .28s var(--mo-ease-out) !important; }
+.hdr__logo img{ transition:height .28s var(--mo-ease-out), transform .35s var(--mo-ease) !important; }
+.hdr__logo:hover img{ transform:scale(1.03); }
+
+/* nav: animated underline instead of a filled pill */
+.hdr__link{ background:transparent !important; }
+.hdr__link::after{
+  content:""; position:absolute; bottom:6px; left:14px; right:14px; height:2px; border-radius:999px;
+  background:linear-gradient(90deg,var(--brand),var(--brand-light));
+  transform:scaleX(0); transform-origin:center; opacity:0;
+  transition:transform .35s var(--mo-ease-out), opacity .2s;
+}
+.hdr__link:hover::after, .hdr__link[aria-expanded="true"]::after,
+.hdr__link.is-active::after, .hdr__link[aria-current=page]::after{ transform:scaleX(1); opacity:1; }
+.hdr__link:hover, .hdr__link[aria-expanded="true"]{ color:#fff !important; }
+.hdr__link.is-active, .hdr__link[aria-current=page]{ color:var(--brand-hi) !important; }
+.hdr__link .caret{ transition:transform .3s var(--mo-ease), opacity .2s !important; }
+.hdr__link:hover .caret{ opacity:1; }
+
+/* a hairline between the menu and the tools */
+@media (min-width:1081px){
+  .hdr__tools{ position:relative; padding-inline-start:18px; }
+  .hdr__tools::before{ content:""; position:absolute; inset-inline-start:0; top:50%; height:26px; width:1px; transform:translateY(-50%); background:rgba(255,255,255,.14); }
+}
+.hdr__tools .btn--sm svg{ transition:transform .3s var(--mo-ease); }
+.hdr__tools .btn--sm:hover svg{ transform:translateX(3px); }
+[dir="rtl"] .hdr__tools .btn--sm:hover svg{ transform:translateX(-3px); }
+
+/* Pages that open with a dark hero: the header floats over it at the top and
+   turns solid once the page moves. */
+body.has-overlay-hdr .hdr:not(.is-stuck){
+  background:linear-gradient(180deg, rgba(5,9,17,.72) 0%, rgba(5,9,17,.28) 70%, rgba(5,9,17,0) 100%) !important;
+  border-bottom-color:transparent !important; box-shadow:none !important;
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+}
+body.has-overlay-hdr .hdr:not(.is-stuck)::before{ opacity:0; }
+/* الحالة والهيرو خلفها يُرسمان معًا من الخادم، بلا انتظار JavaScript. */
+body .hdr.hdr--home-hero:not(.is-stuck){
+  background:transparent !important;
+  border-bottom-color:transparent !important;
+  box-shadow:none !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+body .hdr.hdr--home-hero:not(.is-stuck)::before{ opacity:0; }
+body .hdr.hdr--home-hero:not(.is-stuck) .hdr__logo-img{
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.9)) !important;
+}
+body .hdr.hdr--home-hero:not(.is-stuck) .hdr__link{
+  text-shadow:0 1px 4px rgba(0,0,0,.95);
+}
+.hdr::before{ transition:opacity .35s; }
+.under-hdr{ margin-top:calc(var(--header-h) * -1) !important; }
+.vhero.under-hdr{ padding-top:calc(var(--header-h) + clamp(48px, 7vh, 90px)) !important; }
+.phero.under-hdr{ padding-top:var(--header-h) !important; }
+@media (max-width:760px){
+  .vhero.under-hdr{ padding-top:calc(var(--header-h) + 36px) !important; }
+}
+
+/* mega menu: columns cascade in */
+@media (prefers-reduced-motion:no-preference){
+  .mega.is-open .mega__col, .mega.is-open .mega__promo{ animation:moUp .45s var(--mo-ease-out) both; }
+  .mega.is-open .mega__col:nth-child(2){ animation-delay:.05s; }
+  .mega.is-open .mega__col:nth-child(3){ animation-delay:.1s; }
+  .mega.is-open .mega__col:nth-child(4), .mega.is-open .mega__promo{ animation-delay:.15s; }
+}
+.mega__col a{ transition:color .2s, background-color .2s, transform .25s var(--mo-ease) !important; }
+.mega__col a:hover{ transform:translateX(4px); }
+[dir="rtl"] .mega__col a:hover{ transform:translateX(-4px); }
+
+/* ------------------------------------------------------------------ 2. Hero */
+@media (prefers-reduced-motion:no-preference){
+  /* slow zoom on the slide on screen (scale is separate from the locked transform) */
+  .vhero__slide.is-active .vhero__img{ animation:moKenBurns 7.5s ease-out both; }
+  .vhero.is-held .vhero__slide.is-active .vhero__img{ animation-play-state:paused; }
+  .vhero.is-held .vhero__tab.is-active .vhero__tab-fill{ animation-play-state:paused !important; }
+
+  /* copy enters once on load */
+  .vhero__eyebrow, .vhero__title, .vhero__lede, .vhero__cta, .ux-intents, .vhero__foot{
+    animation:moUp .9s var(--mo-ease-out) both;
+  }
+  .vhero__title{ animation-delay:.08s; }
+  .vhero__lede{ animation-delay:.18s; }
+  .vhero__cta{ animation-delay:.28s; }
+  .ux-intents{ animation-delay:.36s; }
+  .vhero__foot{ animation-delay:.45s; }
+
+  /* inner-page hero */
+  .phero__in > *{ animation:moUp .8s var(--mo-ease-out) both; }
+  .phero__in > *:nth-child(2){ animation-delay:.07s; }
+  .phero__in > *:nth-child(3){ animation-delay:.14s; }
+  .phero__in > *:nth-child(4){ animation-delay:.21s; }
+  .phero__in > *:nth-child(n+5){ animation-delay:.28s; }
+  .phero img{ animation:moKenBurns 9s ease-out both; }
+}
+.vhero__slide{ transition:opacity .9s var(--mo-ease), visibility .9s !important; }
+.vhero__tab{ transition:background-color .3s, border-color .3s, transform .3s var(--mo-ease) !important; }
+.vhero__tab:hover{ transform:translateY(-2px); }
+
+/* ---------------------------------------------------------- 3. Scroll reveal */
+@media (prefers-reduced-motion:no-preference){
+  html.motion [data-mo]{
+    opacity:0 !important; transform:translateY(28px) !important;
+    transition:opacity .8s var(--mo-ease-out), transform .8s var(--mo-ease-out) !important;
+    transition-delay:var(--mo-d, 0ms) !important;
+  }
+  html.motion [data-mo].mo-in{ opacity:1 !important; transform:none !important; }
+}
+
+/* -------------------------------------------------------- 4. Cards & buttons */
+.fscard, .pgcard, .projcard, .projgrid > *, .avmv > *, .scard{
+  transition:transform .45s var(--mo-ease-out), box-shadow .45s var(--mo-ease-out), border-color .3s !important;
+}
+@media (hover:hover){
+  .fscard:hover, .pgcard:hover, .projgrid > *:hover{
+    transform:translateY(-6px) !important;
+    box-shadow:0 22px 44px -22px rgba(9,17,29,.35) !important;
+  }
+}
+.fscard__fig, .pgcard__fig, .projgrid figure{ overflow:hidden; }
+.fscard__fig img, .pgcard__fig img, .projgrid figure img, .pgfeature img{ transition:transform .9s var(--mo-ease-out) !important; }
+@media (hover:hover){
+  .fscard:hover .fscard__fig img, .pgcard:hover .pgcard__fig img, .projgrid > *:hover img{ transform:scale(1.06) !important; }
+}
+.btn svg, .fscard__cta svg, .pgcard__go svg{ transition:transform .3s var(--mo-ease); }
+.btn:hover svg, .fscard:hover .fscard__cta svg, .pgcard:hover .pgcard__go svg{ transform:translateX(4px); }
+[dir="rtl"] .btn:hover svg, [dir="rtl"] .fscard:hover .fscard__cta svg, [dir="rtl"] .pgcard:hover .pgcard__go svg{ transform:translateX(-4px); }
+.btn{ transition:background-color .25s, color .25s, border-color .25s, box-shadow .3s, transform .25s var(--mo-ease) !important; }
+.btn:active{ transform:translateY(1px) scale(.99); }
+
+/* --------------------------------------------------------- 5. Page transitions */
+@view-transition{ navigation:auto; }
+.hdr{ view-transition-name:site-header; }
+::view-transition-old(root){ animation:moFadeOut .22s ease both; }
+::view-transition-new(root){ animation:moFadeIn .45s var(--mo-ease-out) both; }
+::view-transition-group(site-header){ animation-duration:0s; }
+@media (prefers-reduced-motion:reduce){
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*){ animation:none !important; }
+}
+/* fallback for browsers without cross-document view transitions */
+html.motion main, html.motion #site-footer{ transition:opacity .2s ease, transform .2s ease; }
+html.motion.is-leaving main, html.motion.is-leaving #site-footer{ opacity:0; transform:translateY(8px); }
+
+/* ---------------------------------------------------------------- keyframes */
+@keyframes moUp{ from{ opacity:0; transform:translateY(22px); } to{ opacity:1; transform:none; } }
+@keyframes moKenBurns{ from{ scale:1.12; } to{ scale:1; } }
+@keyframes moFadeOut{ to{ opacity:0; transform:translateY(-6px); } }
+@keyframes moFadeIn{ from{ opacity:0; transform:translateY(10px); } }
+
+/* ------------------------------------------------------- 6. Brand logo strip
+   A static grid was left in ux.css; this brings back the endless marquee.
+   It animates `translate` (ux.css locks `transform`) and pauses on hover. */
+@media (prefers-reduced-motion:no-preference){
+  .logostrip .logostrip__marquee{
+    overflow:hidden !important; direction:ltr;
+    -webkit-mask-image:linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%) !important;
+            mask-image:linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%) !important;
+  }
+  .logostrip .logostrip__track{
+    display:flex !important; width:max-content !important;
+    animation:moMarquee 38s linear infinite !important;
+  }
+  .logostrip .logostrip__marquee:hover .logostrip__track{ animation-play-state:paused !important; }
+  .logostrip .logostrip__group, .logostrip .logostrip__group[aria-hidden="true"]{
+    display:flex !important; align-items:center; flex-shrink:0; width:auto !important;
+    gap:clamp(36px, 4.5vw, 64px) !important; padding-inline-end:clamp(36px, 4.5vw, 64px);
+  }
+  .logostrip .logostrip__item{ flex:0 0 auto !important; height:56px; padding:0 !important; }
+  .logostrip .logostrip__item img{ height:36px !important; width:auto !important; max-width:150px !important; object-fit:contain; }
+  @media (max-width:760px){
+    .logostrip .logostrip__track{ animation-duration:26s !important; }
+    .logostrip .logostrip__item{ height:44px; }
+    .logostrip .logostrip__item img{ height:28px !important; max-width:112px !important; }
+  }
+}
+@keyframes moMarquee{ from{ translate:0 0; } to{ translate:-50% 0; } }
+
+/* English header fits six items (After-sales services is long) */
+@media (min-width:1081px) and (max-width:1520px){
+  html:not([lang="ar"]) .hdr__link{ padding-inline:8px !important; font-size:14px !important; }
+  html:not([lang="ar"]) .hdr__tools{ padding-inline-start:12px; gap:8px !important; }
+  html:not([lang="ar"]) .hdr__tools .btn--sm{ letter-spacing:.02em !important; padding-inline:14px !important; }
+  html:not([lang="ar"]) .hdr__tools .lang{ padding-inline:10px; }
+}
+@media (min-width:1081px) and (max-width:1320px){
+  html:not([lang="ar"]) .hdr__tools .hdr__cta-long{ display:none !important; }
+  html:not([lang="ar"]) .hdr__tools .hdr__cta-short{ display:inline !important; }
+  html:not([lang="ar"]) .hdr__tools .lang .lang__code{ display:none; }
+  html:not([lang="ar"]) .hdr__link{ font-size:13.5px !important; padding-inline:7px !important; }
+}
+@media (min-width:1081px) and (max-width:1180px){
+  html:not([lang="ar"]) .hdr__link{ font-size:13px !important; padding-inline:5px !important; }
+  html:not([lang="ar"]) .hdr__logo img{ height:40px !important; }
+}
+@media (min-width:761px){ #afterCards{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; } }
+@media (min-width:1081px) and (max-width:1180px){
+  html:not([lang="ar"]) .hdr__link{ font-size:12.5px !important; padding-inline:4px !important; }
+  .hdr__in{ gap:8px !important; }
+}
+
+/* English header links, one step larger at every desktop width (they read
+   small next to the logo). Sizes follow the free room measured at each width;
+   at 1081–1180 the logo gives up a little height to make that room. */
+html:not([lang="ar"]) .hdr__link{ font-size:16px !important; padding-inline:10px !important; }
+@media (min-width:1081px) and (max-width:1520px){ html:not([lang="ar"]) .hdr__link{ font-size:15.5px !important; padding-inline:8px !important; } }
+@media (min-width:1081px) and (max-width:1320px){ html:not([lang="ar"]) .hdr__link{ font-size:15px !important; padding-inline:6px !important; } }
+@media (min-width:1081px) and (max-width:1250px){ html:not([lang="ar"]) .hdr__link{ font-size:14.5px !important; padding-inline:5px !important; } }
+@media (min-width:1081px) and (max-width:1180px){
+  html:not([lang="ar"]) .hdr__link{ font-size:14px !important; padding-inline:4px !important; }
+  html:not([lang="ar"]) .hdr__logo img{ height:36px !important; }
+}

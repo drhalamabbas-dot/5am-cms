@@ -1,0 +1,17 @@
+/* ==========================================================================
+   5A&M for Import, Export and Contracting — Master CSS Entry Point
+
+   No longer linked by the site: app/(site)/layout.tsx links base, home,
+   equipment, model, quote, services and about directly, in this same order,
+   each with the content-fingerprint version (?v=…). The @imports below carried
+   a fixed version, so an edit to any of them never reached returning visitors.
+   Kept only for anything outside the app that still references it.
+   ========================================================================== */
+
+@import url('base.css?v=20261059');
+@import url('home.css?v=20261059');
+@import url('equipment.css?v=20261059');
+@import url('model.css?v=20261059');
+@import url('quote.css?v=20261059');
+@import url('services.css?v=20261059');
+@import url('about.css?v=20261059');
