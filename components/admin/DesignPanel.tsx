@@ -8,7 +8,7 @@
    كل خانة تبدأ «تلقائي» (تصميم الموقع كما هو)، وزرّ ↺ بجانبها يعيدها إليه.
    التغيير يظهر في الصفحة بعد لحظة، ولا يُحفظ إلا بـ «احفظ».
 ============================================================================= */
-import { FONTS, IMG_POS, THEME_DEFAULTS, type Design, type Theme } from '@/lib/design';
+import { ANIMS, FONTS, IMG_POS, THEME_DEFAULTS, type Design, type Theme } from '@/lib/design';
 
 /** تعديل جزئي: قيمة جديدة، أو دالة تحسبها من أحدث قيمة (للضغط المتتالي على +)،
  *  أو undefined للرجوع إلى «تلقائي». null يعني إعادة الكل إلى الأصل. */
@@ -177,6 +177,14 @@ export function DesignPanel({ value, onChange, hero }: {
       <SizeRow label="تكبير/تصغير داخل الإطار" value={d.imgZoom} min={50} max={200} step={5} unit="%" onChange={set('imgZoom')} />
       <Seg label="الجزء الظاهر من الصورة" value={d.imgPos as any} options={IMG_POS as any} onChange={set('imgPos') as any} />
       <SizeRow label="استدارة الأركان" value={d.imgRadius} min={0} max={40} onChange={set('imgRadius')} />
+
+      <h3 className="dz__h">الحركة</h3>
+      <Seg label="حركة الدخول مع التمرير" value={d.anim as any} options={ANIMS as any}
+           onChange={set('anim') as any} />
+      <p className="dz__hint" style={{ marginTop: 0 }}>
+        تتقدّم مع تمرير الزائر نفسه. المتصفحات التي لا تدعمها تعرض القسم عاديًّا،
+        ومن طلب تقليل الحركة من جهازه لا تظهر له.
+      </p>
 
       <h3 className="dz__h">المسافات والظهور</h3>
       <SizeRow label="مسافة فوق" value={d.padTop} min={0} max={200} step={4} onChange={set('padTop')} />

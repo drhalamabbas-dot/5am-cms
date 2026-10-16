@@ -42,6 +42,11 @@ const crashed = (html) => /id="__next_error__"|Application error|Internal Server
 /* ================================================================ الزائر */
 log.step('صفحات الموقع كما يراها الزائر');
 const pages = await q('SELECT slug, template, published, redirect_to FROM pages ORDER BY position, id');
+/* صفحة المتجر منشورة دائمًا، لكنها تحوّل الزائر حين يقفل صاحب الموقع متجره —
+   وذلك سلوك مقصود لا عطل. فتُفحص كصفحة تحويل ما دام المتجر مقفولًا. */
+const storeRow = (await q("SELECT `value` FROM settings WHERE `key` = 'store'"))[0]?.value;
+const storeSet = typeof storeRow === 'string' ? JSON.parse(storeRow) : (storeRow ?? {});
+const storeOff = storeSet?.enabled === false;
 const urlOf = (slug) => (slug === 'index' ? '/' : `/${slug}.html`);
 const visited = new Map();       // url -> html  (للروابط والصور بعدها)
 
@@ -56,6 +61,11 @@ for (const p of pages) {
     }
     if (!p.published) {
       if (r.status === 404) pass(); else fail(`${url} — مسوّدة ظاهرة للزائر (${r.status})`);
+      continue;
+    }
+    if (p.slug === 'store' && storeOff) {
+      if (r.status >= 300 && r.status < 400) pass();
+      else fail(`${url} — المتجر مقفول ولم يحوّل الزائر (${r.status})`);
       continue;
     }
     if (r.status !== 200) { fail(`${url} — ${r.status}`); continue; }

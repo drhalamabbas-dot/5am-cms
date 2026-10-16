@@ -151,6 +151,139 @@ const SHAPES: Record<string, React.ReactNode> = {
       <rect x="110" y="38" width="32" height="14" rx="7" fill={C.brand} />
     </>
   ),
+  /* صفوف مطويّة، أولها مفتوح فيظهر جوابه */
+  faq: (
+    <>
+      <Head x={8} y={10} w={44} />
+      <rect x="8" y="24" width="144" height="14" rx="3" fill="#fff" stroke={C.line} />
+      <rect x="14" y="29" width="54" height="4" rx="2" fill={C.strong} />
+      <rect x="140" y="29" width="7" height="4" rx="2" fill={C.brand} />
+      <rect x="8" y="38" width="144" height="16" rx="3" fill={C.line} opacity="0.45" />
+      <Lines x={14} y={43} w={100} n={2} gap={6} />
+      {[58, 70].map((y) => (
+        <g key={y}>
+          <rect x="8" y={y} width="144" height="10" rx="3" fill="#fff" stroke={C.line} />
+          <rect x="14" y={y + 3} width="46" height="4" rx="2" fill={C.line} />
+          <rect x="140" y={y + 3} width="7" height="4" rx="2" fill={C.box} />
+        </g>
+      ))}
+    </>
+  ),
+  /* أرقام كبيرة في خانات، فوق كلٍّ شعرة ملوّنة */
+  stats: (
+    <>
+      <Head x={8} y={10} w={44} />
+      <rect x="8" y="26" width="144" height="46" rx="3" fill="#fff" stroke={C.line} />
+      {[8, 44, 80, 116].map((x, i) => (
+        <g key={x}>
+          {i ? <line x1={x} y1="26" x2={x} y2="72" stroke={C.line} /> : null}
+          <rect x={x + 8} y="26" width="14" height="2.5" fill={C.brand} />
+          <rect x={x + 8} y="38" width="20" height="10" rx="2" fill={C.strong} />
+          <rect x={x + 8} y="53" width="24" height="3.5" rx="1.75" fill={C.line} />
+        </g>
+      ))}
+    </>
+  ),
+  /* بطاقتا اقتباس، في كلٍّ علامة تنصيص ثم اسم */
+  quotes: (
+    <>
+      <Head x={8} y={10} w={44} />
+      {[8, 82].map((x) => (
+        <g key={x}>
+          <rect x={x} y="24" width="70" height="52" rx="4" fill="#fff" stroke={C.line} />
+          <text x={x + 8} y="42" fontSize="20" fill={C.brand} opacity="0.55">”</text>
+          <Lines x={x + 8} y={44} w={54} n={2} gap={6} />
+          <line x1={x + 8} y1="62" x2={x + 62} y2="62" stroke={C.line} />
+          <rect x={x + 8} y="66" width="30" height="4" rx="2" fill={C.strong} />
+        </g>
+      ))}
+    </>
+  ),
+  /* إطار فيديو بزرّ تشغيل في وسطه */
+  video: (
+    <>
+      <Head x={8} y={10} w={44} />
+      <rect x="8" y="24" width="144" height="52" rx="4" fill={C.dark} />
+      <circle cx="80" cy="50" r="13" fill="#fff" opacity="0.92" />
+      <path d="M76 44 L88 50 L76 56 Z" fill={C.dark} />
+    </>
+  ),
+  /* ملفات للتحميل: ورقة مثنيّة الركن وسهم نزول بجانب اسم الملف */
+  downloads: (
+    <>
+      <Head x={8} y={10} w={44} />
+      {[26, 50].map((y) => (
+        <g key={y}>
+          <rect x="8" y={y} width="144" height="18" rx="3" fill="#fff" stroke={C.line} />
+          <path d={`M16 ${y + 4} h8 l4 4 v6 h-12 z`} fill={C.box} />
+          <rect x="36" y={y + 6} width="54" height="4" rx="2" fill={C.strong} />
+          <path d={`M140 ${y + 6} v5 m-3 -3 l3 3 l3 -3`} stroke={C.brand} strokeWidth="1.6" fill="none" />
+        </g>
+      ))}
+    </>
+  ),
+  /* خطّ زمني: نقاط على خطّ رأسي، لكلٍّ سنة ونصّ */
+  timeline: (
+    <>
+      <Head x={8} y={10} w={44} />
+      <line x1="18" y1="26" x2="18" y2="78" stroke={C.line} strokeWidth="2" />
+      {[28, 48, 68].map((y) => (
+        <g key={y}>
+          <circle cx="18" cy={y} r="4" fill="#fff" stroke={C.brand} strokeWidth="2" />
+          <rect x="30" y={y - 5} width="22" height="4" rx="2" fill={C.brand} opacity="0.75" />
+          <rect x="30" y={y + 2} width="92" height="3" rx="1.5" fill={C.line} />
+        </g>
+      ))}
+    </>
+  ),
+  /* جدول مواصفات: صفوف بخطّين، الاسم ثم القيمة */
+  specs: (
+    <>
+      <Head x={8} y={10} w={44} />
+      {[26, 40, 54, 68].map((y, i) => (
+        <g key={y}>
+          <rect x="8" y={y} width="144" height="12" rx="2" fill={i % 2 ? '#fff' : C.line} opacity={i % 2 ? 1 : 0.45} />
+          <rect x="14" y={y + 4} width="44" height="4" rx="2" fill={C.strong} />
+          <rect x="94" y={y + 4} width="50" height="4" rx="2" fill={C.line} />
+        </g>
+      ))}
+    </>
+  ),
+  /* فريق العمل: وجوه دائرية تحتها اسم */
+  team: (
+    <>
+      <Head x={8} y={10} w={44} />
+      {[26, 66, 106].map((x) => (
+        <g key={x}>
+          <circle cx={x + 24} cy="44" r="14" fill={C.box} />
+          <rect x={x + 8} y="64" width="32" height="4" rx="2" fill={C.strong} />
+          <rect x={x + 14} y="72" width="20" height="3" rx="1.5" fill={C.line} />
+        </g>
+      ))}
+    </>
+  ),
+  /* ملاحظة بارزة: إطار بحدّ ملوّن على الجهة وأيقونة */
+  callout: (
+    <>
+      <rect x="8" y="26" width="144" height="38" rx="4" fill={C.line} opacity="0.4" />
+      <rect x="8" y="26" width="4" height="38" rx="2" fill={C.brand} />
+      <circle cx="30" cy="45" r="7" fill="none" stroke={C.brand} strokeWidth="2" />
+      <rect x="30" y="44" width="0" height="0" />
+      <rect x="46" y="36" width="56" height="5" rx="2.5" fill={C.strong} />
+      <Lines x={46} y={48} w={92} n={2} gap={7} />
+    </>
+  ),
+  /* لوجوهات تمرّ في صفّ — الأخير مقصوص ليقول إن الشريط يكمل ويتحرّك */
+  logostrip: (
+    <>
+      <rect x="8" y="14" width="40" height="4" rx="2" fill={C.strong} />
+      <rect x="8" y="30" width="144" height="34" rx="4" fill={C.line} opacity="0.5" />
+      {[16, 52, 88, 124].map((x, i) => (
+        <rect key={x} x={x} y={38} width={i === 3 ? 20 : 28} height="18" rx="3"
+              fill={C.box} opacity={i === 3 ? 0.45 : 1} />
+      ))}
+    </>
+  ),
 };
 
 /* =========================================================== معاينة الصفحة
@@ -236,6 +369,118 @@ const BANDS: Record<string, Band> = {
       <rect x="14" y={y + 7} width="52" height="4" rx="2" fill="#fff" opacity="0.9" />
       <rect x="14" y={y + 14} width="36" height="3" rx="1.5" fill="#fff" opacity="0.4" />
       <rect x="118" y={y + 8} width="28" height="9" rx="4.5" fill={C.brand} />
+    </g>
+  )),
+  faq: band(30, (y) => (
+    <g>
+      <rect x="6" y={y} width="40" height="5" rx="2.5" fill={C.strong} />
+      {[11, 21].map((dy, i) => (
+        <g key={dy}>
+          <rect x="6" y={y + dy} width="148" height="8" rx="2" fill="#fff" stroke={C.line} />
+          <rect x="11" y={y + dy + 2.5} width={i ? 40 : 56} height="3" rx="1.5" fill={i ? C.line : C.strong} />
+          <rect x="144" y={y + dy + 2.5} width="5" height="3" rx="1.5" fill={i ? C.box : C.brand} />
+        </g>
+      ))}
+    </g>
+  )),
+  stats: band(26, (y) => (
+    <g>
+      <rect x="6" y={y} width="148" height="24" rx="3" fill="#fff" stroke={C.line} />
+      {[6, 43, 80, 117].map((x, i) => (
+        <g key={x}>
+          {i ? <line x1={x} y1={y} x2={x} y2={y + 24} stroke={C.line} /> : null}
+          <rect x={x + 6} y={y} width="11" height="2" fill={C.brand} />
+          <rect x={x + 6} y={y + 7} width="16" height="7" rx="2" fill={C.strong} />
+          <rect x={x + 6} y={y + 17} width="20" height="3" rx="1.5" fill={C.line} />
+        </g>
+      ))}
+    </g>
+  )),
+  quotes: band(30, (y) => (
+    <g>
+      <rect x="6" y={y} width="40" height="5" rx="2.5" fill={C.strong} />
+      {[6, 82].map((x) => (
+        <g key={x}>
+          <rect x={x} y={y + 11} width="72" height="19" rx="3" fill="#fff" stroke={C.line} />
+          <rect x={x + 6} y={y + 16} width="48" height="3" rx="1.5" fill={C.line} />
+          <rect x={x + 6} y={y + 23} width="28" height="3.5" rx="1.75" fill={C.strong} />
+        </g>
+      ))}
+    </g>
+  )),
+  video: band(32, (y) => (
+    <g>
+      <rect x="6" y={y} width="148" height="32" rx="3" fill={C.dark} />
+      <circle cx="80" cy={y + 16} r="8" fill="#fff" opacity="0.92" />
+      <path d={`M77 ${y + 12} L84 ${y + 16} L77 ${y + 20} Z`} fill={C.dark} />
+    </g>
+  )),
+  logostrip: band(18, (y) => (
+    <g>
+      <rect x="6" y={y} width="148" height="16" rx="3" fill={C.line} opacity="0.5" />
+      {[14, 48, 82, 116].map((x, i) => (
+        <rect key={x} x={x} y={y + 5} width={i === 3 ? 18 : 26} height="7" rx="2"
+              fill={C.box} opacity={i === 3 ? 0.45 : 1} />
+      ))}
+    </g>
+  )),
+  downloads: band(28, (y) => (
+    <g>
+      <rect x="6" y={y} width="40" height="5" rx="2.5" fill={C.strong} />
+      {[y + 10, y + 20].map((ry) => (
+        <g key={ry}>
+          <rect x="6" y={ry} width="148" height="8" rx="2" fill="#fff" stroke={C.line} />
+          <rect x="11" y={ry + 2.5} width="6" height="4" rx="1" fill={C.box} />
+          <rect x="22" y={ry + 3} width="46" height="3" rx="1.5" fill={C.line} />
+          <path d={`M146 ${ry + 2.5} v3 m-2 -2 l2 2 l2 -2`} stroke={C.brand} strokeWidth="1.2" fill="none" />
+        </g>
+      ))}
+    </g>
+  )),
+  timeline: band(34, (y) => (
+    <g>
+      <rect x="6" y={y} width="40" height="5" rx="2.5" fill={C.strong} />
+      <line x1="12" y1={y + 12} x2="12" y2={y + 32} stroke={C.line} strokeWidth="1.6" />
+      {[0, 1, 2].map((i) => (
+        <g key={i}>
+          <circle cx="12" cy={y + 14 + i * 9} r="2.8" fill="#fff" stroke={C.brand} strokeWidth="1.4" />
+          <rect x="22" y={y + 12.5 + i * 9} width="18" height="3" rx="1.5" fill={C.brand} opacity="0.7" />
+          <rect x="46" y={y + 12.5 + i * 9} width="96" height="3" rx="1.5" fill={C.line} />
+        </g>
+      ))}
+    </g>
+  )),
+  specs: band(32, (y) => (
+    <g>
+      <rect x="6" y={y} width="40" height="5" rx="2.5" fill={C.strong} />
+      {[0, 1, 2, 3].map((i) => (
+        <g key={i}>
+          <rect x="6" y={y + 11 + i * 6} width="148" height="5" rx="1.5"
+                fill={i % 2 ? '#fff' : C.line} opacity={i % 2 ? 1 : 0.4} />
+          <rect x="10" y={y + 12.5 + i * 6} width="40" height="2.5" rx="1.25" fill={C.strong} />
+          <rect x="96" y={y + 12.5 + i * 6} width="50" height="2.5" rx="1.25" fill={C.line} />
+        </g>
+      ))}
+    </g>
+  )),
+  team: band(34, (y) => (
+    <g>
+      <rect x="6" y={y} width="40" height="5" rx="2.5" fill={C.strong} />
+      {[20, 64, 108].map((x) => (
+        <g key={x}>
+          <circle cx={x + 16} cy={y + 20} r="9" fill={C.box} />
+          <rect x={x + 2} y={y + 32} width="28" height="3" rx="1.5" fill={C.line} />
+        </g>
+      ))}
+    </g>
+  )),
+  callout: band(20, (y) => (
+    <g>
+      <rect x="6" y={y} width="148" height="18" rx="3" fill={C.line} opacity="0.4" />
+      <rect x="6" y={y} width="3" height="18" rx="1.5" fill={C.brand} />
+      <circle cx="20" cy={y + 9} r="4" fill="none" stroke={C.brand} strokeWidth="1.4" />
+      <rect x="30" y={y + 5} width="56" height="4" rx="2" fill={C.strong} />
+      <rect x="30" y={y + 12} width="90" height="2.5" rx="1.25" fill={C.line} />
     </g>
   )),
 };

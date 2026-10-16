@@ -107,7 +107,14 @@ export function HeroSlider({ s, t, underHeader = false }: { s: Any; t: T; underH
 
 /* ------------------------------------------------- شريط لوجوهات الشركات
    المجموعة مكرّرة مرتين كي تدور الحركة بلا قطع — كما في home.js. */
-export function Logostrip({ s, brands, t }: { s: Any; brands: Record<string, Brand>; t: T }) {
+export function Logostrip({ s, brands, t, uid }: {
+  s: Any; brands: Record<string, Brand>; t: T;
+  /** يُمرَّر حين يُضاف الشريط إلى صفحة عادية، كي لا يتكرّر المعرّف لو وُضع مرتين.
+      الرئيسية لا تمرّره، فتبقى مخرجاتها كما هي حرفًا بحرف. */
+  uid?: string | number;
+}) {
+  const hid = uid == null ? 'logostripH' : `logostripH-${uid}`;
+  const sid = uid == null ? 'brandStrip' : `brandStrip-${uid}`;
   const items = (s.brands ?? [])
     .map((id: string) => brands[id])
     .filter((b: Brand | undefined) => b && b.logo);
@@ -121,11 +128,11 @@ export function Logostrip({ s, brands, t }: { s: Any; brands: Record<string, Bra
     </div>
   );
   return (
-    <section className="logostrip" aria-labelledby="logostripH">
+    <section className="logostrip" aria-labelledby={hid}>
       <div className="wrap logostrip__in">
-        <h2 className="logostrip__label" id="logostripH">{t.tx(s.title)}</h2>
+        <h2 className="logostrip__label" id={hid}>{t.tx(s.title)}</h2>
         <div className="logostrip__marquee">
-          <div className="logostrip__track" id="brandStrip">{group(false)}{group(true)}</div>
+          <div className="logostrip__track" id={sid}>{group(false)}{group(true)}</div>
         </div>
       </div>
     </section>

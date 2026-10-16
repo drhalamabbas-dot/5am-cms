@@ -125,9 +125,12 @@ try {
 
   /* ============================================================ المتجر */
   step('المتجر');
+  /* يُفتح أولًا: الاختبار يفحص السلوك في الحالتين، فلا يصحّ أن يتعلّق بما هو
+     محفوظ وقت التشغيل. صاحب الموقع قد يترك متجره مقفولًا، وذلك ليس عطلًا. */
+  const storeSet = JSON.parse(settingsBefore.store ?? '{}');
+  await setSetting('store', { ...storeSet, enabled: true });
   const st = await html('/store.html?lang=ar');
   check(st.status === 200 && (st.text.match(/class="scard"/g) ?? []).length > 0, 'صفحة المتجر بلا منتجات');
-  const storeSet = JSON.parse(settingsBefore.store ?? '{}');
   await setSetting('store', { ...storeSet, enabled: false, closed: 'home' });
   const closed = await get('/store.html?lang=ar');
   check(closed.status === 307, 'المتجر المقفول لا يحوّل الزائر');
@@ -145,6 +148,16 @@ try {
     const sc = r.headers.get('set-cookie'); if (sc) chatCookie = sc.split(';')[0];
     const d = await r.json(); return { ...d, bot: d.messages?.filter((m) => m.role === 'bot').at(-1)?.text ?? '' };
   };
+  /* قفل المحادثة على أصحاب الحسابات: يُختبر أولًا، ثم تُفتح لبقية الاختبارات
+     التي تحاكي زائرًا بلا حساب. */
+  const chatBase = { ...JSON.parse(settingsBefore.chat), requireLogin: false };
+  await setSetting('chat', { ...chatBase, requireLogin: true });
+  const gated = await post('/api/chat', { text: 'عندكم مكانس شوارع؟', lang: 'ar' });
+  check(gated.status === 401, `المحادثة المقفولة على أصحاب الحسابات ردّت ${gated.status} بدل 401 لزائر`);
+  const gatedGet = await (await fetch(`${BASE}/api/chat`)).json().catch(() => ({}));
+  check(gatedGet.requireLogin === true, 'الواجهة لا تعرف أن المحادثة تطلب تسجيل الدخول');
+  await setSetting('chat', chatBase);
+
   const g = await chat({ text: 'السلام عليكم', lang: 'en' });
   check(/أهل/.test(g.bot), 'التحية بالعربي من صفحة إنجليزية لم يُرد عليها بالعربي');
   const c1 = await chat({ text: 'ايه رقم التليفون والعنوان بتاعكم؟', lang: 'ar' });
@@ -156,7 +169,7 @@ try {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ choices: [{ message: { content: 'المولد ده سعره يبدأ من 350 ألف جنيه. كلمنا على 01099943428 أو sales@fake.com.' } }] }));
   }); }).listen(3998, '127.0.0.1');
-  await setSetting('chat', { ...JSON.parse(settingsBefore.chat), provider: 'own', ownUrl: 'http://127.0.0.1:3998', ownModel: 'qa-mock' });
+  await setSetting('chat', { ...chatBase, provider: 'own', ownUrl: 'http://127.0.0.1:3998', ownModel: 'qa-mock' });
   const own = await chat({ text: 'QA-TEST عايز مولد 450 كيلو لمزرعة', lang: 'ar' });
   check(!/350|جنيه/.test(own.bot), `الفلتر سمح بسعر: ${own.bot}`);
   check(!own.bot.includes('01099943428') && !own.bot.includes('fake.com'), 'الفلتر سمح برقم/بريد مخترع');
@@ -168,12 +181,12 @@ try {
   check(['qwen', 'backup', 'kb'].includes(fbSrc) && fb.bot.length > 10, 'موديلنا نايم ولم يكمّل غيره');
   if (fbSrc === 'kb') log.warn('Qwen والاحتياطي لم يردا الآن (الحد اليومي أو زحمة) — البوت ردّ من صفحات الموقع كما يجب');
   /* DeepSeek مصدرًا: بمفتاحه يرد هو، وبلا مفتاح أو رصيد يكمّل Qwen — العميل لا يقف */
-  await setSetting('chat', { ...JSON.parse(settingsBefore.chat), provider: 'deepseek' });
+  await setSetting('chat', { ...chatBase, provider: 'deepseek' });
   const ds = await chat({ text: 'QA-TEST ايه الفرق بين المولد المفتوح وأبو كابينة؟', lang: 'ar' });
   const dsSrc = (await one('SELECT source FROM chat_messages WHERE role = "bot" ORDER BY id DESC LIMIT 1')).source;
   check(ds.bot.length > 10 && ['deepseek', 'qwen', 'backup', 'kb'].includes(dsSrc), 'مصدر DeepSeek: البوت لم يرد');
   log.ok(`DeepSeek مصدرًا ← ردّ من: ${dsSrc}`);
-  await setSetting('chat', JSON.parse(settingsBefore.chat));
+  await setSetting('chat', chatBase);
   /* الذاكرة: نفس السؤال مرة ثانية لا يكلّم أي موديل */
   if (fbSrc !== 'kb') {
     const again = await chat({ text: 'QA-TEST هل عندكم مولدات بمحركات كامنز؟', lang: 'ar' });

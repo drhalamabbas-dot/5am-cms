@@ -15,18 +15,72 @@ import { reply } from './bot';
 
 type Item = { q: string; lang: 'ar' | 'en' };
 
-const AR_PRODUCT = ['عندكم {n}؟', 'ايه مواصفات {n}؟', '{n} يناسب ايه؟', 'عايز اعرف تفاصيل عن {n}', 'هل {n} متوفر وفيه صيانة؟', 'عايز عرض سعر على {n}'];
-const EN_PRODUCT = ['Do you have the {n}?', 'What are the specifications of the {n}?', 'What is the {n} used for?', 'Can I get a quote for the {n}?'];
-const AR_PAGE = ['ايه خدمات {n} عندكم؟', 'احكيلي عن {n}', 'عايز اعرف اكتر عن {n}'];
+/* الأسئلة على عائلات تشبه ما يقوله عميل حقيقي، لا استعلامًا عن مواصفة فقط:
+   يسأل عن منتج، ويقارن، ويعترض، ويسأل عن الشراء والخدمة بعده. الموديل يتعلّم
+   من إجابات هذه كلها كيف يبيع، لا كيف يسرد مواصفات. */
+const AR_PRODUCT = [
+  'عندكم {n}؟', 'ايه مواصفات {n}؟', '{n} يناسب ايه؟', 'عايز اعرف تفاصيل عن {n}',
+  'هل {n} متوفر وفيه صيانة؟', 'عايز عرض سعر على {n}',
+  'ليه اختار {n} بالذات؟', 'ايه الفرق بين {n} وغيره عندكم؟',
+  '{n} مناسب لشغل كتير يومي؟', 'بعد ما اشتري {n} بتوفروا قطع غياره؟',
+];
+const EN_PRODUCT = [
+  'Do you have the {n}?', 'What are the specifications of the {n}?', 'What is the {n} used for?',
+  'Can I get a quote for the {n}?', 'Why should I choose the {n}?', 'Do you support the {n} after delivery?',
+];
+const AR_PAGE = ['ايه خدمات {n} عندكم؟', 'احكيلي عن {n}', 'عايز اعرف اكتر عن {n}', 'ليه اتعامل معاكم في {n}؟'];
 const EN_PAGE = ['Tell me about your {n}', 'What do you offer for {n}?'];
+
+/* حاجة العميل لا اسم المنتج: هنا يتعلّم الموديل أن يرشّح. */
+const NEEDS: Item[] = [
+  { q: 'عندي مصنع وعايز مولد يشغّله، ايه اللي يناسبني؟', lang: 'ar' },
+  { q: 'عندي ورشة صغيرة، ايه اصغر مولد ينفع؟', lang: 'ar' },
+  { q: 'محتاج مولد احتياطي لمستشفى', lang: 'ar' },
+  { q: 'عايز حاجة تنضف بالوعات الصرف', lang: 'ar' },
+  { q: 'محتاج معدة تشفط مخلفات في مصنع', lang: 'ar' },
+  { q: 'عايز مكنسة تنضف شوارع في مدينة صغيرة', lang: 'ar' },
+  { q: 'عندي مزرعة ومحتاج طاقة للري', lang: 'ar' },
+  { q: 'محتاج مولد لموقع انشاءات مؤقت', lang: 'ar' },
+  { q: 'ايه اللي تنصحني بيه لشركة مقاولات بتشتغل في اكتر من موقع؟', lang: 'ar' },
+  { q: 'I need a generator for a factory, what do you recommend?', lang: 'en' },
+  { q: 'I need equipment to clean sewer lines', lang: 'en' },
+  { q: 'What do you recommend for a municipality street cleaning fleet?', lang: 'en' },
+];
+
+/* اعتراضات: الموديل يتعلّم أن يردّ بحقيقة من الموقع لا بمجادلة. */
+const OBJECTIONS: Item[] = [
+  { q: 'ليه اشتري منكم انتو بالذات؟', lang: 'ar' },
+  { q: 'في حد تاني بيبيع نفس الحاجة ارخص', lang: 'ar' },
+  { q: 'انا مش متأكد، لسه بدور', lang: 'ar' },
+  { q: 'المعدات دي غالية', lang: 'ar' },
+  { q: 'وبعد ما اشتري هتسيبوني؟', lang: 'ar' },
+  { q: 'ازاي اثق ان القطع اصلية؟', lang: 'ar' },
+  { q: 'Why should I buy from you and not another dealer?', lang: 'en' },
+  { q: 'What happens after the sale?', lang: 'en' },
+];
+
+/* خطوات الشراء والخدمة. */
+const PROCESS: Item[] = [
+  { q: 'ازاي اطلب عرض سعر؟', lang: 'ar' },
+  { q: 'ايه الخطوات من الطلب لحد التسليم؟', lang: 'ar' },
+  { q: 'بتركبوا المعدة في الموقع؟', lang: 'ar' },
+  { q: 'بتدربوا الفريق على التشغيل؟', lang: 'ar' },
+  { q: 'فيه عقود صيانة دورية؟', lang: 'ar' },
+  { q: 'How do I request a quotation?', lang: 'en' },
+  { q: 'Do you install and commission on site?', lang: 'en' },
+  { q: 'Do you offer maintenance contracts?', lang: 'en' },
+];
+
 const GENERAL: Item[] = [
   { q: 'انتو مين وبتعملوا ايه؟', lang: 'ar' }, { q: 'فين مكانكم؟', lang: 'ar' }, { q: 'ايه رقم التليفون؟', lang: 'ar' },
   { q: 'بتعملوا صيانة للمولدات؟', lang: 'ar' }, { q: 'عندكم تأجير مولدات؟', lang: 'ar' }, { q: 'بتوصلوا لكل محافظات مصر؟', lang: 'ar' },
   { q: 'ازاي احسب قدرة المولد اللي محتاجه؟', lang: 'ar' }, { q: 'ايه الفرق بين المولد المفتوح وأبو كابينة؟', lang: 'ar' },
   { q: 'عندكم قطع غيار أصلية؟', lang: 'ar' }, { q: 'عايز اكلم المبيعات', lang: 'ar' },
+  { q: 'ايه الماركات اللي بتمثلوها؟', lang: 'ar' }, { q: 'انتو وكلاء رسميين؟', lang: 'ar' },
   { q: 'Who are you and what do you do?', lang: 'en' }, { q: 'Where are you located?', lang: 'en' },
   { q: 'Do you offer generator maintenance?', lang: 'en' }, { q: 'Do you rent generators?', lang: 'en' },
   { q: 'Are you the Federal Signal dealer in Egypt?', lang: 'en' },
+  ...NEEDS, ...OBJECTIONS, ...PROCESS,
 ];
 
 export async function allQuestions(): Promise<Item[]> {

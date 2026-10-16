@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 /* ما كان site.css يستورده يُربط هنا مباشرةً بالترتيب نفسه (فالترتيب في
    المتصفح واحد)، ومع رقم النسخة: الاستيراد كان برقم ثابت لا يتغيّر، فتعديل
    base.css وأخواته لم يكن يصل إلى من زار الموقع قبله — والملفات تُخزَّن عامًا. */
-const CSS = ['base', 'home', 'equipment', 'model', 'quote', 'services', 'about', 'ux', 'motion', 'story', 'store', 'chat'];
+const CSS = ['base', 'home', 'equipment', 'model', 'quote', 'services', 'about', 'ux', 'motion', 'story', 'store', 'chat', 'blocks'];
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const h = await headers();

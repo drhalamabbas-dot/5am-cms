@@ -26,6 +26,15 @@ function Listening($p) {
   $null -ne (Get-NetTCPConnection -State Listen -LocalPort $p -ErrorAction SilentlyContinue)
 }
 
+# نسخة القاعدة التي يشغّلها هذا المشروع وحدها — تُعرف بمجلد بياناتها في سطر
+# أوامرها. على الجهاز قد تعمل نسخة MySQL أخرى لتطبيق آخر (XAMPP مثلًا)،
+# والخلط بينهما يجعل التشغيل ينتظر نسخةً ليست لنا ثم يفشل.
+# ولو تعذّرت قراءة سطر الأوامر (نسخة بمستخدم آخر) لا تُعدّ لنا.
+function OurMysqld {
+  Get-CimInstance Win32_Process -Filter "Name='mysqld.exe'" -ErrorAction SilentlyContinue |
+    Where-Object { $_.CommandLine -and $_.CommandLine -like "*$dataRoot*" }
+}
+
 function Wait-Port($p, $seconds, $what) {
   for ($i = 0; $i -lt $seconds; $i++) {
     if (Listening $p) { return $true }
@@ -52,9 +61,17 @@ Write-Host ''
 # ------------------------------------------------------------ 1) قاعدة البيانات
 #  نسختان من القاعدة على المجلد نفسه خطر: ضغطتان على start.bat في الثانية
 #  نفسها كانتا تشغّلان اثنتين. ما بدأ ولم يفتح المنفذ بعد يُنتظر، لا يُكرَّر.
-$starting = Get-CimInstance Win32_Process -Filter "Name='mysqld.exe'" -ErrorAction SilentlyContinue
+$starting = OurMysqld
 if (Listening 3306) {
-  Write-Host '   [1/3] Database ............ already running' -ForegroundColor DarkGray
+  # المنفذ مفتوح لكن ليس لنا؟ الموقع سيفشل لاحقًا برسالة «تعذّر الاتصال
+  # بالقاعدة» ولن يعرف أحد السبب. فيُقال هنا صراحةً.
+  if (-not $starting) {
+    Write-Host '   [1/3] Database ............ port 3306 is used by another MySQL' -ForegroundColor Yellow
+    Write-Host '         The site will not find its own data. Stop that MySQL, or change' -ForegroundColor DarkGray
+    Write-Host "         the port in: $myCnf  (and DB_PORT in .env.local)" -ForegroundColor DarkGray
+  } else {
+    Write-Host '   [1/3] Database ............ already running' -ForegroundColor DarkGray
+  }
 } elseif ($starting) {
   Write-Host '   [1/3] Database ............ already starting, waiting' -NoNewline
   if (-not (Wait-Port 3306 60 'The database')) { Fail 'Close all windows, double-click stop.bat, then start.bat again.' }

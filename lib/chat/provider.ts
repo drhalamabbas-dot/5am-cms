@@ -23,6 +23,8 @@ export type ChatSettings = {
   deepseekModel: string;
   /** موديل مجاني احتياطي حين يكون Qwen مشغولًا. 'none' = بلا احتياطي */
   backupModel: string;
+  /** لا تُفتح المحادثة إلا لمن سجّل دخوله بحساب عميل */
+  requireLogin: boolean;
   greeting: { ar: string; en: string };
 };
 
@@ -44,6 +46,8 @@ export async function getChatSettings(): Promise<ChatSettings> {
     ownModel: (s.ownModel || '').trim(),
     deepseekModel: (s.deepseekModel || '').trim(),
     backupModel: (s.backupModel || '').trim(),
+    /* الافتراضي: المحادثة مفتوحة للزائر. تُقفل بتفعيل الإعداد من الشاشة. */
+    requireLogin: s.requireLogin === true,
     greeting: { ar: s.greeting?.ar ?? '', en: s.greeting?.en ?? '' },
   };
 }
@@ -62,6 +66,20 @@ export async function providerReady(s: ChatSettings): Promise<{ ok: boolean; why
 
 /* آخر موديل نجح، لو اختفى المحفوظ من المجاني */
 let fallbackModel: string | null = null;
+/* وآخر احتياطي ردّ فعلًا: الطلب التالي يبدأ منه بدل أن يعيد المرور على
+   الصامتين من أوله في كل مرة. */
+let lastBackup: string | null = null;
+
+/** مهلة المرور على الاحتياطيات كلها. الزائر ينتظر، فالبحث عن موديل فاضٍ
+    لا يصحّ أن يمتدّ دقائق: نمرّ على أكبر عدد يسعه هذا الحدّ ثم نتوقّف. */
+const BACKUP_BUDGET_MS = 25_000;
+
+/* ترتيب الاحتياطيات: ما يصلح للمحادثة أولًا. القائمة المجانية فيها مصنِّف
+   أمان ونماذج برمجة ورؤية — تردّ ردًّا لا يشبه كلام بائع، فتؤخَّر إلى آخر
+   الصفّ ولا تُحذف: موديل ناطق متأخّر خير من لا ردّ. */
+const LATE = /(content-safety|guard|moderation|-code|coder|vl\b|vision|embed|rerank|ocr|tts|whisper)/i;
+const rankBackups = (ids: string[]) =>
+  [...ids].sort((a, b) => Number(LATE.test(a)) - Number(LATE.test(b)));
 
 async function call(url: string, key: string | null, body: object, own: boolean) {
   const ctl = new AbortController();
@@ -94,10 +112,25 @@ export const modelErrors = () => [...errors];
 
 const busy = (s: number) => s === 429 || s === 408 || s >= 500;
 const errOf = (status: number, d: any) => (d?.error?.metadata?.raw ? `${status}: ${String(d.error.metadata.raw)}` : d?.error?.message ? `${status}: ${d.error.message}` : `HTTP ${status}`);
-/* الرد بلا «تفكير» — وأي رد فيه حروف صينية (Qwen يخلط أحيانًا) يُعامل كفشل فيُعاد أو يُستبدل */
+/* حرف لاتيني ملتصق بحرف عربي بلا مسافة: «تachtاج»، «الangenehme». لا تكتب
+   العربية هكذا أبدًا، فهي علامة أن الموديل خلط لغتين داخل الكلمة الواحدة.
+   والأسماء الأجنبية المفصولة بمسافة (Pelican وCrosswind) تمرّ: هي من كلامنا.
+
+   والحروف وحدها لا المدى العربي كلّه: الفاصلة «،» وعلامة الاستفهام «؟» في
+   المدى نفسه، فـ«Pelican، مكنسة» كان يُرفض وهو كلام سليم.
+
+   والشرطة السفلية تُعدّ لصقًا («و_fraction»): لا تصل بين عربية ولاتينية في
+   كلام سليم، بخلاف المسافة والشرطة العادية. */
+const GLUED_LATIN = /[ء-يٱ-ۓ]_?[A-Za-z]|[A-Za-z]_?[ء-يٱ-ۓ]/;
+
+/* الرد بلا «تفكير». ويُعامل كفشل — فيُعاد أو يُستبدل بموديل آخر — إن كان فيه
+   حروف صينية (Qwen يخلط أحيانًا) أو كلمات ملزوقة بلغتين (الموديلات المجانية
+   الضعيفة تفعلها، وقد صرنا نمرّ عليها كلها). */
 const textOf = (d: any) => {
   const t = String(d?.choices?.[0]?.message?.content ?? '').replace(/<think>[\s\S]*?<\/think>/g, '').trim();
-  return /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(t) ? '' : t;
+  if (/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(t)) return '';
+  if (GLUED_LATIN.test(t)) return '';
+  return t;
 };
 
 /** موديل على OpenRouter: حتى 3 محاولات لو مشغول (بعد 1.5 ثم 3.5 ثانية) */
@@ -171,12 +204,33 @@ export async function complete(messages: Msg[], s: ChatSettings): Promise<Comple
   if (r.text) return { ok: true, text: r.text.slice(0, 3000), source: 'qwen' };
   logError(model, errOf(r.status, r.d));
 
-  /* Qwen مشغول: الموديل الاحتياطي المجاني (محاولتان) */
+  /* Qwen مشغول: نمرّ على الموديلات المجانية كلها حتى يردّ واحد.
+
+     كان احتياطيًّا واحدًا، فإن كان هو الآخر مشغولًا سكت البوت أمام العميل
+     بلا سبب يفهمه. والمجاني كثير التوقّف بطبعه، فواحدٌ لا يكفي.
+
+     الترتيب: المختار من الشاشة أولًا (رأي صاحب الموقع أسبق)، ثم ما نجح آخر
+     مرة، ثم الباقي. محاولتان للأول ومحاولة لكلّ ما بعده — من صمت مرة في هذه
+     اللحظة غالبًا صامت، والوقت ملك الزائر لا ملكنا. */
   if (s.backupModel !== 'none') {
-    const backup = s.backupModel || DEFAULT_BACKUP;
-    const b = await tryOpenRouter(backup, messages, key, 2);
-    if (b.text) return { ok: true, text: b.text.slice(0, 3000), source: 'backup' };
-    logError(backup, errOf(b.status, b.d));
+    const chosen = s.backupModel || DEFAULT_BACKUP;
+    const rest = rankBackups((await freeModels()).filter((m) => m !== chosen && m !== lastBackup));
+    const chain = [chosen, ...(lastBackup && lastBackup !== chosen ? [lastBackup] : []), ...rest];
+    const until = Date.now() + BACKUP_BUDGET_MS;
+    let tried = 0;
+    for (const m of chain) {
+      const b = await tryOpenRouter(m, messages, key, m === chosen ? 2 : 1);
+      tried++;
+      if (b.text) {
+        lastBackup = m;
+        return { ok: true, text: b.text.slice(0, 3000), source: 'backup' };
+      }
+      logError(m, errOf(b.status, b.d));
+      if (Date.now() >= until) {
+        if (tried < chain.length) logError('الاحتياطيات', `انتهت المهلة بعد ${tried} من ${chain.length} موديل`);
+        break;
+      }
+    }
   }
   return { ok: false, error: errOf(r.status, r.d) };
 }

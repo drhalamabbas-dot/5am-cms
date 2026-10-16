@@ -13,9 +13,18 @@ Set-Location $root
 $Host.UI.RawUI.WindowTitle = '5A&M - Stop'
 
 $mysqladmin = 'C:\Program Files\MySQL\MySQL Server 8.4\bin\mysqladmin.exe'
+$dataRoot = Join-Path $env:USERPROFILE '5am-data'
 
 function Listening($p) {
   $null -ne (Get-NetTCPConnection -State Listen -LocalPort $p -ErrorAction SilentlyContinue)
+}
+
+# نسخة القاعدة التي يشغّلها هذا المشروع وحدها — تُعرف بمجلد بياناتها في سطر
+# أوامرها. على الجهاز قد تعمل نسخة MySQL أخرى لتطبيق آخر، وقتلها بالعافية
+# وهي تكتب قد يُتلف بياناته. وما لا نستطيع قراءة سطر أوامره لا نلمسه.
+function OurMysqld {
+  Get-CimInstance Win32_Process -Filter "Name='mysqld.exe'" -ErrorAction SilentlyContinue |
+    Where-Object { $_.CommandLine -and $_.CommandLine -like "*$dataRoot*" }
 }
 
 function Kill-Port($p, $name) {
@@ -67,10 +76,22 @@ if (Listening 3306) {
   Write-Host '   Database .......... was not running' -ForegroundColor DarkGray
 }
 
-# نسخة من القاعدة لم تفتح المنفذ قط (تشغيلان في الوقت نفسه): لم تفتح الملفات،
+# نسخة *من قاعدتنا* لم تفتح المنفذ قط (تشغيلان في الوقت نفسه): لم تفتح الملفات،
 # فإيقافها آمن، ولو بقيت لمنعت التشغيل التالي.
+#
+# ويقتصر هذا على نسختنا وحدها: كان هنا Get-Process mysqld بلا تمييز، فكان
+# يقتل أي MySQL آخر على الجهاز — ولو كان يكتب لتلفت بيانات تطبيق لا شأن له بنا.
 if (-not (Listening 3306)) {
-  Get-Process mysqld -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+  $ours = OurMysqld
+  if ($ours) {
+    $ours | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+    Write-Host '   Database .......... a half-started copy of our database was cleared' -ForegroundColor DarkGray
+  }
+  # نسخة MySQL أخرى على الجهاز تُترك كما هي: ليست لنا.
+  $others = Get-Process mysqld -ErrorAction SilentlyContinue
+  if ($others -and -not $ours) {
+    Write-Host '   Note .............. another MySQL is running on this PC - left untouched' -ForegroundColor DarkGray
+  }
 }
 
 # نوافذ الأوامر التي فتحها ملف التشغيل

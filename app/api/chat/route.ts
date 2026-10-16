@@ -42,6 +42,8 @@ export async function GET(req: Request) {
     enabled: true,
     greeting: s.greeting,
     status: conv?.status ?? null,
+    /* تخبر الواجهة أن تطلب الدخول قبل الكتابة. والمنع نفسه في POST تحت. */
+    requireLogin: s.requireLogin,
     account: acc ? { name: acc.name, email: acc.email, phone: acc.phone_norm } : null,
     messages: conv ? await messages(conv.id, after) : [],
   });
@@ -58,6 +60,10 @@ export async function POST(req: Request) {
   const h = await headers();
   const ip = ipHash((h.get('x-forwarded-for') ?? '').split(',')[0].trim() || h.get('x-real-ip') || null);
   const acc = await currentCustomer();
+
+  /* المحادثة مقصورة على أصحاب الحسابات: المنع هنا لا في الواجهة وحدها، فمن
+     يرسل للـ API مباشرةً يُمنع كذلك. */
+  if (s.requireLogin && !acc) return json({ ok: false, error: 'login' }, 401);
 
   /* ------------------------------------------------------- طلب موظف */
   if (b?.handoff) {

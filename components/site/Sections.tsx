@@ -8,6 +8,8 @@ import type { T } from '@/lib/i18n';
 import { Icon } from './Icon';
 import type { Brand, Product } from '@/lib/content';
 import { Pic, Ico } from './Pic';
+import { Logostrip } from './HomeSections';
+import { ytId } from '@/lib/youtube';
 
 type Any = Record<string, any>;
 
@@ -343,9 +345,14 @@ function Products({ s, ctx }: { s: Any; ctx: Ctx }) {
 }
 
 /* ---------------------------------------------------------- صف الحكاية (story) */
+/* أشكال قسم «صورة ونص» — صنف واحد يغيّر التخطيط، والقائمة مغلقة فلا يصل إلى
+   صفحة الزائر صنف لم يُكتب هنا. */
+const STORY_VARIANTS = new Set(['stack', 'card', 'tall', 'plain']);
+
 function Story({ s, anchor, n, t }: { s: Any; anchor: string | null; n: number; t: T }) {
   const num = String(n).padStart(2, '0');
-  const cls = `sec story${s.flip ? ' story--flip sec--paper' : ''}${s.points ? ' story--long' : ''}`;
+  const variant = STORY_VARIANTS.has(s.variant) ? ` story--${s.variant}` : '';
+  const cls = `sec story${s.flip ? ' story--flip sec--paper' : ''}${s.points ? ' story--long' : ''}${variant}`;
   /* الصورة الأساسية أولًا، ثم صور المعرض بلا تكرار */
   const gallery = [...new Set([s.img, ...(Array.isArray(s.imgs) ? s.imgs : [])].filter(Boolean))] as string[];
   return (
@@ -549,6 +556,244 @@ function Contact({ company, t }: { company: any; t: T }) {
   );
 }
 
+/* ------------------------------------------------------------ أسئلة شائعة
+   details/summary: يُفتح ويُطوى بلا جافاسكريبت، ومحرّك البحث يقرأ السؤال
+   وجوابه معًا حتى والجواب مطويّ. */
+function Faq({ s, anchor, t }: { s: Any; anchor: string | null; t: T }) {
+  const items = (s.items ?? []).filter((i: Any) => t.tx(i.q));
+  if (!items.length) return null;
+  return (
+    <section className="sec" id={anchor ?? undefined}>
+      <div className="wrap">
+        <SectionHead title={s.title} note={s.note} t={t} />
+        <div className="faq">
+          {items.map((i: Any, n: number) => (
+            <details className="faq__i" key={n} {...(s.open && n === 0 ? { open: true } : {})}>
+              <summary className="faq__q">
+                <span>{t.tx(i.q)}</span>
+                <i className="faq__sign" aria-hidden="true" />
+              </summary>
+              <div className="faq__a"><p>{t.tx(i.a)}</p></div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------------------------------------- أرقام وإنجازات */
+function Stats({ s, anchor, t }: { s: Any; anchor: string | null; t: T }) {
+  const items = (s.items ?? []).filter((i: Any) => String(i.v ?? '').trim());
+  if (!items.length) return null;
+  return (
+    <section className={`sec${s.tone === 'paper' ? ' sec--paper' : s.tone === 'light' ? ' sec--light' : ''}`}
+             id={anchor ?? undefined}>
+      <div className="wrap">
+        {t.tx(s.title) ? <SectionHead title={s.title} note={s.note} t={t} /> : null}
+        <dl className="nums">
+          {items.map((i: Any, n: number) => (
+            <div className="nums__i" key={n}>
+              <dt className="nums__v">{i.v}</dt>
+              <dd className="nums__k">{t.tx(i.k)}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------ آراء العملاء */
+function Quotes({ s, anchor, t }: { s: Any; anchor: string | null; t: T }) {
+  const items = (s.items ?? []).filter((i: Any) => t.tx(i.text));
+  if (!items.length) return null;
+  return (
+    <section className="sec" id={anchor ?? undefined}>
+      <div className="wrap">
+        <SectionHead title={s.title} note={s.note} t={t} />
+        <div className="says">
+          {items.map((i: Any, n: number) => (
+            <figure className="say" key={n}>
+              <blockquote className="say__t">{t.tx(i.text)}</blockquote>
+              <figcaption className="say__by">
+                <b>{t.tx(i.who)}</b>
+                {t.tx(i.role) ? <span>{t.tx(i.role)}</span> : null}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------- فيديو
+   تضمين كسول ومن نطاق youtube-nocookie: لا يُحمَّل المشغّل ولا تُكتب كوكي
+   إلا حين يقترب الزائر من الفيديو. */
+function Videos({ s, anchor, t }: { s: Any; anchor: string | null; t: T }) {
+  const items = (s.items ?? []).map((i: Any) => ({ ...i, id: ytId(i.yt) })).filter((i: Any) => i.id);
+  if (!items.length) return null;
+  return (
+    <section className="sec" id={anchor ?? undefined}>
+      <div className="wrap">
+        {t.tx(s.title) ? <SectionHead title={s.title} note={s.note} t={t} /> : null}
+        <div className={`vids${items.length === 1 ? ' vids--one' : ''}`}>
+          {items.map((i: Any, n: number) => (
+            <figure className="vid" key={n}>
+              <div className="vid__box">
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${i.id}`}
+                  title={t.tx(i.cap) || t.tx(s.title) || 'YouTube'}
+                  loading="lazy" allowFullScreen
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  referrerPolicy="strict-origin-when-cross-origin" />
+              </div>
+              {t.tx(i.cap) ? <figcaption className="vid__cap">{t.tx(i.cap)}</figcaption> : null}
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------------------------------------- ملفات للتحميل
+   الملف يُفتح في تبويب جديد لا يحلّ محلّ الصفحة: من فتح كتالوجًا لا يقصد أن
+   يغادر ما كان يقرأ. وdownload يجعل المتصفح يحفظه باسمه بدل عرضه أحيانًا. */
+function Downloads({ s, anchor, t }: { s: Any; anchor: string | null; t: T }) {
+  const items = (s.items ?? []).filter((i: Any) => String(i.file ?? '').trim());
+  if (!items.length) return null;
+  const ext = (p: string) => (p.split('.').pop() ?? '').toUpperCase().slice(0, 4);
+  return (
+    <section className="sec" id={anchor ?? undefined}>
+      <div className="wrap">
+        {t.tx(s.title) ? <SectionHead title={s.title} note={s.note} t={t} /> : null}
+        <ul className="dlist">
+          {items.map((i: Any, n: number) => (
+            <li key={n}>
+              {/* dlist لا dl: ‎.dl‎ مأخوذ في model.css لقائمة أخرى، وإعادة
+                  استعماله هنا كانت تقلب الصفّ عموديًّا. */}
+              <a className="dlist__a" href={i.file} target="_blank" rel="noopener" download>
+                <span className="dlist__ext" aria-hidden="true">{ext(i.file)}</span>
+                <span className="dlist__txt">
+                  <b>{t.tx(i.label) || i.file.split('/').pop()}</b>
+                  {t.tx(i.note) ? <small>{t.tx(i.note)}</small> : null}
+                </span>
+                <svg className="dlist__go" viewBox="0 0 24 24" width="18" height="18" fill="none"
+                     stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                     aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5M4 20h16" /></svg>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------ مسيرة بالسنوات */
+function Timeline({ s, anchor, t }: { s: Any; anchor: string | null; t: T }) {
+  const items = (s.items ?? []).filter((i: Any) => String(i.y ?? '').trim() || t.tx(i.t));
+  if (!items.length) return null;
+  return (
+    <section className={`sec${s.tone === 'paper' ? ' sec--paper' : s.tone === 'light' ? ' sec--light' : ''}`}
+             id={anchor ?? undefined}>
+      <div className="wrap">
+        {t.tx(s.title) ? <SectionHead title={s.title} note={s.note} t={t} /> : null}
+        <ol className="tline">
+          {items.map((i: Any, n: number) => (
+            <li className="tline__i" key={n}>
+              {String(i.y ?? '').trim() ? <b className="tline__y" dir="ltr">{i.y}</b> : null}
+              <div className="tline__b">
+                {t.tx(i.t) ? <h3>{t.tx(i.t)}</h3> : null}
+                {t.tx(i.d) ? <p>{t.tx(i.d)}</p> : null}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------------------------------------- جدول مواصفات
+   جدول حقيقي لا شبكة divs: قارئ الشاشة يقول «المواصفة: القيمة»، وعلى الهاتف
+   تُرصّ الصفوف بـ CSS فيبقى مقروءًا بلا تمرير أفقي. */
+function Specs({ s, anchor, t }: { s: Any; anchor: string | null; t: T }) {
+  const rows = (s.rows ?? []).filter((r: Any) => t.tx(r.k) || t.tx(r.v));
+  if (!rows.length) return null;
+  return (
+    <section className={`sec${s.tone === 'paper' ? ' sec--paper' : s.tone === 'light' ? ' sec--light' : ''}`}
+             id={anchor ?? undefined}>
+      <div className="wrap">
+        {t.tx(s.title) ? <SectionHead title={s.title} note={s.note} t={t} /> : null}
+        <table className="spex">
+          <tbody>
+            {rows.map((r: Any, n: number) => (
+              <tr key={n}>
+                <th scope="row">{t.tx(r.k)}</th>
+                <td>{t.tx(r.v)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------- فريق العمل */
+function Team({ s, anchor, t }: { s: Any; anchor: string | null; t: T }) {
+  const items = (s.items ?? []).filter((i: Any) => t.tx(i.name));
+  if (!items.length) return null;
+  return (
+    <section className="sec" id={anchor ?? undefined}>
+      <div className="wrap">
+        {t.tx(s.title) ? <SectionHead title={s.title} note={s.note} t={t} /> : null}
+        <ul className="crew">
+          {items.map((i: Any, n: number) => (
+            <li className="crew__i" key={n}>
+              {i.img
+                ? <img className="crew__img" src={i.img} alt={t.tx(i.name)} loading="lazy" decoding="async" />
+                : <span className="crew__img crew__img--none" aria-hidden="true">{t.tx(i.name).trim().charAt(0)}</span>}
+              <b>{t.tx(i.name)}</b>
+              {t.tx(i.role) ? <small>{t.tx(i.role)}</small> : null}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------------------------------------------------- ملاحظة بارزة */
+function Callout({ s, anchor, ctx }: { s: Any; anchor: string | null; ctx: Ctx }) {
+  const { t } = ctx;
+  if (!t.tx(s.title) && !t.tx(s.text)) return null;
+  return (
+    <section className={`sec sec--tight${s.tone === 'paper' ? ' sec--paper' : s.tone === 'light' ? ' sec--light' : ''}`}
+             id={anchor ?? undefined}>
+      <div className="wrap">
+        {/* flag لا note: ‎.note‎ مأخوذ في model.css */}
+        <aside className="flag">
+          <span className="flag__ico" aria-hidden="true"><Icon name={s.icon || 'info'} /></span>
+          <div className="flag__b">
+            {t.tx(s.title) ? <b>{t.tx(s.title)}</b> : null}
+            {t.tx(s.text) ? <p>{t.tx(s.text)}</p> : null}
+            {s.cta?.href ? (
+              <a className="tlink" href={t.href(s.cta.href)}>
+                <span>{t.tx(s.cta.label)}</span>
+                <span className="tlink__arrow" aria-hidden="true"><Icon name="arrow" /></span>
+              </a>
+            ) : null}
+          </div>
+        </aside>
+      </div>
+    </section>
+  );
+}
+
 /* ------------------------------------------------------------------ التوزيع */
 export function Section({ s, ctx, storyIndex }: { s: { type: string; anchor: string | null; content: Any }; ctx: Ctx; storyIndex: number }) {
   const c = s.content, a = s.anchor, { t } = ctx;
@@ -564,6 +809,18 @@ export function Section({ s, ctx, storyIndex }: { s: { type: string; anchor: str
     case 'cta':      return <Cta s={c} quoteHref={ctx.quoteHref} t={t} />;
     case 'compare':  return <Compare s={c} anchor={a} t={t} />;
     case 'contact':  return <Contact company={ctx.company} t={t} />;
+    case 'faq':      return <Faq s={c} anchor={a} t={t} />;
+    case 'stats':    return <Stats s={c} anchor={a} t={t} />;
+    case 'quotes':   return <Quotes s={c} anchor={a} t={t} />;
+    case 'video':    return <Videos s={c} anchor={a} t={t} />;
+    case 'downloads': return <Downloads s={c} anchor={a} t={t} />;
+    case 'timeline': return <Timeline s={c} anchor={a} t={t} />;
+    case 'specs':    return <Specs s={c} anchor={a} t={t} />;
+    case 'team':     return <Team s={c} anchor={a} t={t} />;
+    case 'callout':  return <Callout s={c} anchor={a} ctx={ctx} />;
+    /* شريط اللوجوهات كان للرئيسية وحدها؛ صار يُضاف لأي صفحة. رسمه واحد في
+       HomeSections كي لا يوجد شكلان للشريط نفسه. */
+    case 'logostrip': return <Logostrip s={c} brands={ctx.brands} t={t} uid={a ?? 'p'} />;
     default:         return null;
   }
 }

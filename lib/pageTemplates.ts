@@ -42,6 +42,30 @@ export const TEMPLATES: Template[] = [
     sections: ['story', 'steps', 'cta'],
   },
   {
+    id: 'landing',
+    label: 'صفحة تسويقية كاملة',
+    hint: 'شرح، فأرقام، فمزايا، فآراء عملاء، فأسئلة شائعة، ثم دعوة للتواصل. الأطول والأكمل.',
+    sections: ['story', 'stats', 'cards', 'quotes', 'faq', 'cta'],
+  },
+  {
+    id: 'product-brand',
+    label: 'صفحة وكالة أو ماركة',
+    hint: 'تعريف بالماركة، ثم موديلاتها، ثم فيديو، ثم دعوة للتواصل. مثل «وحدات الطرق».',
+    sections: ['story', 'products', 'video', 'cta'],
+  },
+  {
+    id: 'faq',
+    label: 'صفحة أسئلة ودعم',
+    hint: 'شرح قصير، ثم أسئلة شائعة، ثم بيانات التواصل. تصلح لصفحة مساعدة.',
+    sections: ['feature', 'faq', 'cta'],
+  },
+  {
+    id: 'about',
+    label: 'صفحة «من نحن»',
+    hint: 'تعريف بالشركة، فأرقامها، فرؤيتها ورسالتها، فشركائها، ثم دعوة للتواصل.',
+    sections: ['story', 'stats', 'vmv', 'logostrip', 'cta'],
+  },
+  {
     id: 'blank',
     label: 'صفحة فارغة',
     hint: 'تبدأ بلا أقسام، وتضيف ما تشاء بنفسك.',

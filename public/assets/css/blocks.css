@@ -1,0 +1,206 @@
+/* =============================================================================
+   أقسام أُضيفت بعد نقل الموقع: أسئلة شائعة، أرقام، آراء عملاء، فيديو.
+
+   مبنيّة على متغيّرات base.css نفسها (اللون الأساسي والخطوط والحدود)، فتتبع
+   ألوان الموقع إذا غُيّرت من «ألوان وخطوط الموقع»، ولا تحمل ألوانًا ثابتة
+   إلا حيث لا بديل.
+============================================================================= */
+
+/* ================================================= أشكال قسم «صورة ونص»
+   لا تلمس بنية القسم: صنف واحد على <section> يغيّر الشبكة ونسبة الصورة.
+   فالقسم نفسه بمحتواه، ويبقى التبديل بينها بلا أي خطر على ما كُتب فيه. */
+
+/* ملاحظة على نسبة الصورة: ux.css يفرض aspect-ratio:auto على .story__media عمدًا
+   كي تظهر الصورة كاملةً بلا قصّ. فالأشكال هنا تغيّر التخطيط وحده ولا تمسّ
+   النسبة — ولو فرضتها لقصّت الصور عكس ما استقرّ عليه الموقع. */
+
+/* صورة بعرض الصفحة فوق والنصّ تحتها — تناسب صور المواقع والمعدّات الطويلة */
+.story--stack .story__row{ grid-template-columns:minmax(0,1fr) !important; gap:32px; }
+.story--stack .story__media{ max-height:60vh; }
+.story--stack .story__media img{ object-fit:contain; }
+
+/* الصفّ كلّه داخل بطاقة بيضاء مرفوعة */
+.story--card .story__row{
+  background:#fff; border:1px solid var(--line); border-radius:16px;
+  padding:clamp(20px, 3vw, 40px); box-shadow:0 30px 60px -40px rgba(6,11,20,.4);
+  gap:clamp(26px, 4vw, 56px);
+}
+.story--card .story__media{ box-shadow:none; }
+
+/* صورة أضيق ومساحة أوسع للنص — تناسب الصور الرأسية والنصوص الطويلة */
+.story--tall .story__row{ grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr); }
+.story--tall.story--flip .story__row{ grid-template-columns:minmax(0,1.22fr) minmax(0,.78fr); }
+@media (max-width:960px){
+  .story--tall .story__row,
+  .story--tall.story--flip .story__row{ grid-template-columns:minmax(0,1fr); }
+}
+
+/* صورة هادئة: بلا ظلّ ولا تدرّج داكن، بحدّ رفيع */
+.story--plain .story__media{ box-shadow:none; border:1px solid var(--line); border-radius:8px; }
+.story--plain .story__media::after{ display:none; }
+
+/* ------------------------------------------------------------ أسئلة شائعة */
+.faq{ display:flex; flex-direction:column; gap:10px; max-width:860px; }
+.faq__i{
+  border:1px solid var(--line); border-radius:8px; background:#fff;
+  transition:border-color .18s var(--ease, ease), box-shadow .18s var(--ease, ease);
+}
+.faq__i[open]{ border-color:var(--brand-pale, #f1d4c4); box-shadow:0 6px 22px -14px rgba(6,11,20,.35); }
+.faq__i:hover{ border-color:var(--brand-soft, #f3c9b2); }
+.faq__q{
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:16px 20px; cursor:pointer; list-style:none;
+  font-family:var(--display); font-weight:700; font-size:17px; line-height:1.5; color:var(--ink);
+}
+[lang="ar"] .faq__q{ font-family:var(--display-ar); }
+.faq__q::-webkit-details-marker{ display:none; }
+.faq__q:focus-visible{ outline:2px solid var(--brand); outline-offset:-2px; border-radius:8px; }
+/* علامة + تصير − عند الفتح: تُفهم بلا كلام وبلا ملف أيقونات */
+.faq__sign{
+  position:relative; flex:0 0 auto; width:18px; height:18px;
+  color:var(--brand-strong, var(--brand));
+}
+.faq__sign::before, .faq__sign::after{
+  content:""; position:absolute; inset-inline:0; top:50%; height:2px; border-radius:2px;
+  background:currentColor; transform:translateY(-50%);
+}
+.faq__sign::after{ rotate:90deg; transition:rotate .22s var(--ease, ease), opacity .22s; }
+.faq__i[open] .faq__sign::after{ rotate:0deg; opacity:0; }
+.faq__a{ padding:0 20px 18px; }
+.faq__a p{ margin:0; color:var(--body); line-height:1.9; }
+@media (max-width:600px){ .faq__q{ font-size:15.5px; padding:14px 16px; } .faq__a{ padding:0 16px 16px; } }
+
+/* -------------------------------------------------------- أرقام وإنجازات */
+.nums{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
+  gap:0; margin:0; border:1px solid var(--line); border-radius:4px;
+  background:#fff; overflow:hidden;
+}
+.nums__i{ padding:26px 24px; border-inline-start:1px solid var(--line); }
+.nums__i:first-child{ border-inline-start:0; }
+.nums__v{
+  font-family:var(--display); font-weight:800; font-size:clamp(30px, 3.4vw, 46px);
+  line-height:1; color:var(--ink); letter-spacing:-.02em; font-variant-numeric:tabular-nums;
+}
+.nums__k{
+  margin:9px 0 0; font-size:13.5px; font-weight:600; color:var(--muted); line-height:1.6;
+}
+/* شعرة بلون الماركة فوق كل رقم: تربط الصفّ بهوية الموقع بلا ضجيج */
+.nums__i{ position:relative; }
+.nums__i::before{
+  content:""; position:absolute; inset-block-start:0; inset-inline-start:0; width:34px; height:3px;
+  background:var(--brand);
+}
+@media (max-width:760px){
+  .nums{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+  .nums__i{ padding:20px 18px; border-top:1px solid var(--line); }
+  .nums__i:nth-child(-n+2){ border-top:0; }
+  .nums__i:nth-child(2n+1){ border-inline-start:0; }
+}
+
+/* ------------------------------------------------------------ آراء العملاء */
+.says{ display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr)); gap:18px; }
+.say{
+  margin:0; padding:26px 24px 22px; background:#fff;
+  border:1px solid var(--line); border-radius:8px;
+  display:flex; flex-direction:column; gap:16px;
+}
+/* علامة اقتباس مرسومة بالخطّ نفسه، لا صورة */
+.say::before{
+  content:"”"; display:block; font-family:var(--display); font-size:52px; line-height:.6;
+  color:var(--brand); opacity:.5;
+}
+.say__t{ margin:0; font-size:16px; line-height:1.9; color:var(--body); }
+.say__by{ margin-top:auto; padding-top:14px; border-top:1px solid var(--line); }
+.say__by b{ display:block; font-weight:700; font-size:14.5px; color:var(--ink); }
+.say__by span{ display:block; margin-top:2px; font-size:13px; color:var(--muted); }
+
+/* ------------------------------------------------------------------- فيديو */
+.vids{ display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px; }
+.vids--one{ grid-template-columns:minmax(0,1fr); max-width:900px; }
+.vid{ margin:0; }
+.vid__box{
+  position:relative; aspect-ratio:16/9; border-radius:8px; overflow:hidden;
+  background:var(--navy, #060B14); border:1px solid var(--line);
+}
+.vid__box iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
+.vid__cap{ margin-top:10px; font-size:14px; color:var(--muted); line-height:1.7; }
+
+
+/* ================================================== ملفات للتحميل
+   صفّ لكل ملف: نوعه ثم اسمه ثم سهم نزول. مساحة الضغط هي الصفّ كله لا
+   الاسم وحده — أسهل على الإصبع في الهاتف. */
+.dlist{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+.dlist__a{
+  display:flex; align-items:center; gap:14px; padding:14px 16px;
+  border:1px solid var(--line); border-radius:var(--radius-lg, 6px); background:#fff;
+  color:inherit; transition:border-color .2s var(--ease), box-shadow .2s var(--ease), transform .2s var(--ease);
+}
+.dlist__a:hover{ border-color:var(--brand); box-shadow:var(--shadow-sm); transform:translateY(-1px); color:inherit; }
+.dlist__ext{
+  flex:0 0 auto; min-width:46px; text-align:center; padding:7px 8px; border-radius:4px;
+  background:var(--brand); color:#fff; font-size:11.5px; font-weight:700; letter-spacing:.04em;
+}
+.dlist__txt{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:3px; }
+.dlist__txt b{ font-size:16px; }
+.dlist__txt small{ color:var(--muted); font-size:13.5px; }
+.dlist__go{ flex:0 0 auto; color:var(--brand); }
+
+/* ================================================== مسيرة بالسنوات
+   خطّ رأسي ونقاط عليه. الخطّ من ::before على القائمة لا عنصرًا في الصفحة. */
+.tline{ list-style:none; margin:0; padding:0; position:relative; }
+.tline::before{
+  content:""; position:absolute; inset-block:10px; inset-inline-start:7px;
+  width:2px; background:var(--line);
+}
+.tline__i{ position:relative; padding-inline-start:34px; padding-bottom:26px; }
+.tline__i:last-child{ padding-bottom:0; }
+.tline__i::before{
+  content:""; position:absolute; inset-inline-start:0; top:6px; width:16px; height:16px;
+  border-radius:50%; background:#fff; border:3px solid var(--brand);
+}
+/* inline-block لا block: الرقم مكتوب بـ dir=ltr، ولو ملأ عرض السطر
+   انزلق إلى يسار الصفحة بعيدًا عن نقطته. */
+.tline__y{ display:inline-block; color:var(--brand-strong, var(--brand)); font-size:14px; font-weight:700; letter-spacing:.04em; }
+.tline__b h3{ margin:4px 0 6px; font-size:19px; }
+.tline__b p{ margin:0; color:var(--body); }
+
+/* ================================================== جدول مواصفات
+   جدول حقيقي؛ وعلى الهاتف تصير الخلايا كتلًا مرصوصة فلا تمرير أفقي. */
+.spex{ width:100%; border-collapse:collapse; border:1px solid var(--line); border-radius:var(--radius-lg, 6px); overflow:hidden; }
+.spex tr:nth-child(odd){ background:#FAFAF9; }
+.spex th, .spex td{ padding:13px 16px; text-align:start; font-size:15px; vertical-align:top; }
+.spex th{ width:38%; font-weight:600; color:var(--ink); border-inline-end:1px solid var(--line); }
+.spex td{ color:var(--body); }
+.spex tr + tr th, .spex tr + tr td{ border-top:1px solid var(--line); }
+@media (max-width:600px){
+  .spex, .spex tbody, .spex tr, .spex th, .spex td{ display:block; width:auto; }
+  .spex th{ border-inline-end:0; padding-bottom:2px; color:var(--muted); font-size:13px; }
+  .spex td{ padding-top:0; font-weight:600; }
+  .spex tr + tr th{ border-top:1px solid var(--line); padding-top:13px; }
+  .spex tr + tr td{ border-top:0; }
+}
+
+/* ================================================== فريق العمل */
+.crew{ list-style:none; margin:0; padding:0; display:grid; gap:24px; grid-template-columns:repeat(auto-fit, minmax(min(160px, 100%), 1fr)); }
+.crew__i{ text-align:center; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.crew__img{ width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:10px; background:#EFEAE8; }
+.crew__img--none{
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--display); font-size:40px; font-weight:700; color:var(--brand);
+}
+.crew__i b{ font-size:16.5px; }
+.crew__i small{ color:var(--muted); font-size:14px; }
+
+/* ================================================== ملاحظة بارزة */
+.flag{
+  display:flex; gap:16px; align-items:flex-start; padding:20px 22px;
+  background:#fff; border:1px solid var(--line); border-radius:var(--radius-lg, 6px);
+  border-inline-start:4px solid var(--brand);
+}
+.flag__ico{ flex:0 0 auto; display:flex; width:38px; height:38px; align-items:center; justify-content:center; border-radius:50%; background:var(--brand); color:#fff; }
+.flag__ico svg{ width:19px; height:19px; }
+.flag__b{ flex:1 1 auto; min-width:0; }
+.flag__b b{ display:block; font-size:18px; margin-bottom:5px; }
+.flag__b p{ margin:0; color:var(--body); }
+.flag__b .tlink{ margin-top:10px; }

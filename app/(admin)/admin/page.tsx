@@ -35,10 +35,10 @@ export default async function AdminHome({ searchParams }: { searchParams: Promis
            sub="كل ما في الموقع يُعدَّل من هنا، ويظهر للزائر فور الحفظ.">
       {deniedMsg ? <p className="msg msg--bad" role="alert">{deniedMsg}</p> : null}
       <div className="grid grid--4" style={{ marginBottom: 22 }}>
-        <div className="stat"><b>{n.pages}</b><span>صفحة منشورة</span></div>
-        <div className="stat"><b>{n.sections}</b><span>قسم</span></div>
-        <div className="stat"><b>{n.products}</b><span>منتج</span></div>
-        <div className="stat"><b>{n.media}</b><span>ملف في المكتبة</span></div>
+        <div className="stat stat--fill stat--1"><b>{n.pages}</b><span>صفحة منشورة</span></div>
+        <div className="stat stat--fill stat--2"><b>{n.sections}</b><span>قسم</span></div>
+        <div className="stat stat--fill stat--3"><b>{n.products}</b><span>منتج</span></div>
+        <div className="stat stat--4"><b>{n.media}</b><span>ملف في المكتبة</span></div>
         <div className="stat"><b>{n.translations}</b><span>نص مترجم</span></div>
       </div>
 

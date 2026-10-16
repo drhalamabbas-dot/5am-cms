@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { ASSET_V } from '@/lib/version';
+import { Motion } from '@/components/admin/Motion';
 
 export const metadata: Metadata = {
   title: 'لوحة تحكم 5A&M',
@@ -22,7 +23,7 @@ export default function AdminRootLayout({ children }: { children: ReactNode }) {
         {/* موسوم ببصمة المحتوى: بعد كل تحديث يصل التصميم الجديد لا المخزَّن */}
         <link rel="stylesheet" href={`/admin.css?v=${ASSET_V}`} />
       </head>
-      <body>{children}</body>
+      <body>{children}<Motion /></body>
     </html>
   );
 }

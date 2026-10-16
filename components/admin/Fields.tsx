@@ -8,7 +8,7 @@
 
    الجافاسكريبت هنا لأمرين فقط: إضافة عنصر إلى قائمة وحذفه، وتغيير ترتيبه.
 ============================================================================= */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Field } from '@/lib/sectionSchema';
 import { MediaPicker, byName } from './MediaPicker';
 
@@ -17,22 +17,28 @@ type Any = Record<string, any>;
 const D = (v: any) => (v && typeof v === 'object' ? v : { en: v ?? '', ar: '' });
 
 /* --------------------------------------------------------- نص بلغتيه */
-function Dual({ name, label, hint, value, long }: Any) {
+function Dual({ name, label, hint, value, long, suggest }: Any) {
+  /* الاقتراح يكتب في الحقل، والحقل غير محكوم (defaultValue) كي لا يُعاد رسمه
+     مع كل حرف. فيُعاد تركيبه بمفتاح جديد ليظهر ما كُتب فيه. */
+  const [v, setV] = useState<any>(value);
+  const [rev, setRev] = useState(0);
   return (
-    <div className="field">
+    <div className="field" key={rev}>
       <label>{label}</label>
+      <Suggest list={suggest} mode="fill"
+               onPick={(s) => { setV(s); setRev((r) => r + 1); }} />
       <div className="row">
         <div>
           <small>عربي</small>
           {long
-            ? <textarea name={`${name}.ar`} defaultValue={D(value).ar ?? ''} />
-            : <input type="text" name={`${name}.ar`} defaultValue={D(value).ar ?? ''} />}
+            ? <textarea name={`${name}.ar`} defaultValue={D(v).ar ?? ''} />
+            : <input type="text" name={`${name}.ar`} defaultValue={D(v).ar ?? ''} />}
         </div>
         <div dir="ltr">
           <small style={{ display: 'block', textAlign: 'start' }}>English</small>
           {long
-            ? <textarea name={`${name}.en`} defaultValue={D(value).en ?? ''} />
-            : <input type="text" name={`${name}.en`} defaultValue={D(value).en ?? ''} />}
+            ? <textarea name={`${name}.en`} defaultValue={D(v).en ?? ''} />
+            : <input type="text" name={`${name}.en`} defaultValue={D(v).en ?? ''} />}
         </div>
       </div>
       {hint ? <p className="field__hint">{hint}</p> : null}
@@ -83,13 +89,14 @@ function ImageField({ name, label, hint, value, kind = 'image' }: Any) {
 }
 
 /* ------------------------------------------- قائمة نصوص، كلٌّ بلغتيه */
-function ListField({ name, label, hint, value }: Any) {
+function ListField({ name, label, hint, value, suggest }: Any) {
   const [items, setItems] = useState<any[]>(Array.isArray(value) ? value : []);
   const set = (i: number, k: 'en' | 'ar', v: string) =>
     setItems(items.map((x, n) => (n === i ? { ...D(x), [k]: v } : x)));
   return (
     <div className="field">
       <label>{label}</label>
+      <Suggest list={suggest} used={items} onPick={(v) => setItems([...items, v])} />
       {items.map((it, i) => (
         <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center' }}>
           <input type="text" name={`${name}.${i}.ar`} value={D(it).ar ?? ''}
@@ -181,12 +188,43 @@ function ImageList({ name, label, hint, value }: Any) {
   );
 }
 
+/* --------------------------------------------- اقتراحات تُضاف بضغطة
+   الحقل الفارغ أصعب من الحقل الممتلئ: من يفتح قسمًا جديدًا يرى حقولًا بيضاء
+   ولا يعرف بم يبدأ. فتُعرض هنا صيغ جاهزة يضغطها فتُضاف ثم يعدّل عليها.
+
+   وما يُضغط هو ما يُضاف فقط: لا نملأ القسم بنصّ لم يختره أحد فيُنشر سهوًا. */
+function Suggest({ list, used, onPick, mode = 'add' }: {
+  list?: { label: string; value: any }[];
+  /** ما أُضيف بالفعل فلا يُعرض ثانيةً (بالمقارنة النصّية للقيمة) */
+  used?: any[];
+  onPick: (v: any) => void;
+  /** add: يُضاف إلى القائمة · fill: يملأ حقلًا واحدًا */
+  mode?: 'add' | 'fill';
+}) {
+  if (!list?.length) return null;
+  const seen = new Set((used ?? []).map((v) => JSON.stringify(v)));
+  const rest = list.filter((s) => !seen.has(JSON.stringify(s.value)));
+  if (!rest.length) return null;
+  return (
+    <div className="sugg">
+      <small>{mode === 'fill' ? 'اقتراحات — اضغط ليُكتب' : 'اقتراحات — اضغط ليُضاف'}</small>
+      <div className="sugg__row">
+        {rest.map((s, i) => (
+          <button type="button" key={i} className="sugg__one"
+                  onClick={() => onPick(structuredClone(s.value))}>{s.label}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ------------------------------------------------- قائمة نصوص مفردة */
-function PlainList({ name, label, hint, value, placeholder }: Any) {
+function PlainList({ name, label, hint, value, placeholder, suggest }: Any) {
   const [items, setItems] = useState<string[]>(Array.isArray(value) ? value : []);
   return (
     <div className="field">
       <label>{label}</label>
+      <Suggest list={suggest} used={items} onPick={(v) => setItems([...items, v])} />
       {items.map((it, i) => (
         <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
           <input type="text" name={`${name}.${i}`} dir="ltr" value={it} placeholder={placeholder}
@@ -197,6 +235,103 @@ function PlainList({ name, label, hint, value, placeholder }: Any) {
       ))}
       <button type="button" className="btn btn--ghost btn--sm"
               onClick={() => setItems([...items, ''])}>+ سطر</button>
+      {hint ? <p className="field__hint">{hint}</p> : null}
+    </div>
+  );
+}
+
+/* ------------------------------------------- اختيار لوجوهات بالضغط
+   شريط اللوجوهات كان حقل أسطر: تكتب معرّف كل ماركة بسطر وتحفظه عن ظهر قلب.
+   وهي بيانات موجودة عندنا أصلًا، فالأولى أن تُعرض ليضغط عليها.
+
+   ما يُحفظ لم يتغيّر: مصفوفة معرّفات بنفس الأسماء المنقوطة، فالصفحات القديمة
+   تُقرأ كما هي، ومعرّف لم يعد له ماركة يبقى ظاهرًا ليُحذف بوعي لا أن يختفي. */
+function BrandsField({ name, label, hint, value }: Any) {
+  const [picked, setPicked] = useState<string[]>(
+    Array.isArray(value) ? value.filter((v) => typeof v === 'string') : []);
+  const [all, setAll] = useState<{ slug: string; name: string; logo: string | null }[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/admin/brands')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((d) => { if (alive) setAll(d.brands ?? []); })
+      .catch(() => { if (alive) setFailed(true); });
+    return () => { alive = false; };
+  }, []);
+
+  const by = new Map((all ?? []).map((b) => [b.slug, b]));
+  const rest = (all ?? []).filter((b) => !picked.includes(b.slug));
+  const move = (i: number, d: number) => {
+    const n = [...picked]; const j = i + d;
+    if (j < 0 || j >= n.length) return;
+    [n[i], n[j]] = [n[j], n[i]];
+    setPicked(n);
+  };
+  /* ماركة بلا لوجو لا تظهر في الشريط (يرشّحها Logostrip)، فالأوضح تنبيه من
+     يختارها هنا بدل أن يحفظ ثم يسأل لماذا لا يراها. */
+  const noLogo = (slug: string) => by.has(slug) && !by.get(slug)!.logo;
+
+  return (
+    <div className="field">
+      <label>{label}</label>
+      {picked.map((slug, i) => (
+        <input key={`v-${i}`} type="hidden" name={`${name}.${i}`} value={slug} />
+      ))}
+
+      {picked.length ? (
+        <ul className="brandpick__on">
+          {picked.map((slug, i) => (
+            <li key={slug + i}>
+              <span className="brandpick__thumb">
+                {by.get(slug)?.logo
+                  ? <img src={by.get(slug)!.logo!} alt="" />
+                  : <b dir="ltr">{slug}</b>}
+              </span>
+              <span className="brandpick__name">
+                {by.get(slug)?.name ?? slug}
+                {noLogo(slug) ? <em>بلا لوجو — لن تظهر في الشريط</em> : null}
+                {all && !by.has(slug) ? <em>ماركة محذوفة</em> : null}
+              </span>
+              <span className="brandpick__acts">
+                <button type="button" className="btn btn--ghost btn--sm" onClick={() => move(i, -1)}
+                        disabled={i === 0} aria-label="قدّمها">↑</button>
+                <button type="button" className="btn btn--ghost btn--sm" onClick={() => move(i, 1)}
+                        disabled={i === picked.length - 1} aria-label="أخّرها">↓</button>
+                <button type="button" className="btn btn--bad btn--sm"
+                        onClick={() => setPicked(picked.filter((_, n) => n !== i))}>احذفها</button>
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="field__hint" style={{ marginTop: 0 }}>لم تختر ماركة بعد.</p>}
+
+      {failed ? (
+        <p className="field__hint">تعذّر تحميل قائمة الماركات. حدّث الصفحة.</p>
+      ) : !all ? (
+        <p className="field__hint">يُحمّل الماركات…</p>
+      ) : rest.length ? (
+        <>
+          <div className="brandpick__head">
+            <small>اضغط لتضيفها</small>
+            <button type="button" className="btn btn--ghost btn--sm"
+                    onClick={() => setPicked([...picked, ...rest.filter((b) => b.logo).map((b) => b.slug)])}>
+              أضف كل ما له لوجو
+            </button>
+          </div>
+          <div className="brandpick">
+            {rest.map((b) => (
+              <button type="button" key={b.slug} className="brandpick__one"
+                      onClick={() => setPicked([...picked, b.slug])}>
+                {b.logo ? <img src={b.logo} alt="" /> : <span className="brandpick__nologo">بلا لوجو</span>}
+                <small>{b.name}</small>
+              </button>
+            ))}
+          </div>
+        </>
+      ) : <p className="field__hint">كل الماركات مختارة.</p>}
+
       {hint ? <p className="field__hint">{hint}</p> : null}
     </div>
   );
@@ -220,8 +355,9 @@ function LinkField({ name, label, hint, value }: Any) {
 }
 
 /* ---------------------------------------- قائمة عناصر لكلٍّ حقوله */
-function Repeat({ name, label, hint, value, of, item }: Any) {
+function Repeat({ name, label, hint, value, of, item, suggest }: Any) {
   const [rows, setRows] = useState<any[]>(Array.isArray(value) ? value : value ? [value] : []);
+  const [rev, setRev] = useState(0);
   const move = (i: number, d: number) => {
     const j = i + d;
     if (j < 0 || j >= rows.length) return;
@@ -233,8 +369,12 @@ function Repeat({ name, label, hint, value, of, item }: Any) {
     <div className="field">
       <label>{label}</label>
       {hint ? <p className="field__hint" style={{ marginTop: 0, marginBottom: 10 }}>{hint}</p> : null}
+      {/* الصفوف مركّبة بالمفتاح rev: الاقتراح يضيف صفًّا بقيم، وحقول الصفّ
+          تحتفظ بقيمتها الابتدائية داخلها، فبلا إعادة تركيب يظهر الصفّ فارغًا. */}
+      <Suggest list={suggest} used={rows}
+               onPick={(v) => { setRows([...rows, v]); setRev((r) => r + 1); }} />
       {rows.map((row, i) => (
-        <div key={i} style={{
+        <div key={`${rev}-${i}`} style={{
           border: '1px solid var(--line)', borderRadius: 8, padding: 14,
           marginBottom: 12, background: '#fbfcfe',
         }}>
@@ -261,13 +401,15 @@ function Repeat({ name, label, hint, value, of, item }: Any) {
 /* ------------------------------------------------------------ التوزيع */
 export function FieldView({ f, name, value }: { f: Field; name: string; value: any }) {
   switch (f.kind) {
-    case 'dual': return <Dual name={name} label={f.label} hint={f.hint} value={value} />;
-    case 'long': return <Dual name={name} label={f.label} hint={f.hint} value={value} long />;
+    case 'dual': return <Dual name={name} label={f.label} hint={f.hint} value={value} suggest={f.suggest} />;
+    case 'long': return <Dual name={name} label={f.label} hint={f.hint} value={value} suggest={f.suggest} long />;
     case 'image': return <ImageField name={name} label={f.label} hint={f.hint} value={value} />;
-    case 'list': return <ListField name={name} label={f.label} hint={f.hint} value={value} />;
+    case 'list': return <ListField name={name} label={f.label} hint={f.hint} value={value} suggest={f.suggest} />;
     case 'images': return <ImageList name={name} label={f.label} hint={f.hint} value={value} />;
     case 'video': return <ImageField name={name} label={f.label} hint={f.hint} value={value} kind="video" />;
-    case 'texts': return <PlainList name={name} label={f.label} hint={f.hint} value={value} placeholder="" />;
+    case 'file': return <ImageField name={name} label={f.label} hint={f.hint ?? 'ارفعه أولًا من «الصور والفيديو»، ثم اختره من هنا.'} value={value} kind="document" />;
+    case 'texts': return <PlainList name={name} label={f.label} hint={f.hint} value={value} suggest={f.suggest} placeholder="" />;
+    case 'brands': return <BrandsField name={name} label={f.label} hint={f.hint} value={value} />;
     case 'num':
       return (
         <div className="field">
@@ -278,7 +420,7 @@ export function FieldView({ f, name, value }: { f: Field; name: string; value: a
       );
     case 'refs': return <PlainList name={name} label={f.label} hint={f.hint ?? 'معرّف منتج في كل سطر.'} value={value} placeholder="genset-canopy" />;
     case 'link': return <LinkField name={name} label={f.label} hint={f.hint} value={value} />;
-    case 'repeat': return <Repeat name={name} label={f.label} hint={f.hint} value={value} of={f.of} item={f.item ?? 'عنصر'} />;
+    case 'repeat': return <Repeat name={name} label={f.label} hint={f.hint} value={value} of={f.of} item={f.item ?? 'عنصر'} suggest={f.suggest} />;
     case 'group':
       return (
         <fieldset style={{ border: '1px solid var(--line)', borderRadius: 8, padding: 14, marginBottom: 16 }}>

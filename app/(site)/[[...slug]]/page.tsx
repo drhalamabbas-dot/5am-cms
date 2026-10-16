@@ -147,7 +147,7 @@ export default async function Page(
     <i className={`ux-mark${hidden ? ' is-hidden' : ''}`} data-sec={id} id={`ux-sec-${id}`} aria-hidden="true" />;
   /* تصميم القسم (lib/design.ts): قواعده قبله مباشرةً، ولا شيء إن لم يُصمَّم */
   const Design = ({ id, d }: { id: number | 'hero'; d: any }) => {
-    const css = designCss(id, d, Boolean(editor));
+    const css = designCss(id, d, Boolean(editor), Boolean(preview));
     return css ? <style data-sd={id}>{css}</style> : null;
   };
 

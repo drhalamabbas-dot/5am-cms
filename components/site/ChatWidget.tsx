@@ -23,6 +23,10 @@ const TXT = {
     account: 'سجّل دخولك علشان تكمّل المحادثة بعدين من أي جهاز', accountIn: 'حسابي',
     err: 'تعذّر الإرسال، حاول تاني.', wait: 'رسائل كتير ورا بعض — استنى دقيقة.', phoneErr: 'اكتب رقم موبايل صحيح.',
     privacy: 'المحادثة محفوظة لتحسين الرد عليك.',
+    gateTitle: 'سجّل دخولك علشان تبدأ المحادثة',
+    gateWhy: 'عشان فريقنا يعرف يرد عليك، وتلاقي محادثتك في أي وقت ومن أي جهاز.',
+    gateBtn: 'دخول أو حساب جديد',
+    gateNote: 'بالموبايل وكلمة مرور، أو برمز يوصل على بريدك.',
   },
   en: {
     open: 'Chat with us', title: '5A&M assistant', bot: 'Replies instantly', human: 'With our team', close: 'Close',
@@ -32,6 +36,10 @@ const TXT = {
     account: 'Sign in to continue this chat later from any device', accountIn: 'My account',
     err: 'Could not send — try again.', wait: 'Too many messages — wait a minute.', phoneErr: 'Enter a valid mobile number.',
     privacy: 'This chat is saved to help us serve you.',
+    gateTitle: 'Sign in to start the chat',
+    gateWhy: 'So our team can reply to you, and you can pick the chat up any time from any device.',
+    gateBtn: 'Sign in or create an account',
+    gateNote: 'With a mobile and password, or a code sent to your email.',
   },
 };
 
@@ -64,6 +72,8 @@ export function ChatWidget({ lang, greeting }: { lang: 'ar' | 'en'; greeting: st
   const [handoff, setHandoff] = useState(false);
   const [note, setNote] = useState('');
   const [unseen, setUnseen] = useState(false);
+  /* null = لم نسأل الخادم بعد، فلا نومض بلوحة الدخول قبل أن نعرف */
+  const [needLogin, setNeedLogin] = useState<boolean | null>(null);
   const lastId = useRef(0);
   const list = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
@@ -84,6 +94,7 @@ export function ChatWidget({ lang, greeting }: { lang: 'ar' | 'en'; greeting: st
       const d = await r.json();
       if (d.enabled === false) return;
       setStatus(d.status); setAcc(d.account);
+      setNeedLogin(Boolean(d.requireLogin) && !d.account);
       if (d.messages?.length) {
         merge(d.messages);
         if (d.messages.some((m: Msg) => m.role === 'agent')) setUnseen(true);
@@ -128,6 +139,8 @@ export function ChatWidget({ lang, greeting }: { lang: 'ar' | 'en'; greeting: st
         body: JSON.stringify({ text: v, lang, page: location.pathname + location.search }) });
       const d = await r.json().catch(() => ({}));
       setMsgs((c) => c.filter((m) => m.id !== temp.id));
+      /* انتهت جلسته وهو يكتب؟ تظهر له لوحة الدخول لا رسالة خطأ غامضة */
+      if (r.status === 401 || d?.error === 'login') { setNeedLogin(true); setText(v); return; }
       if (!r.ok || !d.ok) { setNote(r.status === 429 ? t.wait : t.err); setText(v); return; }
       try { localStorage.setItem(ACTIVE, '1'); } catch { /* */ }
       merge(d.messages); setStatus(d.status ?? 'bot');
@@ -168,7 +181,8 @@ export function ChatWidget({ lang, greeting }: { lang: 'ar' | 'en'; greeting: st
 
           <div className="ux-chat__list" ref={list} aria-live="polite">
             <p className="ux-chat__msg ux-chat__msg--bot">{greeting}</p>
-            {!msgs.length ? (
+            {/* الاقتراحات تبعث رسالة فورًا، فتُخفى حين يُطلب الدخول */}
+            {!msgs.length && !needLogin ? (
               <div className="ux-chat__chips">
                 {t.chips.map((c) => <button type="button" key={c} onClick={() => send(c)}>{c}</button>)}
               </div>
@@ -191,14 +205,25 @@ export function ChatWidget({ lang, greeting }: { lang: 'ar' | 'en'; greeting: st
           </div>
 
           {note ? <p className="ux-chat__note" role="alert">{note}</p> : null}
-          <form className="ux-chat__input" onSubmit={(e) => { e.preventDefault(); send(text); }}>
-            <textarea ref={input} rows={1} value={text} maxLength={1000} placeholder={t.placeholder} aria-label={t.placeholder}
-                      onChange={(e) => setText(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(text); } }} />
-            <button type="submit" disabled={busy || !text.trim()} aria-label={t.send}>
-              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M3 20.5 21 12 3 3.5 3 10l12 2-12 2z"/></svg>
-            </button>
-          </form>
+
+          {/* المحادثة مقصورة على أصحاب الحسابات: مكان الكتابة يصير مدخل دخول */}
+          {needLogin ? (
+            <div className="ux-chat__gate">
+              <b>{t.gateTitle}</b>
+              <p>{t.gateWhy}</p>
+              <a className="btn btn--sm" href={accountHref}>{t.gateBtn}</a>
+              <small>{t.gateNote}</small>
+            </div>
+          ) : (
+            <form className="ux-chat__input" onSubmit={(e) => { e.preventDefault(); send(text); }}>
+              <textarea ref={input} rows={1} value={text} maxLength={1000} placeholder={t.placeholder} aria-label={t.placeholder}
+                        onChange={(e) => setText(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(text); } }} />
+              <button type="submit" disabled={busy || !text.trim()} aria-label={t.send}>
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M3 20.5 21 12 3 3.5 3 10l12 2-12 2z"/></svg>
+              </button>
+            </form>
+          )}
           <p className="ux-chat__foot">
             {acc ? <a href={accountHref}>{t.accountIn}</a> : <a href={accountHref}>{t.account}</a>}
             <span> · {t.privacy}</span>

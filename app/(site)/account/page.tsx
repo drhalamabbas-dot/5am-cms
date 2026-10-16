@@ -41,6 +41,11 @@ const TX = {
     otherEmail: 'بريد تاني', phone: 'رقم الموبايل', password: 'كلمة المرور', login: 'دخول', name: 'الاسم', register: 'حساب جديد',
     registerHint: 'كلمة المرور 8 أحرف على الأقل.', hello: 'أهلًا', logout: 'خروج',
     chats: 'محادثاتي', noChats: 'لا محادثات بعد.', continue: 'كمّل المحادثة', requests: 'طلباتي', noRequests: 'لا طلبات بعد.',
+    replied: 'فريقنا ردّ عليك', waiting: 'في انتظار ردّنا', msgs: 'رسالة', showChat: 'اعرض المحادثة',
+    who: { user: 'أنت', bot: 'المساعد', agent: 'فريق 5A&M', system: '' } as Record<string, string>,
+    convStatus: { bot: 'مع المساعد', human: 'مع فريقنا', closed: 'مقفولة' } as Record<string, string>,
+    myInfo: 'بياناتي', myInfoSub: 'بتساعد فريقنا يرد عليك أسرع ويعرف طبيعة شغلك.',
+    pname: 'الاسم', company: 'الشركة', city: 'المدينة', save: 'احفظ', saved: 'اتحفظت بياناتك.',
     erase: 'امسح حسابي وبياناتي', eraseConfirm: 'مسح حسابك ومحادثاتك وبياناتك الشخصية نهائيًا؟',
     privacy: 'نحفظ بياناتك للتواصل معك بخصوص طلباتك فقط، وتقدر تمسحها في أي وقت.',
     devNote: 'وضع التطوير: البريد غير مضبوط، فالرمز مطبوع في نافذة الموقع.',
@@ -57,6 +62,11 @@ const TX = {
     otherEmail: 'Use another email', phone: 'Mobile number', password: 'Password', login: 'Sign in', name: 'Name', register: 'Create account',
     registerHint: 'At least 8 characters.', hello: 'Hello', logout: 'Sign out',
     chats: 'My conversations', noChats: 'No conversations yet.', continue: 'Continue the chat', requests: 'My requests', noRequests: 'No requests yet.',
+    replied: 'Our team replied', waiting: 'Waiting for our reply', msgs: 'messages', showChat: 'Show the conversation',
+    who: { user: 'You', bot: 'Assistant', agent: '5A&M team', system: '' } as Record<string, string>,
+    convStatus: { bot: 'With the assistant', human: 'With our team', closed: 'Closed' } as Record<string, string>,
+    myInfo: 'My details', myInfoSub: 'They help our team reply faster and understand your work.',
+    pname: 'Name', company: 'Company', city: 'City', save: 'Save', saved: 'Your details were saved.',
     erase: 'Delete my account and data', eraseConfirm: 'Permanently delete your account, conversations and personal data?',
     privacy: 'We keep your details only to contact you about your requests, and you can delete them any time.',
     devNote: 'Development mode: email is not configured, so the code is printed in the site window.',
@@ -68,7 +78,7 @@ const TX = {
   },
 };
 
-type SP = { lang?: string; e?: string; dev?: string };
+type SP = { lang?: string; e?: string; dev?: string; ok?: string };
 
 /* خارج الصفحة عمدًا: دالة داخلها لا تُمرَّر لإجراءات الخادم */
 async function ipOf() {
@@ -121,6 +131,22 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
     await endCustomerSession();
     redirect(self);
   }
+  /* بيانات العميل: يكتبها بنفسه فيراها الموظف في المحادثة وفي شاشة العملاء.
+     تُكتب في سجلّ العميل نفسه، لا في جدول منفصل. */
+  async function saveProfile(form: FormData) {
+    'use server';
+    const a = await currentCustomer();
+    if (!a?.customer_id) redirect(self);
+    const s = (k: string, max: number) => {
+      const v = String(form.get(k) ?? '').trim().slice(0, max);
+      return v || null;
+    };
+    const name = s('pname', 120);
+    await q('UPDATE customers SET name = COALESCE(?, name), company = ?, city = ? WHERE id = ?',
+      [name, s('company', 160), s('city', 120), a.customer_id]);
+    if (name) await q('UPDATE customer_accounts SET name = COALESCE(name, ?) WHERE id = ?', [name, a.id]);
+    redirect(`${self}&ok=profile`);
+  }
   async function erase() {
     'use server';
     const a = await currentCustomer();
@@ -141,12 +167,27 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
   ]);
   const t = makeT(lang, dict);
   const quote = `quote.html?source=account&lang=${lang}`;
-  const [convs, reqs] = acc ? await Promise.all([
+  /* المحادثة كاملة لا آخر سطر: العميل يراجع ما قيل له قبل أن يكمّل.
+     و«ردّ فريقنا» = آخر رسالة من موظف — فيعرف أن عليه دورًا بلا عمود جديد. */
+  const [convs, reqs, profile] = acc ? await Promise.all([
     q<any>(`SELECT c.id, c.status, c.last_message_at,
-              (SELECT text FROM chat_messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_text
+              (SELECT role FROM chat_messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_role,
+              (SELECT COUNT(*) FROM chat_messages m WHERE m.conversation_id = c.id) AS n
              FROM chat_conversations c WHERE c.account_id = ? ORDER BY c.last_message_at DESC LIMIT 10`, [acc.id]),
     acc.customer_id ? q<any>('SELECT id, kind, status, items, created_at FROM requests WHERE customer_id = ? ORDER BY id DESC LIMIT 20', [acc.customer_id]) : Promise.resolve([]),
-  ]) : [[], []];
+    acc.customer_id ? q<any>('SELECT name, company, city, email, phone FROM customers WHERE id = ?', [acc.customer_id]) : Promise.resolve([]),
+  ]) : [[], [], []];
+  const me = profile[0] ?? {};
+  /* رسائل كل محادثة — بلا الرسائل الداخلية التي لا تخصّ العميل */
+  const threads: Record<number, any[]> = {};
+  if (convs.length) {
+    const rows = await q<any>(
+      `SELECT conversation_id, role, text, created_at FROM chat_messages
+        WHERE conversation_id IN (${convs.map(() => '?').join(',')}) AND role IN ('user','bot','agent','system')
+        ORDER BY id`, convs.map((c: any) => c.id)
+    );
+    for (const r of rows) (threads[r.conversation_id] ??= []).push(r);
+  }
   const items = (v: any) => { try { const a = typeof v === 'string' ? JSON.parse(v) : v; return Array.isArray(a) ? a : []; } catch { return []; } };
   const err = sp.e ? x.err[sp.e] : null;
   const css = themeCss(theme);
@@ -161,6 +202,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
             <h1 className="acct__title">{acc ? `${x.hello}${acc.name ? ` ${acc.name}` : ''}` : x.title}</h1>
             <p className="acct__sub">{x.sub}</p>
             {err ? <p className="formmsg is-err" role="alert">{err}</p> : null}
+            {sp.ok === 'profile' ? <p className="formmsg is-ok" role="status">{x.saved}</p> : null}
 
             {!acc ? (
               <div className="acct__grid">
@@ -204,14 +246,28 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
               </div>
             ) : (
               <div className="acct__grid">
-                <div className="acct__card">
+                <div className="acct__card acct__card--wide">
                   <h2>{x.chats}</h2>
                   {convs.length ? (
-                    <ul className="acct__list">
+                    <div className="acct__convs">
                       {convs.map((c: any) => (
-                        <li key={c.id}><small dir="ltr">{when(c.last_message_at)}</small><span>{String(c.last_text ?? '').slice(0, 140)}</span></li>
+                        <details className="conv" key={c.id} {...(c.last_role === 'agent' ? { open: true } : {})}>
+                          <summary>
+                            <span className={`conv__dot${c.last_role === 'agent' ? ' is-new' : ''}`} aria-hidden="true" />
+                            <b>{c.last_role === 'agent' ? x.replied : x.convStatus[c.status] ?? c.status}</b>
+                            <small dir="ltr">{when(c.last_message_at)} · {c.n} {x.msgs}</small>
+                          </summary>
+                          <ol className="conv__thread">
+                            {(threads[c.id] ?? []).map((m: any, i: number) => (
+                              <li key={i} className={`conv__m conv__m--${m.role}`}>
+                                {x.who[m.role] ? <b>{x.who[m.role]}</b> : null}
+                                <span>{m.text}</span>
+                              </li>
+                            ))}
+                          </ol>
+                        </details>
                       ))}
-                    </ul>
+                    </div>
                   ) : <p>{x.noChats}</p>}
                   <OpenChat label={x.continue} />
                 </div>
@@ -229,6 +285,19 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
                     </ul>
                   ) : <p>{x.noRequests}</p>}
                 </div>
+                {acc.customer_id ? (
+                  <div className="acct__card">
+                    <h2>{x.myInfo}</h2>
+                    <p className="acct__note" style={{ marginTop: 0 }}>{x.myInfoSub}</p>
+                    <form action={saveProfile} className="acct__form">
+                      <label>{x.pname}<input name="pname" defaultValue={me.name ?? acc.name ?? ''} maxLength={120} autoComplete="name" /></label>
+                      <label>{x.company}<input name="company" defaultValue={me.company ?? ''} maxLength={160} autoComplete="organization" /></label>
+                      <label>{x.city}<input name="city" defaultValue={me.city ?? ''} maxLength={120} autoComplete="address-level2" /></label>
+                      <button className="btn btn--ghost btn--sm" type="submit">{x.save}</button>
+                    </form>
+                  </div>
+                ) : null}
+
                 <div className="acct__card acct__card--wide">
                   <p className="acct__me"><bdi dir="ltr">{acc.email ?? acc.phone_norm}</bdi></p>
                   <div className="acct__actions">

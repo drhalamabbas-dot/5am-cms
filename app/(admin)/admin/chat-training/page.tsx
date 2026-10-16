@@ -24,7 +24,7 @@ import { describeSecret, setSecret, checkOpenRouterKey, checkDeepSeekKey, getSec
 export const dynamic = 'force-dynamic';
 
 type SP = { s?: string; q?: string; ok?: string; e?: string; f?: string };
-const SRC: Record<string, string> = { qwen: 'Qwen', own: 'موديلنا', deepseek: 'DeepSeek', backup: 'الموديل الاحتياطي', staff: 'الفريق', claude: 'Claude (من محتوى الموقع)', cache: 'الذاكرة', kb: 'من الموقع بلا موديل' };
+const SRC: Record<string, string> = { qwen: 'Qwen', own: 'موديلنا', deepseek: 'DeepSeek', backup: 'الموديل الاحتياطي', staff: 'الفريق', claude: 'Claude (من محتوى الموقع)', debate: 'نقاش — مصحَّحة', cache: 'الذاكرة', kb: 'من الموقع بلا موديل' };
 
 export default async function ChatTraining({ searchParams }: { searchParams: Promise<SP> }) {
   const me = await requirePerm('chat.train');
@@ -66,6 +66,7 @@ export default async function ChatTraining({ searchParams }: { searchParams: Pro
       ownModel: (clip(form.get('ownModel'), 120) ?? '').replace(/[^\w./:-]/g, ''),
       backupModel: (clip(form.get('backupModel'), 120) ?? '').replace(/[^\w./:-]/g, ''),
       deepseekModel: (clip(form.get('deepseekModel'), 80) ?? '').replace(/[^\w./:-]/g, ''),
+      requireLogin: form.get('requireLogin') === '1',
       greeting: { ar: clip(form.get('greet_ar'), 400) ?? before.greeting.ar, en: clip(form.get('greet_en'), 400) ?? before.greeting.en },
     };
     await q(`INSERT INTO settings (\`key\`, \`value\`, \`group\`, label_en, label_ar) VALUES ('chat', ?, 'chat', 'Chat', 'المحادثة')
@@ -182,6 +183,17 @@ export default async function ChatTraining({ searchParams }: { searchParams: Pro
                   </select>
                 </div>
                 <div className="field">
+                  <label htmlFor="requireLogin">مين يقدر يكتب في المحادثة</label>
+                  <select id="requireLogin" name="requireLogin" defaultValue={s.requireLogin ? '1' : '0'}>
+                    <option value="0">أي زائر — بلا تسجيل دخول</option>
+                    <option value="1">أصحاب الحسابات بس — يسجّل دخوله الأول</option>
+                  </select>
+                  <p className="field__hint">
+                    مع «أصحاب الحسابات»: الزائر يشوف الترحيب، وبدل مربع الكتابة يلاقي زرّ دخول.
+                    بتعرف مين بيكلّمك في كل رسالة، لكن عدد المحادثات بيقلّ.
+                  </p>
+                </div>
+                <div className="field">
                   <label htmlFor="provider">مصدر الردود</label>
                   <select id="provider" name="provider" defaultValue={s.provider}>
                     <option value="qwen">Qwen (مجاني عبر OpenRouter)</option>
@@ -213,12 +225,16 @@ export default async function ChatTraining({ searchParams }: { searchParams: Pro
                 <p className="field__hint">{dsInfo?.ok ? `رصيد DeepSeek: ${dsInfo.balance ?? '—'}` : 'ضع مفتاح DeepSeek من «المفاتيح» تحت لتظهر موديلاته ورصيده.'} لو رصيده خلص، Qwen المجاني يرد بداله تلقائيًا.</p>
               </div>
               <div className="field">
-                <label htmlFor="backupModel">الموديل الاحتياطي (لما Qwen المجاني يكون مشغول)</label>
+                <label htmlFor="backupModel">أول موديل احتياطي (لما Qwen المجاني يكون مشغول)</label>
                 <select id="backupModel" name="backupModel" defaultValue={s.backupModel || DEFAULT_BACKUP}>
                   <option value="none">بلا احتياطي — يرد من صفحات الموقع</option>
                   {[...new Set([s.backupModel || DEFAULT_BACKUP, ...allFree])].filter((m) => m && m !== 'none').map((m) => <option key={m} value={m}>{m}</option>)}
                 </select>
-                <p className="field__hint">ردود الاحتياطي تمرّ بنفس فلتر الأسعار والأرقام، فلو اخترع سعرًا أو رقمًا لا يصل للعميل.</p>
+                <p className="field__hint">
+                  البوت بيبدأ بالموديل ده، ولو كان مشغول بيكمّل على باقي الموديلات المجانية
+                  {allFree.length ? ` (${allFree.length} موديل متاح دلوقتي)` : ''} لحد ما واحد يرد.
+                  وردود الاحتياطي تمرّ بنفس فلتر الأسعار والأرقام، فلو اخترع سعرًا أو رقمًا لا يصل للعميل.
+                </p>
               </div>
               <div className="row">
                 <div className="field"><label htmlFor="greet_ar">رسالة الترحيب (عربي)</label><textarea id="greet_ar" name="greet_ar" defaultValue={s.greeting.ar} /></div>

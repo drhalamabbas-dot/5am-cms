@@ -19,12 +19,14 @@
      group     عنصر واحد له حقوله (لا قائمة)
      choice    اختيار من قائمة ثابتة
      texts     قائمة نصوص مفردة بلا ترجمة
+     brands    ماركات تُختار بالضغط على لوجوهاتها (تُحفظ كقائمة معرّفات)
      num       رقم
      video     ملف فيديو من المكتبة
+     file      ملف من المكتبة (PDF وما شابهه)
 ============================================================================= */
 export type FieldKind =
   | 'dual' | 'long' | 'image' | 'text' | 'bool' | 'link' | 'list' | 'images' | 'refs'
-  | 'repeat' | 'group' | 'choice' | 'texts' | 'num' | 'video';
+  | 'repeat' | 'group' | 'choice' | 'texts' | 'brands' | 'num' | 'video' | 'file';
 
 export type Field = {
   name: string;
@@ -43,6 +45,15 @@ export type Field = {
   keyBy?: string;
   /** اسم العنصر في زرّ الإضافة. */
   item?: string;
+  /** اقتراحات جاهزة تُضاف بضغطة بدل كتابتها من الصفر.
+
+      القسم الجديد يبدأ فارغًا، فيقف صاحب الموقع أمام حقول بيضاء لا يدري بم
+      يملؤها. هنا صيغ مكتوبة بلغتيها من شغل 5A&M نفسه: يضغط فتُضاف ثم يعدّل
+      عليها. وهي اقتراح لا إلزام — ما لا يُضغط لا يظهر في الموقع.
+
+      القيمة بحسب نوع الحقل: صفّ كامل لـ repeat، و{en,ar} لـ list وdual
+      وlong، ونصّ مفرد لـ texts. */
+  suggest?: { label: string; value: any }[];
 };
 
 export type TypeSpec = {
@@ -64,6 +75,25 @@ const CTA: Field = {
   name: 'cta', label: 'زرّ في آخر القسم', kind: 'link', advanced: true,
   hint: 'ينقل الزائر إلى صفحة أخرى.',
 };
+/* ------------------------------------------------------------ الاقتراحات
+   صيغ جاهزة من شغل 5A&M نفسها — استيراد وتصدير ومقاولات، توليد طاقة وحلول
+   بيئية — يضغطها صاحب الموقع فتُضاف ثم يعدّل عليها.
+
+   ما لا يُعرَف لا يُقترَح: لا أرقام مخترَعة ولا آراء عملاء مكتوبة من عندنا.
+   الأرقام تُترك فارغة ليكتبها صاحبها، وقسم الآراء لا اقتراح لنصّه أصلًا —
+   رأي لم يقله عميل لا يُكتب باسمه. */
+const dual = (ar: string, en: string) => ({ ar, en });
+
+const BULLETS: { label: string; value: { ar: string; en: string } }[] = [
+  { label: 'قطع غيار أصلية', value: dual('قطع غيار أصلية من الوكيل مباشرةً', 'Genuine spare parts, straight from the agent') },
+  { label: 'فريق فني معتمد', value: dual('فريق فني معتمد من الشركة المصنِّعة', 'Service engineers certified by the manufacturer') },
+  { label: 'ضمان', value: dual('ضمان على التوريد والتركيب', 'Warranty on supply and installation') },
+  { label: 'تدريب المشغّلين', value: dual('تدريب المشغّلين على المعدة قبل التسليم', 'Operator training before handover') },
+  { label: 'صيانة دورية', value: dual('عقود صيانة دورية بمواعيد ثابتة', 'Scheduled maintenance contracts') },
+  { label: 'دعم فني', value: dual('دعم فني ومتابعة بعد البيع', 'Technical support and after-sales follow-up') },
+  { label: 'مطابقة المواصفات', value: dual('مطابقة لمواصفات الجهات الحكومية', 'Compliant with government specifications') },
+];
+
 /** خلفية القسم — تتبادل الصفحة بين الأبيض والرملي كي ينفصل قسم عن قسم. */
 const TONE: Field = {
   name: 'tone', label: 'لون خلفية القسم', kind: 'choice', advanced: true,
@@ -84,7 +114,18 @@ export const SECTION_TYPES: Record<string, TypeSpec> = {
         name: 'imgs', label: 'صور المعرض', kind: 'images',
         hint: 'أضف صورًا هنا فتصير الصورة معرضًا كصفحة المنتج: الكبيرة بزرّ «تكبير الصورة»، وتحتها صور صغيرة يُضغط عليها لتبديلها. اتركه فارغًا لصورة واحدة.',
       },
-      { name: 'points', label: 'النقاط', kind: 'list' },
+      { name: 'points', label: 'النقاط', kind: 'list', suggest: BULLETS },
+      {
+        name: 'variant', label: 'شكل القسم', kind: 'choice',
+        options: [
+          ['', 'الافتراضي — صورة بجانب النص'],
+          ['stack', 'صورة عريضة فوق، والنصّ تحتها'],
+          ['card', 'الصفّ كلّه داخل بطاقة بيضاء'],
+          ['tall', 'صورة طولية، ومساحة أوسع للنص'],
+          ['plain', 'صورة هادئة بحدّ رفيع بلا ظلّ'],
+        ],
+        hint: 'الصورة العريضة تناسب صور المواقع والمعدّات الطويلة، والطولية تناسب الصور الرأسية.',
+      },
       {
         name: 'eyebrowStyle', label: 'الرقم والسطر الصغير فوق العنوان', kind: 'choice',
         options: [['', 'يظهر الرقم والسطر (مثل: 01 مشروعاتنا)'], ['text', 'السطر وحده بلا رقم'], ['none', 'إخفاء الاثنين']],
@@ -164,7 +205,7 @@ export const SECTION_TYPES: Record<string, TypeSpec> = {
     label: 'قائمة نقاط',
     pick: 'بنود بعلامة صح',
     addable: true,
-    fields: [TITLE, { name: 'items', label: 'البنود', kind: 'list' }],
+    fields: [TITLE, { name: 'items', label: 'البنود', kind: 'list', suggest: BULLETS }],
   },
 
   steps: {
@@ -176,6 +217,34 @@ export const SECTION_TYPES: Record<string, TypeSpec> = {
       {
         name: 'steps', label: 'الخطوات', kind: 'repeat', item: 'خطوة',
         of: [{ name: 't', label: 'العنوان', kind: 'dual' }, { name: 'd', label: 'الشرح', kind: 'long' }],
+        /* رحلة العميل عندنا من أول مكالمة إلى الصيانة — بالترتيب، فمن يضغطها
+           واحدةً بعد أخرى يخرج بقسم كامل. */
+        suggest: [
+          { label: '1 · طلب عرض سعر', value: {
+            t: dual('تطلب عرض سعر', 'You request a quote'),
+            d: dual('تقول لنا طبيعة الشغل وحجمه، ونرد بعرض مفصّل.',
+              'Tell us the job and its size, and we reply with a detailed quotation.') } },
+          { label: '2 · معاينة', value: {
+            t: dual('نعاين الموقع', 'We survey the site'),
+            d: dual('زيارة لتحديد المعدة المناسبة ومتطلبات التركيب.',
+              'A visit to determine the right equipment and installation requirements.') } },
+          { label: '3 · توريد', value: {
+            t: dual('نورّد المعدة', 'We supply the equipment'),
+            d: dual('من المخزن أو باستيراد مباشر من الوكيل.',
+              'From stock, or imported directly from the agent.') } },
+          { label: '4 · تركيب وتشغيل', value: {
+            t: dual('نركّب ونشغّل', 'We install and commission'),
+            d: dual('فريقنا يسلّمك المعدة وهي تعمل في موقعك.',
+              'Our team hands over a running machine on your site.') } },
+          { label: '5 · تدريب', value: {
+            t: dual('ندرّب المشغّلين', 'We train the operators'),
+            d: dual('تدريب عملي على التشغيل الصحيح والصيانة اليومية.',
+              'Hands-on training on correct operation and daily maintenance.') } },
+          { label: '6 · صيانة', value: {
+            t: dual('نتابع بالصيانة', 'We keep it running'),
+            d: dual('زيارات دورية وقطع غيار أصلية ودعم فني عند الحاجة.',
+              'Scheduled visits, genuine parts and technical support when needed.') } },
+        ],
       },
     ],
   },
@@ -218,6 +287,22 @@ export const SECTION_TYPES: Record<string, TypeSpec> = {
           { name: 't', label: 'العنوان', kind: 'dual' },
           { name: 'd', label: 'النص', kind: 'long' },
         ],
+        /* البطاقات الثلاث المعتادة بأيقوناتها — والنصّ صيغة تُعدَّل، فالرؤية
+           والرسالة كلام صاحب الشركة لا كلامنا. */
+        suggest: [
+          { label: 'الرؤية', value: {
+            icon: 'eye', t: dual('رؤيتنا', 'Our vision'),
+            d: dual('أن نكون المرجع الأول في مصر لمعدّات البيئة وتوليد الطاقة.',
+              'To be Egypt’s first reference for environmental and power generation equipment.') } },
+          { label: 'الرسالة', value: {
+            icon: 'target', t: dual('رسالتنا', 'Our mission'),
+            d: dual('نورّد معدّات موثوقة وندعمها بخدمة وقطع غيار تبقيها شغّالة.',
+              'We supply reliable equipment and back it with service and parts that keep it running.') } },
+          { label: 'القيم', value: {
+            icon: 'gem', t: dual('قيمنا', 'Our values'),
+            d: dual('الصدق في الوعد، والالتزام بالموعد، والمتابعة بعد البيع.',
+              'Honest promises, kept schedules, and follow-up after the sale.') } },
+        ],
       },
     ],
   },
@@ -237,12 +322,293 @@ export const SECTION_TYPES: Record<string, TypeSpec> = {
     ],
   },
 
+  faq: {
+    label: 'أسئلة شائعة',
+    pick: 'سؤال يُفتح بالضغط فيظهر جوابه',
+    hint: 'كل سؤال مطويّ ويُفتح بالضغط. مفيد أيضًا لمحركات البحث: تقرأ السؤال والجواب معًا.',
+    addable: true,
+    fields: [
+      TITLE,
+      {
+        name: 'items', label: 'الأسئلة', kind: 'repeat', item: 'سؤال',
+        of: [
+          { name: 'q', label: 'السؤال', kind: 'dual' },
+          { name: 'a', label: 'الجواب', kind: 'long' },
+        ],
+        /* أكثر ما يُسأل في مكالمات البيع. الأجوبة صيغ عامة تُعدَّل بما يناسب
+           كل صفحة — لا وعد برقم أو مدة لم يقرّها صاحب الموقع. */
+        suggest: [
+          { label: 'الضمان', value: {
+            q: dual('ما مدة الضمان؟', 'How long is the warranty?'),
+            a: dual('يشمل التوريد والتركيب، وتختلف مدته باختلاف المعدة. نوضّحها في عرض السعر قبل الاتفاق.',
+              'It covers supply and installation; the period depends on the equipment and is stated in the quotation.') } },
+          { label: 'قطع الغيار', value: {
+            q: dual('قطع الغيار متوفرة؟', 'Are spare parts available?'),
+            a: dual('نحتفظ بمخزون من القطع سريعة الاستهلاك، وما ليس متوفرًا نستورده من الوكيل مباشرةً.',
+              'We keep fast-moving parts in stock, and order the rest directly from the agent.') } },
+          { label: 'الصيانة', value: {
+            q: dual('هل عندكم عقود صيانة؟', 'Do you offer maintenance contracts?'),
+            a: dual('نعم، عقود بمواعيد ثابتة تشمل الزيارات الدورية والقطع المستهلكة.',
+              'Yes — scheduled contracts covering periodic visits and consumables.') } },
+          { label: 'التركيب والتشغيل', value: {
+            q: dual('هل التركيب والتشغيل عليكم؟', 'Do you handle installation and commissioning?'),
+            a: dual('فريقنا يركّب ويشغّل ويسلّم المعدة وهي تعمل، ويدرّب المشغّلين قبل المغادرة.',
+              'Our team installs, commissions and hands over a running machine, and trains the operators before leaving.') } },
+          { label: 'مدة التوريد', value: {
+            q: dual('التوريد ياخد قد إيه؟', 'What is the delivery time?'),
+            a: dual('المتوفر في المخزن يُسلَّم فورًا، وما يُطلب من الخارج تُحدَّد مدته في عرض السعر.',
+              'Stock items ship immediately; imported items have their lead time stated in the quotation.') } },
+          { label: 'التدريب', value: {
+            q: dual('هل تدرّبون المشغّلين؟', 'Do you train the operators?'),
+            a: dual('نعم، تدريب عملي على المعدة في موقع العمل ضمن التسليم.',
+              'Yes — hands-on training on site, included in the handover.') } },
+        ],
+      },
+      { name: 'open', label: 'افتح أول سؤال', kind: 'bool', advanced: true },
+      NOTE,
+    ],
+  },
+
+  stats: {
+    label: 'أرقام وإنجازات',
+    pick: 'أرقام كبيرة: سنوات خبرة، عملاء…',
+    hint: 'صفّ أرقام كبيرة تحت كلٍّ منها كلمة. اكتب الرقم كما تريده أن يظهر: 35 أو +500 أو 24/7.',
+    addable: true,
+    fields: [
+      TITLE,
+      {
+        name: 'items', label: 'الأرقام', kind: 'repeat', item: 'رقم',
+        of: [
+          { name: 'v', label: 'الرقم', kind: 'text', hint: 'مثل 35 أو +500' },
+          { name: 'k', label: 'الكلمة تحته', kind: 'dual' },
+        ],
+        /* الكلمة جاهزة والرقم فارغ عمدًا: الرقم حقيقة عن الشركة لا يعرفها
+           إلا صاحبها، واقتراح رقم هنا يعني نشر رقم لم يقله أحد. */
+        suggest: [
+          { label: 'سنة خبرة', value: { v: '', k: dual('سنة خبرة', 'Years of experience') } },
+          { label: 'عميل', value: { v: '', k: dual('عميل', 'Clients') } },
+          { label: 'وحدة مورَّدة', value: { v: '', k: dual('وحدة مورَّدة', 'Units supplied') } },
+          { label: 'مشروع منفَّذ', value: { v: '', k: dual('مشروع منفَّذ', 'Projects delivered') } },
+          { label: 'محافظة', value: { v: '', k: dual('محافظة نخدمها', 'Governorates served') } },
+          { label: 'ماركة عالمية', value: { v: '', k: dual('ماركة عالمية', 'Global brands') } },
+          { label: 'دعم 24/7', value: { v: '24/7', k: dual('دعم فني', 'Technical support') } },
+        ],
+      },
+      TONE,
+      NOTE,
+    ],
+  },
+
+  quotes: {
+    label: 'آراء العملاء',
+    pick: 'كلام عميل باسمه وجهة عمله',
+    hint: 'لا تكتب رأيًا لم يُقَل: ما هنا يظهر للزائر منسوبًا لصاحبه.',
+    addable: true,
+    fields: [
+      TITLE,
+      {
+        name: 'items', label: 'الآراء', kind: 'repeat', item: 'رأي',
+        of: [
+          { name: 'text', label: 'نصّ الرأي', kind: 'long' },
+          { name: 'who', label: 'الاسم', kind: 'dual' },
+          /* الصفة وحدها هي ما يُقترَح هنا: مسمًّى وظيفي لا رأيًا. ونصّ الرأي
+             بلا اقتراح عمدًا — كلام ينسب لعميل لا يُكتب إلا كما قاله. */
+          { name: 'role', label: 'الصفة أو الشركة', kind: 'dual', suggest: [
+            { label: 'مدير المشتريات', value: dual('مدير المشتريات', 'Procurement Manager') },
+            { label: 'مدير الصيانة', value: dual('مدير الصيانة', 'Maintenance Manager') },
+            { label: 'مدير المشروع', value: dual('مدير المشروع', 'Project Manager') },
+            { label: 'مدير التشغيل', value: dual('مدير التشغيل', 'Operations Manager') },
+            { label: 'رئيس القطاع الفني', value: dual('رئيس القطاع الفني', 'Head of Technical') },
+          ] },
+        ],
+      },
+      NOTE,
+    ],
+  },
+
+  video: {
+    label: 'فيديو',
+    pick: 'فيديو يوتيوب داخل الصفحة',
+    hint: 'الصق رابط الفيديو من يوتيوب كما تنسخه من المتصفح. لا يُحمَّل الفيديو إلا حين يصل إليه الزائر.',
+    addable: true,
+    fields: [
+      TITLE,
+      {
+        name: 'items', label: 'الفيديوهات', kind: 'repeat', item: 'فيديو', keyBy: 'yt',
+        of: [
+          { name: 'yt', label: 'رابط يوتيوب', kind: 'text' },
+          { name: 'cap', label: 'سطر تحت الفيديو', kind: 'dual' },
+        ],
+      },
+      NOTE,
+    ],
+  },
+
+  downloads: {
+    label: 'ملفات للتحميل',
+    pick: 'كتالوجات وكراسات PDF',
+    hint: 'الكتالوج في يد العميل يبيع وأنت نائم. ارفع الملف من «الصور والفيديو» ثم اختره هنا.',
+    addable: true,
+    fields: [
+      TITLE,
+      {
+        name: 'items', label: 'الملفات', kind: 'repeat', item: 'ملف', keyBy: 'file',
+        of: [
+          { name: 'file', label: 'الملف', kind: 'file' },
+          { name: 'label', label: 'اسم الملف كما يظهر', kind: 'dual' },
+          { name: 'note', label: 'سطر تحته', kind: 'dual' },
+        ],
+        suggest: [
+          { label: 'كتالوج المعدة', value: {
+            file: '', label: dual('كتالوج المعدة', 'Equipment brochure'),
+            note: dual('المواصفات الكاملة والمقاسات', 'Full specifications and dimensions') } },
+          { label: 'كراسة فنية', value: {
+            file: '', label: dual('الكراسة الفنية', 'Technical datasheet'),
+            note: dual('بيانات الأداء والتشغيل', 'Performance and operating data') } },
+          { label: 'قائمة قطع الغيار', value: {
+            file: '', label: dual('قائمة قطع الغيار', 'Spare parts list'),
+            note: dual('أرقام القطع المعتمدة', 'Approved part numbers') } },
+        ],
+      },
+      NOTE,
+    ],
+  },
+
+  timeline: {
+    label: 'مسيرة بالسنوات',
+    pick: 'محطات الشركة سنةً بعد سنة',
+    hint: 'خطّ زمني: سنة ومعها ما حدث فيها. يصلح لصفحة «من نحن» ولمسيرة وكالة.',
+    addable: true,
+    fields: [
+      TITLE,
+      {
+        name: 'items', label: 'المحطات', kind: 'repeat', item: 'محطة',
+        of: [
+          { name: 'y', label: 'السنة', kind: 'text', hint: 'مثل 2022' },
+          { name: 't', label: 'العنوان', kind: 'dual' },
+          { name: 'd', label: 'الشرح', kind: 'long' },
+        ],
+        /* السنوات فارغة: تاريخ الشركة لا يُقترَح عليها */
+        suggest: [
+          { label: 'التأسيس', value: { y: '', t: dual('تأسيس الشركة', 'The company is founded'),
+            d: dual('بدأنا بتوريد المعدات الثقيلة للسوق المصري.', 'We began supplying heavy equipment to the Egyptian market.') } },
+          { label: 'وكالة جديدة', value: { y: '', t: dual('وكالة جديدة', 'A new agency'),
+            d: dual('أصبحنا الوكيل المعتمد لماركة عالمية في مصر.', 'We became the authorised agent for a global brand in Egypt.') } },
+          { label: 'مركز خدمة', value: { y: '', t: dual('افتتاح مركز الخدمة', 'Service centre opens'),
+            d: dual('ورشة وقطع غيار تخدم العملاء بعد البيع.', 'A workshop and parts store serving customers after the sale.') } },
+          { label: 'توسّع', value: { y: '', t: dual('توسّع في التغطية', 'Wider coverage'),
+            d: dual('وصلت خدمتنا إلى محافظات جديدة.', 'Our service reached new governorates.') } },
+        ],
+      },
+      TONE,
+      NOTE,
+    ],
+  },
+
+  specs: {
+    label: 'جدول مواصفات',
+    pick: 'صفّان: الاسم وقيمته',
+    hint: 'جدول بسيط من سطرين في كل صفّ: اسم المواصفة وقيمتها. يُقرأ على الهاتف سطرًا سطرًا.',
+    addable: true,
+    fields: [
+      TITLE,
+      {
+        name: 'rows', label: 'الصفوف', kind: 'repeat', item: 'صفّ',
+        of: [
+          { name: 'k', label: 'المواصفة', kind: 'dual' },
+          { name: 'v', label: 'القيمة', kind: 'dual' },
+        ],
+        /* أسماء المواصفات جاهزة والقيم فارغة — القيمة تخصّ معدةً بعينها */
+        suggest: [
+          { label: 'سعة الخزان', value: { k: dual('سعة الخزان', 'Tank capacity'), v: dual('', '') } },
+          { label: 'المحرك', value: { k: dual('المحرك', 'Engine'), v: dual('', '') } },
+          { label: 'القدرة', value: { k: dual('القدرة', 'Power output'), v: dual('', '') } },
+          { label: 'الوزن', value: { k: dual('الوزن التشغيلي', 'Operating weight'), v: dual('', '') } },
+          { label: 'الأبعاد', value: { k: dual('الأبعاد', 'Dimensions'), v: dual('', '') } },
+          { label: 'الاستهلاك', value: { k: dual('استهلاك الوقود', 'Fuel consumption'), v: dual('', '') } },
+          { label: 'بلد الصنع', value: { k: dual('بلد الصنع', 'Country of origin'), v: dual('', '') } },
+          { label: 'الضمان', value: { k: dual('الضمان', 'Warranty'), v: dual('', '') } },
+        ],
+      },
+      TONE,
+      NOTE,
+    ],
+  },
+
+  team: {
+    label: 'فريق العمل',
+    pick: 'صور الفريق بأسمائهم',
+    hint: 'وجه ومسمّى وظيفي يطمئن العميل أن خلف الشركة ناسًا. الصورة اختيارية.',
+    addable: true,
+    fields: [
+      TITLE,
+      {
+        name: 'items', label: 'الأشخاص', kind: 'repeat', item: 'شخص',
+        of: [
+          { name: 'img', label: 'الصورة', kind: 'image' },
+          { name: 'name', label: 'الاسم', kind: 'dual' },
+          { name: 'role', label: 'المسمّى الوظيفي', kind: 'dual', suggest: [
+            { label: 'المدير العام', value: dual('المدير العام', 'General Manager') },
+            { label: 'مدير المبيعات', value: dual('مدير المبيعات', 'Sales Manager') },
+            { label: 'مدير الخدمة', value: dual('مدير الخدمة والصيانة', 'Service Manager') },
+            { label: 'مهندس تطبيقات', value: dual('مهندس تطبيقات', 'Application Engineer') },
+            { label: 'مسؤول قطع الغيار', value: dual('مسؤول قطع الغيار', 'Parts Specialist') },
+          ] },
+        ],
+      },
+      NOTE,
+    ],
+  },
+
+  callout: {
+    label: 'ملاحظة بارزة',
+    pick: 'سطر مهم في إطار ملوّن',
+    hint: 'لِما لا يصحّ أن يفوت القارئ: شرط، أو تنبيه، أو عرض لفترة. سطر أو سطران لا فقرة.',
+    addable: true,
+    fields: [
+      {
+        ...TITLE,
+        suggest: [
+          { label: 'توصيل مجاني', value: dual('التوصيل والتركيب داخل القاهرة والجيزة مجانًا', 'Free delivery and installation in Cairo and Giza') },
+          { label: 'متوفر في المخزن', value: dual('متوفر في المخزن — تسليم فوري', 'In stock — immediate delivery') },
+          { label: 'قطع غيار مضمونة', value: dual('قطع الغيار مضمونة طول عمر المعدة', 'Spare parts guaranteed for the life of the machine') },
+        ],
+      },
+      { name: 'text', label: 'الشرح', kind: 'long' },
+      {
+        name: 'icon', label: 'الأيقونة', kind: 'choice',
+        options: [['info', 'معلومة'], ['alert', 'تنبيه'], ['tick', 'علامة صح'], ['bolt', 'طاقة'], ['truck', 'توريد'], ['wrench', 'صيانة'], ['shield', 'ضمان']],
+      },
+      TONE,
+      CTA,
+      NOTE,
+    ],
+  },
+
   cta: {
     label: 'دعوة للتواصل',
     pick: 'شريط داكن بزرّ، في آخر الصفحة',
     hint: 'الشريط الداكن قبل الفوتر. زرّه ينقل دائمًا إلى نموذج عرض السعر.',
     addable: true,
-    fields: [TITLE, { name: 'text', label: 'النص', kind: 'long' }],
+    fields: [
+      {
+        ...TITLE,
+        suggest: [
+          { label: 'محتاج معدة؟', value: dual('محتاج معدة لمشروعك؟', 'Need equipment for your project?') },
+          { label: 'نساعدك تختار', value: dual('مش متأكد من المقاس المناسب؟', 'Not sure which size fits?') },
+          { label: 'اطلب عرض سعر', value: dual('اطلب عرض سعر النهارده', 'Request a quote today') },
+        ],
+      },
+      {
+        name: 'text', label: 'النص', kind: 'long',
+        suggest: [
+          { label: 'نرد في يوم عمل', value: dual('ابعت لنا تفاصيل شغلك ونرد عليك بعرض مفصّل خلال يوم عمل.',
+            'Send us your requirements and we’ll reply with a detailed quotation within one working day.') },
+          { label: 'نساعدك تختار', value: dual('قول لنا طبيعة الشغل وفريقنا يرشّح لك المعدة المناسبة.',
+            'Tell us about the job and our team will recommend the right machine.') },
+        ],
+      },
+    ],
   },
 
   contact: {
@@ -280,9 +646,12 @@ export const SECTION_TYPES: Record<string, TypeSpec> = {
 
   logostrip: {
     label: 'شريط لوجوهات الشركات',
+    pick: 'لوجوهات تمرّ في شريط متحرّك',
+    hint: 'شريط اللوجوهات يمرّ أفقيًّا بلا توقّف. اللوجو والاسم من صفحة الماركات، فتعديلهما هناك يظهر هنا.',
+    addable: true,
     fields: [
       TITLE,
-      { name: 'brands', label: 'الماركات', kind: 'texts', hint: 'معرّف ماركة في كل سطر، مثل elgin. الترتيب هو ترتيب الظهور.' },
+      { name: 'brands', label: 'الماركات', kind: 'brands', hint: 'اضغط اللوجو لتضيفه، والسهمان يرتّبان الظهور. اللوجو والاسم من صفحة الماركات.' },
     ],
   },
 

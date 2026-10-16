@@ -28,6 +28,8 @@ export type Design = {
   imgHeight?: number; imgZoom?: number; imgPos?: string; imgRadius?: number;
   /** عرض الصورة بإطارها: نصيبها من صفّ «صورة ونص» بالمئة (الباقي للنص) */
   imgShare?: number;
+  /** حركة دخول القسم مع التمرير (مفتاح من ANIMS). */
+  anim?: string;
   hideMobile?: boolean; hideDesktop?: boolean;
   /** تكبير صورة بعينها داخل إطارها، ومركز التكبير (أي جزء منها يبقى ظاهرًا).
    *  المفتاح مسار الصورة كما يُخزَّن؛ z نسبة مئوية، وx وy موضع المركز 0–100. */
@@ -151,6 +153,32 @@ export const IMG_POS: [string, string][] = [
   ['', 'الوسط'], ['top', 'أعلى'], ['bottom', 'أسفل'], ['right', 'يمين'], ['left', 'يسار'],
 ];
 
+/* ------------------------------------------------------------- حركة الدخول
+   الحركة مربوطة بالتمرير نفسه (animation-timeline:view)، فتتقدّم مع حركة
+   إصبع الزائر لا بمؤقّت — ولا تحتاج جافاسكريبت أصلًا.
+
+   وهي مكتوبة بحيث لا تخفي شيئًا أبدًا: المتصفح الذي لا يعرف هذه الخاصية لا
+   يُكتب له القاعدة من أساسها (@supports)، فيرى القسم كاملًا بلا حركة. ومن
+   طلب تقليل الحركة من نظامه لا تصله كذلك. */
+export const ANIMS: [string, string][] = [
+  ['', 'بلا حركة'],
+  ['fade', 'ظهور تدريجي'],
+  ['up', 'يصعد من تحت'],
+  ['zoom', 'يكبر برفق'],
+  ['start', 'يدخل من أول السطر'],
+  ['end', 'يدخل من آخر السطر'],
+];
+
+/** الحالة التي تبدأ منها كل حركة. تنتهي كلها عند الوضع الطبيعي. */
+const ANIM_FROM: Record<string, string> = {
+  fade: 'opacity:0',
+  up: 'opacity:0;transform:translateY(30px)',
+  zoom: 'opacity:0;transform:scale(.94)',
+  /* منطقيّة في الاتجاهين: في العربية «أول السطر» يمين، وفي الإنجليزية يسار */
+  start: 'opacity:0;transform:translateX(calc(44px * -1))',
+  end: 'opacity:0;transform:translateX(44px)',
+};
+
 /** تصميم القسم بعد الفحص. فارغ إن لم يُغيَّر شيء. */
 export function cleanDesign(v: any): Design {
   return drop({
@@ -164,6 +192,7 @@ export function cleanDesign(v: any): Design {
     imgPos: IMG_POS.some(([k]) => k && k === v?.imgPos) ? v.imgPos : undefined,
     imgRadius: num(v?.imgRadius, 0, 60),
     imgShare: num(v?.imgShare, 25, 80),
+    anim: ANIMS.some(([k]) => k && k === v?.anim) ? v.anim : undefined,
     hideMobile: v?.hideMobile === true || undefined, hideDesktop: v?.hideDesktop === true || undefined,
     imgFx: cleanFx(v?.imgFx),
   });
@@ -190,10 +219,11 @@ export const hasDesign = (v: any) => Object.keys(cleanDesign(v)).length > 0;
  * قواعد تصميم قسم واحد. تُوضع في <style data-sd="…"> قبل القسم مباشرةً (أو قبل
  * علامة المحرّر التي تسبقه)، فتصيبه وحده بمحدِّد «العنصر التالي».
  */
-export function designCss(id: string | number, raw: any, tools = false): string {
+export function designCss(id: string | number, raw: any, tools = false, preview = false): string {
   const d = cleanDesign(raw);
   if (!Object.keys(d).length) return '';
-  const k = `style[data-sd="${String(id).replace(/[^\w-]/g, '')}"]`;
+  const sid = String(id).replace(/[^\w-]/g, '');
+  const k = `style[data-sd="${sid}"]`;
   /* للزائر: القسم يلي القواعد مباشرةً. لصاحب الموقع وفي المحرّر تسبقه علامة أو
      شريط تحرير، فيُتخطّيان — ولا تُذكر أسماؤهما في صفحة الزائر. */
   const S = tools ? `:is(${k}+:is(.ux-mark,.ux-edittools)+*,${k}+:not(.ux-mark):not(.ux-edittools))` : `${k}+*`;
@@ -251,6 +281,25 @@ export function designCss(id: string | number, raw: any, tools = false): string 
   }
   /* التقريب يكبّر الصورة داخل إطارها، لا فوق ما حولها */
   if ((d.imgZoom && d.imgZoom !== 100) || d.imgFx) r.push(`${S} :is(figure,picture,[class*="fig"],[class*="media"]):has(>img,>picture){overflow:hidden!important}`);
+
+  /* حركة الدخول — انظر ANIMS أعلاه. الاسم يحمل معرّف القسم فلا تتضارب قسمان
+     في الصفحة الواحدة. */
+  if (d.anim && ANIM_FROM[d.anim]) {
+    const name = `sdin-${sid}`;
+    r.push(`@keyframes ${name}{from{${ANIM_FROM[d.anim]}}to{opacity:1;transform:none}}`);
+    if (preview) {
+      /* المعاينة تلغي كل الحركات عمدًا كي لا ترفرف مع كل تعديل، وإطارها بطول
+         الصفحة فلا يمرّر أصلًا — فالحركة المربوطة بالتمرير تنتهي قبل أن تُرى.
+         هنا تُعرض مرة واحدة بمؤقّت ليرى من يختارها ما اختار. */
+      r.push('@media (prefers-reduced-motion:no-preference){'
+        + `${S}{animation:${name} .9s cubic-bezier(.16,1,.3,1) both !important}}`);
+    } else {
+      r.push('@media (prefers-reduced-motion:no-preference){'
+        + '@supports (animation-timeline:view()){'
+        + `${S}{animation:${name} 1s linear both;animation-timeline:view();`
+        + 'animation-range:entry 0% cover 32%}}}');
+    }
+  }
 
   if (d.hideMobile) r.push(`@media (max-width:820px){${S}{display:none!important}}`);
   if (d.hideDesktop) r.push(`@media (min-width:821px){${S}{display:none!important}}`);

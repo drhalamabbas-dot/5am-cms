@@ -327,59 +327,24 @@
      ارتفاع المستند فيقفز ما تحته. وبعتبة واحدة يقلب الصنف ذهابًا وإيابًا حولها
      فيتكرر القفز — وهذا هو الاهتزاز. لذا لكل حالة عتبتان متباعدتان:
      تُفتح عند حد وتُغلق عند حد أقل منه بكثير. */
-  /* صورة الافتتاح التي يطفو الهيدر فوقها — نفس ما يختاره motion.js، لكن مقروءًا
-     هنا مباشرةً كي لا يتعلّق الأمر بأيّ السكربتين سبق الآخر. */
-  function heroUnderHeader() {
-    const main = qs('#main');
-    if (!main) return null;
-    const skip = function (el) {
-      return el.tagName === 'NOSCRIPT' || el.hidden ||
-        el.tagName === 'STYLE' || el.classList.contains('ux-mark') ||
-        el.classList.contains('ux-edittools');
-    };
-    let el = main.firstElementChild;
-    while (el && skip(el)) el = el.nextElementSibling;
-    if (el && el.id === 'pageRoot') {
-      el = el.firstElementChild;
-      while (el && skip(el)) el = el.nextElementSibling;
-    }
-    return el && (el.classList.contains('vhero') || el.classList.contains('phero')) ? el : null;
-  }
-
   function stickyHeader(hdr, mnav) {
     if (!hdr) return;
-    const hero = heroUnderHeader();
     let last = window.scrollY, ticking = false;
     let stuck = false, compact = false;
-    /* فوق صورة الافتتاح يبقى الهيدر شفافًا حتى نهايتها، ثم يعتم ويقصر معًا في
-       نقلة واحدة. وفي صفحة بلا صورة افتتاح يعتم مع أول تمرير. */
-    let solidAt = 10;
-    const measure = function () {
-      if (!hero) { solidAt = 10; return; }
-      const hh = parseInt(getComputedStyle(D.documentElement).getPropertyValue('--header-h'), 10) || 88;
-      solidAt = Math.max(10, Math.round(hero.getBoundingClientRect().bottom + window.scrollY - hh));
-    };
     const apply = function () {
       const y = Math.max(0, window.scrollY);
-      const off = Math.max(2, solidAt - 60);
-      if (stuck ? y < off : y > solidAt) hdr.classList.toggle('is-stuck', (stuck = !stuck));
-      const compactOn = hero ? solidAt : 150, compactOff = hero ? off : 80;
-      if (compact ? y < compactOff : y > compactOn) hdr.classList.toggle('hdr--compact', (compact = !compact));
+      if (stuck ? y < 2 : y > 10) hdr.classList.toggle('is-stuck', (stuck = !stuck));
+      if (compact ? y < 80 : y > 150) hdr.classList.toggle('hdr--compact', (compact = !compact));
       const menuOpen = mnav && mnav.classList.contains('is-open');
       /* الهيدر يبقى ظاهرًا أثناء تصفّح الصفحات الطويلة */
       if (y < last - 4 || y <= 260 || menuOpen) hdr.classList.remove('hdr--hidden');
       last = y;
       ticking = false;
     };
-    const remeasure = function () { measure(); apply(); };
     window.addEventListener('scroll', function () {
       if (!ticking) { ticking = true; requestAnimationFrame(apply); }
     }, { passive: true });
-    window.addEventListener('resize', remeasure);
-    /* ارتفاع صورة الافتتاح لا يستقرّ إلا بعد تحميل صورها */
-    window.addEventListener('load', remeasure);
-    if (hero && 'ResizeObserver' in window) new ResizeObserver(remeasure).observe(hero);
-    remeasure();
+    apply();
   }
 
   /* ============================== 8) شريط محتويات الصفحة يتابع موضع القراءة */
