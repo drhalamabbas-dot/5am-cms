@@ -626,9 +626,15 @@ export const SECTION_TYPES: Record<string, TypeSpec> = {
         name: 'slides', label: 'الصور', kind: 'repeat', item: 'صورة', keyBy: 'img',
         of: [
           { name: 'img', label: 'صورة الشاشة الواسعة', kind: 'image' },
-          /* قَصّة الهاتف: تُختار من لوحة الصور في المحرّر. وتركها فارغة يجعل
-             الموقع يبحث عن «الاسم-mobile.jpg» بجانب الصورة (lib/uploads.ts). */
+          /* قَصّة الهاتف: تُختار من لوحة الصور في المحرّر. وتركها فارغةً لا
+             يستدعي قَصًّا تلقائيًّا: صورةٌ عريضة تُقَصّ إلى إطارٍ طوليّ تفقد
+             معظم عرضها، فتُعرض كما هي ما لم تُرفع لها قَصّة. */
           { name: 'imgMobile', label: 'صورة الهاتف', kind: 'image', advanced: true },
+          {
+            name: 'only', label: 'تظهر على', kind: 'choice',
+            options: [['', 'كل الأجهزة'], ['desktop', 'الشاشات الواسعة فقط'], ['mobile', 'الهاتف فقط']],
+            hint: 'صورةٌ بمقاس الشاشة الواسعة لا تناسب الهاتف — اجعلها «واسعة فقط».',
+          },
           { name: 'group', label: 'المجموعة', kind: 'text', hint: 'تربط الصورة بتبويبها، مثل elgin.' },
           { name: 'alt', label: 'وصف الصورة', kind: 'dual' },
         ],

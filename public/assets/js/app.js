@@ -392,6 +392,15 @@
      كل تبويب يمثّل مجموعة صور لا صورة واحدة، ولكل مجموعة مدة إجمالية: منتج
      بعشر صور لا يأخذ عشرة أضعاف وقت منتج بصورة. */
   function heroSlider() {
+    /* شريحةٌ مقصورةٌ على جهازٍ آخر تُنزَع من الدورة كلها لا تُخفى وحدها:
+       لو بقيت في القائمة لوقف السلايدر عندها فظهر فراغ. ونزعُها من الـDOM
+       يجعل كل ما بعده — المجموعات والمُدد وأرقام التبويبات — على المرئيّ. */
+    const phone = window.matchMedia('(max-width:768px)').matches;
+    qsa('.vhero__slide').forEach(function (el) {
+      const only = el.dataset.only;
+      if ((only === 'desktop' && phone) || (only === 'mobile' && !phone)) el.remove();
+    });
+
     const slides = qsa('.vhero__slide');
     const tabs = qsa('.vhero__tab');
     const video = qs('.vhero__video');
@@ -402,6 +411,20 @@
       const g = groupOf(slides[i]);
       return tabs.filter(function (t) { return groupOf(t) === g; })[0] || null;
     };
+    /* هدف التبويب يُحسب من مجموعته لا من data-slide: ذاك رقمٌ في القائمة
+       الكاملة، وقد نُزع منها ما لا يخصّ هذا الجهاز. */
+    const slideForTab = function (tab) {
+      const g = groupOf(tab);
+      for (let i = 0; i < slides.length; i++) if (groupOf(slides[i]) === g) return i;
+      return 0;
+    };
+    /* تبويبٌ لا شريحة له على هذا الجهاز لا يُعرض: نقرُه كان يرجع إلى الأولى. */
+    tabs.slice().forEach(function (tab) {
+      const g = groupOf(tab);
+      const has = slides.filter(function (s) { return groupOf(s) === g; }).length;
+      if (!has) { tab.remove(); tabs.splice(tabs.indexOf(tab), 1); }
+    });
+    if (!slides.length && !video) return;
 
     const BASE_INTERVAL = 4300, MAX_GROUP = 20000, MIN_INTERVAL = 2600;
     const groups = [];
@@ -495,11 +518,11 @@
           : e.key === 'End' ? tabs.length - 1
           : (i + ((e.key === 'ArrowRight') !== rtl() ? 1 : -1) + tabs.length) % tabs.length;
         setPlayingState(false);
-        showSlide(Number(tabs[next].dataset.slide) || 0);
+        showSlide(slideForTab(tabs[next]));
         tabs[next].focus();
       });
       tab.addEventListener('click', function () {
-        showSlide(Number(tab.dataset.slide) || 0);
+        showSlide(slideForTab(tab));
         if (isPlaying) startTimer();
       });
     });
