@@ -97,6 +97,33 @@ export function Bell() {
     return () => { document.removeEventListener('keydown', onKey); document.removeEventListener('mousedown', onDown); };
   }, [open]);
 
+  /* مكان اللوحة يُقاس من الزرّ نفسه لا بعددٍ مكتوب: كان 262 بكسلًا بينما
+     العمود الجانبيّ 280، فتركب عليه؛ وكان أعلاها 16 والزرّ أسفل منه، فتبدو
+     معلّقةً لا خارجةً منه. واللوحة ثابتة لأن العمود عليه overflow يقصّ. */
+  const btn = useRef<HTMLButtonElement>(null);
+  const [place, setPlace] = useState<React.CSSProperties>();
+  useEffect(() => {
+    if (!open) return;
+    const put = () => {
+      const r = btn.current?.getBoundingClientRect();
+      if (!r) return;
+      const GAP = 10, EDGE = 12;
+      const rtl = getComputedStyle(document.documentElement).direction === 'rtl';
+      /* الأفق يُقاس من حافة العمود لا من الزرّ: الزرّ داخل حشو العمود،
+         فلوحةٌ ملاصقةٌ له تبقى فوق العمود بمقدار ذلك الحشو. */
+      const col = btn.current?.closest('.side')?.getBoundingClientRect();
+      /* لا تتجاوز أسفل الشاشة: تُرفع عند الحاجة وتبقى تحت حافتها العليا */
+      const top = Math.max(EDGE, Math.min(r.top, window.innerHeight - 160));
+      setPlace(rtl
+        ? { top, right: window.innerWidth - (col?.left ?? r.left) + GAP }
+        : { top, left: (col?.right ?? r.right) + GAP });
+    };
+    put();
+    window.addEventListener('resize', put);
+    window.addEventListener('scroll', put, true);
+    return () => { window.removeEventListener('resize', put); window.removeEventListener('scroll', put, true); };
+  }, [open]);
+
   const mark = async (body: object) => {
     await fetch('/api/admin/notifications', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).catch(() => {});
     load();
@@ -104,14 +131,14 @@ export function Bell() {
 
   return (
     <div className="bell" ref={box}>
-      <button type="button" className={`bell__btn${unread ? ' has-new' : ''}`} onClick={() => setOpen((o) => !o)}
+      <button ref={btn} type="button" className={`bell__btn${unread ? ' has-new' : ''}`} onClick={() => setOpen((o) => !o)}
               aria-expanded={open} aria-label={unread ? `${unread} تنبيه جديد` : 'التنبيهات'}>
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3a1.5 1.5 0 0 0-3 0v1.16A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Z"/></svg>
         <span>التنبيهات</span>
         {unread ? <b>{unread > 99 ? '99+' : unread}</b> : null}
       </button>
       {open ? (
-        <div className="bell__panel" role="dialog" aria-label="التنبيهات">
+        <div className="bell__panel" role="dialog" aria-label="التنبيهات" style={place}>
           <div className="bell__head">
             <b>التنبيهات</b>
             {unread ? <button type="button" onClick={() => mark({ all: true })}>علّم الكل مقروءًا</button> : null}
