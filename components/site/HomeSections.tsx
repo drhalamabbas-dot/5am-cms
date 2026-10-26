@@ -50,6 +50,9 @@ export function HeroSlider({ s, t, underHeader = false }: { s: Any; t: T; underH
                «‎-mobile.jpg» بجانب الصورة فتُقَصّ كل صورةٍ عريضة إلى إطارٍ
                طوليّ بلا طلب — ومن يريد صورةً للهاتف يرفعها هو. */
             const phone = (sl.imgMobile ?? '').trim();
+            /* data-nophone: شريحةٌ بلا «صورة الهاتف» ينزعها app.js على
+               الهاتف. صورةُ الشاشة الواسعة في إطارٍ طوليّ تُكبَّر حتى لا
+               يظهر من المعدة إلا طرفها. */
             const img = (
               <img
                 {...(preload ? { src: ver(sl.img) } : { 'data-src': ver(sl.img) })}
@@ -61,7 +64,8 @@ export function HeroSlider({ s, t, underHeader = false }: { s: Any; t: T; underH
               />
             );
             return (
-              <div className={`vhero__slide${i === 0 ? ' is-active' : ''}`} data-index={i} data-group={sl.group} key={i}>
+              <div className={`vhero__slide${i === 0 ? ' is-active' : ''}`}
+                   data-index={i} data-group={sl.group} data-nophone={phone ? undefined : ''} key={i}>
                 {phone ? (
                   <picture>
                     {/* srcset يُؤجَّل كالصورة: مصدرٌ مطابق بلا تأجيل ينزّل قَصّات
