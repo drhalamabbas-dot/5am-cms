@@ -16,25 +16,27 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### لماذا `--webpack` في سكربت التطوير؟
+### Why `--webpack` in the dev script?
 
-`npm run dev` يمرّر `--webpack` عمدًا. المجمِّع الافتراضي (Turbopack) في Next.js 16
-يرسم إطار الشيفرة حول أي خطأ بلغة Rust، وهو يقصّ السطر بعدّ **البايتات** لا الأحرف.
-الحرف العربي بايتان، فحين يقع الخطأ على سطر فيه عربية ينهار المجمِّع:
+`npm run dev` passes `--webpack` on purpose. The default bundler (Turbopack) in
+Next.js 16 draws a code frame around errors using Rust, and it slices the line by
+**byte count**, not character count. Arabic characters are two bytes each, so when
+an error lands on a line containing Arabic the bundler panics:
 
 ```
 panicked at crates\next-code-frame\src\highlight.rs: end byte index … is not a
 char boundary; it is inside 'ل'
 ```
 
-والانهيار يعبر حدود NAPI بلا التقاط، فيموت خادم التطوير كلّه ويصير الموقع «لا يمكن
-الوصول إليه» — لا لخطأ في الموقع بل لأن الخطأ الأصلي تعذّر عرضه. وشيفرة هذا المشروع
-معلَّقة بالعربية كلها، فالاحتمال قائم في أي ملف.
+The panic crosses the NAPI boundary uncaught, killing the entire dev server — the
+site becomes unreachable not because of a code bug but because the original error
+could not be displayed. This project's codebase is heavily commented in Arabic, so
+the risk exists in virtually every file.
 
-العلّة مرفوعة في Next.js ([#98178](https://github.com/vercel/next.js/issues/98178))
-ولم تُصلَح بعد. ولمّا تُصلَح، يُشغَّل `npm run dev:turbo` للعودة إلى Turbopack
-(أسرع)؛ ولا شيء في `next.config.ts` يعتمد على أيّ منهما، والبناء (`npm run build`)
-على Turbopack كما هو.
+The bug is filed in Next.js ([#98178](https://github.com/vercel/next.js/issues/98178))
+and is not yet fixed. Once it is, run `npm run dev:turbo` to switch back to
+Turbopack (faster). Nothing in `next.config.ts` depends on either bundler, and
+production builds (`npm run build`) use Turbopack as-is.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

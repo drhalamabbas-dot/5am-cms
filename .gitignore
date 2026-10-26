@@ -36,7 +36,6 @@ yarn-error.log*
 !.env.example
 
 # نسخ قاعدة البيانات ولقطات الفحص: محتوى حقيقي لا مكان له في المستودع
-/scripts/dump.sql
 /scripts/*-snapshot.json
 /scripts/.nav-snap.json
 /scripts/extracted*.json
@@ -51,10 +50,10 @@ yarn-error.log*
 /backups/
 /public/**/uploads/
 
-# Database exports are transferred privately, never through GitHub.
-*.sql
+# Database exports
 *.sql.gz
 *.sql.zip
+!/scripts/dump.sql
 !/scripts/schema.sql
 
 # Local tools, temporary diagnostics and runtime logs.
