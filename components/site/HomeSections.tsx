@@ -10,7 +10,6 @@
    فعلًا، أي نسخة ux.js.
 ============================================================================= */
 import type { T } from '@/lib/i18n';
-import { mobileOf } from '@/lib/uploads';
 import type { Brand } from '@/lib/content';
 import { Icon } from './Icon';
 import { Pic, MOBILE_AT } from './Pic';
@@ -47,11 +46,10 @@ export function HeroSlider({ s, t, underHeader = false }: { s: Any; t: T; underH
                لا بعلامة مخزّنة: الصورة المستبدَلة تفقد علاماتها (هي مربوطة
                بمسار الصورة)، فكانت الأولى تظهر فارغة حتى يصلها السلايدر. */
             const preload = i < 2 || sl.preload === true;
-            /* قَصّة الهاتف: المكتوبة في الشريحة، وإلا «‎-mobile.jpg» بجانب
-               الصورة. وبدونها تُكبَّر الصورة العريضة في إطارٍ طوليّ حتى لا
-               يظهر من المعدة إلا طرفها. ومن لا يريد صورته على الهاتف أصلًا
-               يجعل «تظهر على» = الشاشات الواسعة فقط. */
-            const phone = (sl.imgMobile ?? '').trim() || mobileOf(sl.img);
+            /* قَصّة الهاتف: المكتوبة في الشريحة وحدها. كان يُبحث عن
+               «‎-mobile.jpg» بجانب الصورة فيُقَصّ ما رُفع بمقاس الشاشة
+               الواسعة إلى إطارٍ طوليّ، فيضيع معظم عرضه. */
+            const phone = (sl.imgMobile ?? '').trim();
             const img = (
               <img
                 {...(preload ? { src: ver(sl.img) } : { 'data-src': ver(sl.img) })}
