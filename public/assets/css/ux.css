@@ -947,7 +947,9 @@ body{ overflow-x:clip !important; overflow-y:visible !important; }
     display:flex; align-items:center; gap:12px; position:relative;
     min-height:48px; padding:10px 4px; width:100%;
     background:none; border:0; font:inherit; font-size:15.5px;
-    color:inherit; text-align:start; cursor:pointer;
+    text-align:start; cursor:pointer;
+    /* المنيو داكن وinherit يأتي بحبر الصفحة الكحليّ، فيختفي على سواده */
+    color:#fff;
   }
   .mnav__tool svg{ flex:0 0 auto; opacity:.82; }
   .mnav__tool u{
