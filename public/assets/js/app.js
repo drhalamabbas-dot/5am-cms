@@ -418,13 +418,15 @@
       for (let i = 0; i < slides.length; i++) if (groupOf(slides[i]) === g) return i;
       return 0;
     };
+    /* لا شريحة على هذا الجهاز: يبقى الفيديو وحده، ويُنزع شريط التبويبات
+       والسهمان معه — سهمٌ لا ينقل إلى شيء. */
+    if (!slides.length) { const foot = qs('.vhero__foot'); if (foot) foot.remove(); return; }
     /* تبويبٌ لا شريحة له على هذا الجهاز لا يُعرض: نقرُه كان يرجع إلى الأولى. */
     tabs.slice().forEach(function (tab) {
       const g = groupOf(tab);
       const has = slides.filter(function (s) { return groupOf(s) === g; }).length;
       if (!has) { tab.remove(); tabs.splice(tabs.indexOf(tab), 1); }
     });
-    if (!slides.length && !video) return;
 
     const BASE_INTERVAL = 4300, MAX_GROUP = 20000, MIN_INTERVAL = 2600;
     const groups = [];
