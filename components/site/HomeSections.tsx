@@ -46,9 +46,9 @@ export function HeroSlider({ s, t, underHeader = false }: { s: Any; t: T; underH
                لا بعلامة مخزّنة: الصورة المستبدَلة تفقد علاماتها (هي مربوطة
                بمسار الصورة)، فكانت الأولى تظهر فارغة حتى يصلها السلايدر. */
             const preload = i < 2 || sl.preload === true;
-            /* قَصّة الهاتف: المكتوبة في الشريحة وحدها. كان يُبحث عن
-               «‎-mobile.jpg» بجانب الصورة فيُقَصّ ما رُفع بمقاس الشاشة
-               الواسعة إلى إطارٍ طوليّ، فيضيع معظم عرضه. */
+            /* قَصّة الهاتف: المرفوعة في «صورة الهاتف» وحدها. وكان يُبحث عن
+               «‎-mobile.jpg» بجانب الصورة فتُقَصّ كل صورةٍ عريضة إلى إطارٍ
+               طوليّ بلا طلب — ومن يريد صورةً للهاتف يرفعها هو. */
             const phone = (sl.imgMobile ?? '').trim();
             const img = (
               <img
@@ -60,10 +60,8 @@ export function HeroSlider({ s, t, underHeader = false }: { s: Any; t: T; underH
                 {...(i === 0 ? { fetchPriority: 'high' as const } : { decoding: 'async' as const })}
               />
             );
-            /* data-only: app.js ينزع الشريحة من الدورة إن كانت لجهازٍ آخر */
             return (
-              <div className={`vhero__slide${i === 0 ? ' is-active' : ''}`}
-                   data-index={i} data-group={sl.group} data-only={sl.only || undefined} key={i}>
+              <div className={`vhero__slide${i === 0 ? ' is-active' : ''}`} data-index={i} data-group={sl.group} key={i}>
                 {phone ? (
                   <picture>
                     {/* srcset يُؤجَّل كالصورة: مصدرٌ مطابق بلا تأجيل ينزّل قَصّات
