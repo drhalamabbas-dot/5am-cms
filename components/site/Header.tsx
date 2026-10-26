@@ -214,10 +214,40 @@ export function Header({
         <a className="btn btn--block mt-24" href={quoteHref}>
           {t.t('cta.requestQuote', 'Request a quote')} <Icon name="arrow" />
         </a>
-        {/* الشريط العلوي ضيّق على الهاتف، فالباب نفسه هنا بنصّه كاملًا */}
-        <a className="btn btn--ghost btn--block mt-8" href={`/account?lang=${t.ar ? 'ar' : 'en'}`} rel="nofollow">
-          {t.ar ? 'حسابي' : 'My account'}
-        </a>
+
+        {/* أدوات الشريط العلوي تنتقل إلى هنا على الهاتف: خمسة أزرار في شريطٍ
+            عرضه 320px تفيض عنه بثمانيةٍ وثلاثين بكسلًا، فيظهر فراغٌ أسود
+            جانبيّ. وهي هنا بنصّها لا بأيقونتها وحدها، فأوضح. */}
+        <div className="mnav__tools">
+          <button className="mnav__tool" type="button" data-proxy="searchBtn">
+            <Icon name="search" />
+            <span>{t.ar ? 'بحث' : 'Search'}</span>
+          </button>
+          <button className="mnav__tool" type="button" data-proxy="langBtn" lang={other}>
+            <Icon name="globe" />
+            <span>{other === 'ar' ? 'العربية' : 'English'}</span>
+          </button>
+          <a className="mnav__tool" href={`/account?lang=${t.ar ? 'ar' : 'en'}`} rel="nofollow">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="8" r="3.6" />
+              <path d="M4.8 20a7.2 7.2 0 0 1 14.4 0" />
+            </svg>
+            <span>{t.ar ? 'حسابي' : 'My account'}</span>
+            {unread ? <u>{unread > 9 ? '9+' : unread}</u> : null}
+          </a>
+          {!hideAdminLink ? (
+            <a className="mnav__tool" href="/admin" rel="nofollow">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="4" y="10.5" width="16" height="10" rx="2" />
+                <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" />
+                <circle cx="12" cy="15.5" r="1.3" />
+              </svg>
+              <span>{t.ar ? 'لوحة التحكم' : 'Dashboard'}</span>
+            </a>
+          ) : null}
+        </div>
       </div>
     </>
   );

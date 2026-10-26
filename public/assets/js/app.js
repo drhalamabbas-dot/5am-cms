@@ -320,6 +320,18 @@
       });
     }
 
+    /* نسخة الهاتف من زرّي البحث واللغة داخل المنيو: الأصلان مخفيّان هناك،
+       وهذه تنقر عليهما فيعمل مستمعهما وحده. والمنيو يُغلق أولًا كي لا تُفتح
+       نافذة البحث خلف قائمةٍ تغطّيها. */
+    D.querySelectorAll('.mnav__tool[data-proxy]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const target = qs('#' + btn.getAttribute('data-proxy'));
+        if (!target) return;
+        if (burger && mnav && mnav.classList.contains('is-open')) burger.click();
+        target.click();
+      });
+    });
+
     stickyHeader(hdr, mnav);
   }
 

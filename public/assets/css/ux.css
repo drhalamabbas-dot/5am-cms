@@ -928,15 +928,42 @@ body{ overflow-x:clip !important; overflow-y:visible !important; }
 .pgcard.pgcard--static, .pgcard.pgcard--static:hover{ transform:none !important; box-shadow:0 3px 10px rgb(6 11 20 / 3%) !important; cursor:default; }
 .pgcard.pgcard--static:hover .pgcard__fig img{ transform:none !important; }
 
-/* ---------- Very small phones (≤380px, e.g. iPhone SE at 320/375)
-   Logo + search + language + menu did not fit at 320px and pushed the page
-   sideways. Everything shrinks a step so the bar always fits in one line. */
+/* ---------- Phones: the top bar carries the menu button alone.
+   Five buttons beside the logo measured 215px of a 320px bar and spilled
+   38px past the edge, so the page scrolled sideways onto a black strip.
+   Search, language, account and the dashboard door move into the menu
+   below, where each one is a labelled row instead of a bare glyph. */
+@media (max-width:900px){
+  .hdr__tools > .iconbtn:not(.burger),
+  .hdr__tools > .lang{ display:none !important; }
+}
+.mnav__tools{ display:none; }
+@media (max-width:900px){
+  .mnav__tools{
+    display:grid; gap:2px; margin-top:18px; padding-top:14px;
+    border-top:1px solid rgba(255,255,255,.14);
+  }
+  .mnav__tool{
+    display:flex; align-items:center; gap:12px; position:relative;
+    min-height:48px; padding:10px 4px; width:100%;
+    background:none; border:0; font:inherit; font-size:15.5px;
+    color:inherit; text-align:start; cursor:pointer;
+  }
+  .mnav__tool svg{ flex:0 0 auto; opacity:.82; }
+  .mnav__tool u{
+    text-decoration:none; margin-inline-start:auto;
+    min-width:20px; height:20px; padding-inline:6px; border-radius:10px;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:var(--brand,#8B1D24); color:#fff; font-size:11.5px; font-weight:700;
+  }
+  .mnav__tool:focus-visible{ outline:2px solid var(--brand-light); outline-offset:2px; }
+}
+
+/* ---------- Very small phones (≤380px, e.g. iPhone SE at 320/375) */
 @media (max-width:380px){
   .hdr__in{ gap:6px !important; }
   .hdr__logo img, .hdr--compact .hdr__logo img{ height:32px !important; }
-  .hdr__tools{ gap:4px !important; }
-  .hdr__tools .iconbtn, .hdr__tools .burger{ width:38px !important; min-width:38px !important; height:38px !important; min-height:38px !important; }
-  .hdr__tools .lang{ height:38px !important; min-height:38px !important; min-width:38px !important; padding-inline:7px !important; }
+  .hdr__tools .burger{ width:38px !important; min-width:38px !important; height:38px !important; min-height:38px !important; }
   .wrap{ padding-inline:16px; }
 }
 
