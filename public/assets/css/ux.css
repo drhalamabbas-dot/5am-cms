@@ -392,13 +392,18 @@ body{ overflow-x:clip !important; overflow-y:visible !important; }
    photos are 16:9, so the extra height also means object-fit crops less of
    them. svh keeps it steady on mobile when the browser chrome slides away. */
 .vhero{
-  min-height:clamp(740px, 100vh, 1120px) !important;
-  min-height:clamp(740px, 100svh, 1120px) !important;
+  /* السقف 1120 كان يترك فراغًا أسفل الشاشات الطويلة، والأرضية تحمي
+     النوافذ القصيرة من هيرو يأكل الصفحة كلها. */
+  min-height:max(740px, 100vh) !important;
+  min-height:max(740px, 100svh) !important;
 }
 @media (max-width:760px){
   .vhero{
-    min-height:clamp(560px, 88vh, 760px) !important;
-    min-height:clamp(560px, 88svh, 760px) !important;
+    /* كان 88svh فيظهر طرفُ القسم التالي تحته. ويُزاد الحشو السفليّ بقدر
+       شريط التواصل الثابت (76) وإلا قعد على التبويبات فحجبها. */
+    min-height:max(560px, 100vh) !important;
+    min-height:max(560px, 100svh) !important;
+    padding-bottom:calc(26px + 76px + env(safe-area-inset-bottom)) !important;
   }
 }
 
