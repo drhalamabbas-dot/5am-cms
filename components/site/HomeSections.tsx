@@ -12,7 +12,8 @@
 import type { T } from '@/lib/i18n';
 import type { Brand } from '@/lib/content';
 import { Icon } from './Icon';
-import { Pic } from './Pic';
+import { Pic, MOBILE_AT } from './Pic';
+import { mobileOf } from '@/lib/uploads';
 import { ASSET_V } from '@/lib/version';
 
 type Any = Record<string, any>;
@@ -46,16 +47,30 @@ export function HeroSlider({ s, t, underHeader = false }: { s: Any; t: T; underH
                لا بعلامة مخزّنة: الصورة المستبدَلة تفقد علاماتها (هي مربوطة
                بمسار الصورة)، فكانت الأولى تظهر فارغة حتى يصلها السلايدر. */
             const preload = i < 2 || sl.preload === true;
+            /* قَصّة الهاتف: المكتوبة في الشريحة، وإلا «‎-mobile.jpg» بجانب الصورة */
+            const phone = (sl.imgMobile ?? '').trim() || mobileOf(sl.img);
+            const img = (
+              <img
+                {...(preload ? { src: ver(sl.img) } : { 'data-src': ver(sl.img) })}
+                alt={t.tx(sl.alt)}
+                className="vhero__img"
+                width={sl.w ?? undefined}
+                height={sl.h ?? undefined}
+                {...(i === 0 ? { fetchPriority: 'high' as const } : { decoding: 'async' as const })}
+              />
+            );
             return (
               <div className={`vhero__slide${i === 0 ? ' is-active' : ''}`} data-index={i} data-group={sl.group} key={i}>
-                <img
-                  {...(preload ? { src: ver(sl.img) } : { 'data-src': ver(sl.img) })}
-                  alt={t.tx(sl.alt)}
-                  className="vhero__img"
-                  width={sl.w ?? undefined}
-                  height={sl.h ?? undefined}
-                  {...(i === 0 ? { fetchPriority: 'high' as const } : { decoding: 'async' as const })}
-                />
+                {phone ? (
+                  <picture>
+                    {/* srcset يُؤجَّل كالصورة: مصدرٌ مطابق بلا تأجيل ينزّل قَصّات
+                        الشرائح كلها فور الفتح على الهاتف. يرفعه hydrate في app.js
+                        قبل src كي تُختار القَصّة لا الصورة العريضة. */}
+                    <source media={`(max-width:${MOBILE_AT}px)`}
+                            {...(preload ? { srcSet: ver(phone) } : { 'data-srcset': ver(phone) })} />
+                    {img}
+                  </picture>
+                ) : img}
               </div>
             );
           })}

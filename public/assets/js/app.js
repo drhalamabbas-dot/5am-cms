@@ -424,10 +424,16 @@
         }
       });
     }
-    /* الصور تُحمَّل عند الحاجة لا كلها مرة واحدة */
+    /* الصور تُحمَّل عند الحاجة لا كلها مرة واحدة.
+
+       وقَصّة الهاتف مؤجَّلة مثلها في <source data-srcset>: مصدرٌ مطابق بلا
+       تأجيل كان ينزّل قَصّات الشرائح السبع عشرة فور فتح الصفحة على الهاتف.
+       تُرفَع قبل src كي يختار المتصفح القَصّة لا الصورة العريضة. */
     function hydrate(i) {
       const s = slides[(i + slides.length) % slides.length];
       if (!s) return;
+      const src = qs('source[data-srcset]', s);
+      if (src) { src.srcset = src.dataset.srcset; src.removeAttribute('data-srcset'); }
       const img = qs('img[data-src]', s);
       if (img) { img.src = img.dataset.src; img.removeAttribute('data-src'); }
     }

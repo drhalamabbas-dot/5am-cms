@@ -128,6 +128,28 @@ export function VisualEditor({
   const [sel, setSel] = useState<Sel>(null);
   const [formRev, setFormRev] = useState(0);        // يُعيد رسم الحقول بقيمها بعد تراجع أو حفظ
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
+
+  /* حقول أعلى الصفحة تتبع الجهاز المعروض: للهيرو صورتان — عريضة للشاشة
+     الواسعة وقَصّة طولية للهاتف — وكان يظهران معًا بالترتيب نفسه مهما كان
+     المعروض، فيعدّل المحرّر صورةً لا يراها أمامه ويظنّها لم تتغيّر.
+
+     فتتقدّم صورة الجهاز المعروض ويُكتب على اسمها أنها هي المعروضة الآن.
+     ولا تُخفى الأخرى: تبديل الصورتين في مكان واحد أوضح من البحث عنهما. */
+  const heroFields = useMemo(() => {
+    const mob = device === 'mobile';
+    const now = ' — المعروضة الآن';
+    const named = HERO_FIELDS.map((f) =>
+      f.name === 'img' ? { ...f, label: `صورة الشاشة الواسعة${mob ? '' : now}` }
+        : f.name === 'imgMobile' ? { ...f, label: `صورة الهاتف${mob ? now : ''}` }
+          : f);
+    if (!mob) return named;
+    const a = named.findIndex((f) => f.name === 'img');
+    const b = named.findIndex((f) => f.name === 'imgMobile');
+    if (a < 0 || b < 0) return named;
+    const out = [...named];
+    [out[a], out[b]] = [out[b], out[a]];
+    return out;
+  }, [device]);
   /* الحاسب يُعرض بعرض حاسب حقيقي (1280) مصغَّرًا ليسع المساحة — كما في محرّر
      Shopify — لا بعرض المساحة نفسها: المساحة أضيق من حدّ تصميم الحاسب، فكان
      الموقع يرسم نسخة الهاتف (المنيو المطويّ) ويخفي ما يُراد تعديله. */
@@ -970,7 +992,7 @@ export function VisualEditor({
             <form ref={formRef} key={`${sel}-${formRev}`} className="ved__form" onSubmit={(e) => e.preventDefault()}
                   hidden={tab === 'design'}>
               {sel === 'hero' ? (
-                HERO_FIELDS.map((f) => <FieldView key={f.name} f={f} name={f.name} value={state.hero?.[f.name]} />)
+                heroFields.map((f) => <FieldView key={f.name} f={f} name={f.name} value={state.hero?.[f.name]} />)
               ) : current && spec ? (
                 <>
                   {spec.hint ? <p className="field__hint" style={{ marginTop: 0 }}>{spec.hint}</p> : null}

@@ -10,6 +10,7 @@ import { currentUser } from '@/lib/auth';
 import { can } from '@/lib/permissions';
 import { audit } from '@/lib/audit';
 import { listMedia, saveUpload, deleteMedia, usedBy } from '@/lib/media';
+import { mobileOf } from '@/lib/uploads';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,6 +31,19 @@ export async function GET(req: Request) {
   const u = new URL(req.url);
   const path = u.searchParams.get('used');
   if (path) return NextResponse.json({ used: await usedBy(path) });
+
+  /* أي الصور لها قَصّة هاتف بجانبها على القرص. القرص لا تراه اللوحة، وتجربة
+     تحميل الصورة تكذب مع loading="lazy" — فالخادم يُسأل، وبنفس الدالة التي
+     يختار بها الموقع القَصّة، فما تعرضه اللوحة هو ما سيراه الزائر. */
+  const probe = u.searchParams.get('mobile');
+  if (probe !== null) {
+    const out: Record<string, string> = {};
+    for (const p of probe.split(',').map((s) => s.trim()).filter(Boolean).slice(0, 200)) {
+      const hit = mobileOf(p);
+      if (hit) out[p] = hit;
+    }
+    return NextResponse.json({ mobile: out });
+  }
   const rows = await listMedia({
     kind: u.searchParams.get('kind') ?? undefined,
     q: u.searchParams.get('q') ?? undefined,

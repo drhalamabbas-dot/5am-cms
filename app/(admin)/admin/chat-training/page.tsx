@@ -14,7 +14,7 @@ import { isSuper } from '@/lib/permissions';
 import { audit } from '@/lib/audit';
 import { clip } from '@/lib/requests';
 import { refreshSite } from '@/lib/admin';
-import { getChatSettings, providerReady, freeQwenModels, freeModels, modelErrors, DEFAULT_MODEL, DEFAULT_BACKUP, DEFAULT_DEEPSEEK } from '@/lib/chat/provider';
+import { getChatSettings, providerReady, freeQwenModels, freeModels, modelErrors, DEFAULT_MODEL, DEFAULT_BACKUP, DEFAULT_DEEPSEEK , DEFAULT_VISION , DEFAULT_HEAR } from '@/lib/chat/provider';
 import { TrainGenerator } from '@/components/admin/TrainGenerator';
 import { normalize } from '@/lib/chat/text';
 import { forgetDocs } from '@/lib/chat/kb';
@@ -65,6 +65,8 @@ export default async function ChatTraining({ searchParams }: { searchParams: Pro
       ownUrl: /^https?:\/\/[^\s]+$/.test(ownUrl) ? ownUrl : '',
       ownModel: (clip(form.get('ownModel'), 120) ?? '').replace(/[^\w./:-]/g, ''),
       backupModel: (clip(form.get('backupModel'), 120) ?? '').replace(/[^\w./:-]/g, ''),
+      visionModel: (clip(form.get('visionModel'), 120) ?? '').replace(/[^\w./:-]/g, ''),
+      hearModel: (clip(form.get('hearModel'), 120) ?? '').replace(/[^\w./:-]/g, ''),
       deepseekModel: (clip(form.get('deepseekModel'), 80) ?? '').replace(/[^\w./:-]/g, ''),
       requireLogin: form.get('requireLogin') === '1',
       greeting: { ar: clip(form.get('greet_ar'), 400) ?? before.greeting.ar, en: clip(form.get('greet_en'), 400) ?? before.greeting.en },
@@ -234,6 +236,33 @@ export default async function ChatTraining({ searchParams }: { searchParams: Pro
                   البوت بيبدأ بالموديل ده، ولو كان مشغول بيكمّل على باقي الموديلات المجانية
                   {allFree.length ? ` (${allFree.length} موديل متاح دلوقتي)` : ''} لحد ما واحد يرد.
                   وردود الاحتياطي تمرّ بنفس فلتر الأسعار والأرقام، فلو اخترع سعرًا أو رقمًا لا يصل للعميل.
+                </p>
+              </div>
+              <div className="field">
+                <label htmlFor="visionModel">الموديل اللي بيقرا الصور</label>
+                <select id="visionModel" name="visionModel" defaultValue={s.visionModel || DEFAULT_VISION}>
+                  <option value="none">ما يقراش الصور — يبلّغ موظف يشوفها</option>
+                  {[...new Set([s.visionModel || DEFAULT_VISION, ...allFree.filter((m) => /vl\b|vision|-v\d|gemma-3|llava/i.test(m))])]
+                    .filter((m) => m && m !== 'none').map((m) => <option key={m} value={m}>{m}</option>)}
+                </select>
+                <p className="field__hint">
+                  العميل بيبعت صورة لوحة عدّادات أو تسريب، والموديل ده بيقراها ويقول اللي فيها.
+                  الصورة بتتصغّر لـ1280 بكسل وبتتبعت مضمّنة — فمتبعتش صورة مش عايزها توصل المزوّد.
+                  ولو ما قدرش يقراها، بيقول كده صراحةً وبيبلّغ موظف — ما بيخترعش وصفًا لصورة ما شافهاش.
+                </p>
+              </div>
+              <div className="field">
+                <label htmlFor="hearModel">الموديل اللي بيسمع الرسائل الصوتية</label>
+                <select id="hearModel" name="hearModel" defaultValue={s.hearModel || DEFAULT_HEAR}>
+                  <option value="none">ما يسمعش — يبلّغ موظف يسمعها</option>
+                  {[...new Set([s.hearModel || DEFAULT_HEAR, ...allFree.filter((m) => /omni|audio|voxtral|whisper|inkling/i.test(m))])]
+                    .filter((m) => m && m !== 'none').map((m) => <option key={m} value={m}>{m}</option>)}
+                </select>
+                <p className="field__hint">
+                  العميل بيبعت رسالة صوتية، والموديل ده بيحوّلها كلام والبوت يرد عليها زي أي سؤال مكتوب.
+                  المجاني بيسمع بصعوبة في العامية؛ لو العملاء بيبعتوا صوت كتير، موديل مدفوع زي
+                  <code> mistralai/voxtral-small-24b-2507 </code> أدقّ بكتير وبكسور السنت للرسالة.
+                  ولو ما سمعش، بيقول كده صراحةً وبيبلّغ موظف.
                 </p>
               </div>
               <div className="row">

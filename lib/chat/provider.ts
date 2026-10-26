@@ -23,6 +23,10 @@ export type ChatSettings = {
   deepseekModel: string;
   /** موديل مجاني احتياطي حين يكون Qwen مشغولًا. 'none' = بلا احتياطي */
   backupModel: string;
+  /** موديل يقرأ الصور. 'none' = البوت لا يحلّل الصور ويقولها صراحةً */
+  visionModel: string;
+  /** موديل يسمع الرسائل الصوتية. 'none' = البوت لا يسمعها ويقولها صراحةً */
+  hearModel: string;
   /** لا تُفتح المحادثة إلا لمن سجّل دخوله بحساب عميل */
   requireLogin: boolean;
   greeting: { ar: string; en: string };
@@ -35,6 +39,15 @@ export const DEFAULT_MODEL = 'qwen/qwen3.8-27b:free';
 export const DEFAULT_BACKUP = 'nvidia/nemotron-3-ultra-550b-a55b:free';
 /** الأرخص والأسرع في حساب DeepSeek (الموديلات المتاحة تظهر في «تدريب البوت») */
 export const DEFAULT_DEEPSEEK = 'deepseek-flash';
+/** موديل يقرأ الصور. مجّانيّ على OpenRouter، ويُبدَّل من شاشة «تدريب البوت».
+ *  اختير بالتجربة على صورة لوحة عدّادات: قرأ الرقم والتحذير ومؤشّر ضغط الزيت،
+ *  بينما ردّت gemma بخطأ مزوّد، وnemotron-vl بلا نصّ، وopenrouter/free بتصنيف
+ *  أمانٍ لا بوصف. والمتاح يتغيّر، فالقائمة في الشاشة تُبنى من المتاح وقتها. */
+export const DEFAULT_VISION = 'minimax/minimax-m3.1-flash:free';
+/** موديل يسمع الرسائل الصوتية. ثلاثةٌ مجانية تقبل الصوت، واثنان منها مقصوران
+ *  على «agentic harnesses» فيردّان 403 — فبقي هذا. والمدفوع أدقّ بكثير
+ *  (voxtral وgemini-flash-lite بكسورِ سنت)، ويُختار من شاشة «تدريب البوت». */
+export const DEFAULT_HEAR = 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free';
 
 export async function getChatSettings(): Promise<ChatSettings> {
   const s = await getSetting<Partial<ChatSettings>>('chat', {});
@@ -46,6 +59,8 @@ export async function getChatSettings(): Promise<ChatSettings> {
     ownModel: (s.ownModel || '').trim(),
     deepseekModel: (s.deepseekModel || '').trim(),
     backupModel: (s.backupModel || '').trim(),
+    visionModel: (s.visionModel ?? '').trim() || DEFAULT_VISION,
+    hearModel: (s.hearModel ?? '').trim() || DEFAULT_HEAR,
     /* الافتراضي: المحادثة مفتوحة للزائر. تُقفل بتفعيل الإعداد من الشاشة. */
     requireLogin: s.requireLogin === true,
     greeting: { ar: s.greeting?.ar ?? '', en: s.greeting?.en ?? '' },
@@ -112,16 +127,34 @@ export const modelErrors = () => [...errors];
 
 const busy = (s: number) => s === 429 || s === 408 || s >= 500;
 const errOf = (status: number, d: any) => (d?.error?.metadata?.raw ? `${status}: ${String(d.error.metadata.raw)}` : d?.error?.message ? `${status}: ${d.error.message}` : `HTTP ${status}`);
-/* حرف لاتيني ملتصق بحرف عربي بلا مسافة: «تachtاج»، «الangenehme». لا تكتب
-   العربية هكذا أبدًا، فهي علامة أن الموديل خلط لغتين داخل الكلمة الواحدة.
-   والأسماء الأجنبية المفصولة بمسافة (Pelican وCrosswind) تمرّ: هي من كلامنا.
+/* حرف لاتيني ملتصق بحرف عربي بلا مسافة: «تachtاج»، «مايكروستrainer». علامةُ
+   أن الموديل خلط لغتين داخل الكلمة الواحدة.
+
+   ويُستثنى ما تلتصق به العربية السليمة بالاسم الأجنبي: حروف العطف والجرّ
+   والتعريف — «وCummins» و«بPDF» و«الISO». هذه كتابة صحيحة شائعة، ورفضُها
+   كان يسقط ردودًا سليمة: سبعة من ردودنا المحفوظة طارت لأن فيها «وFleetguard».
 
    والحروف وحدها لا المدى العربي كلّه: الفاصلة «،» وعلامة الاستفهام «؟» في
    المدى نفسه، فـ«Pelican، مكنسة» كان يُرفض وهو كلام سليم.
 
-   والشرطة السفلية تُعدّ لصقًا («و_fraction»): لا تصل بين عربية ولاتينية في
+   والشرطة السفلية لصقٌ دائمًا («و_fraction»): لا تصل بين عربية ولاتينية في
    كلام سليم، بخلاف المسافة والشرطة العادية. */
-const GLUED_LATIN = /[ء-يٱ-ۓ]_?[A-Za-z]|[A-Za-z]_?[ء-يٱ-ۓ]/;
+const AR_LETTER = 'ء-يٱ-ۓ';
+/** سوابق تلتصق بالأجنبي في العربية السليمة */
+const PROCLITIC = /^(?:[وفبكل]|ال|وال|فال|بال|كال|لل)$/;
+
+function gluedLatin(t: string): boolean {
+  if (new RegExp(`[${AR_LETTER}]_[A-Za-z]|[A-Za-z]_[${AR_LETTER}]`).test(t)) return true;
+  /* لاتيني يليه عربي بلا فاصل: لا سابقة تبرّره */
+  if (new RegExp(`[A-Za-z][${AR_LETTER}]`).test(t)) return true;
+  /* عربي يليه لاتيني: يمرّ إن كان الملتصق سابقةً في أول الكلمة */
+  for (const m of t.matchAll(new RegExp(`([${AR_LETTER}]+)(?=[A-Za-z])`, 'g'))) {
+    const before = m.index === 0 ? ' ' : t[m.index! - 1];
+    if (PROCLITIC.test(m[1]) && /[\s("'«»\-–—/،:.]/.test(before)) continue;
+    return true;
+  }
+  return false;
+}
 
 /* الرد بلا «تفكير». ويُعامل كفشل — فيُعاد أو يُستبدل بموديل آخر — إن كان فيه
    حروف صينية (Qwen يخلط أحيانًا) أو كلمات ملزوقة بلغتين (الموديلات المجانية
@@ -129,20 +162,32 @@ const GLUED_LATIN = /[ء-يٱ-ۓ]_?[A-Za-z]|[A-Za-z]_?[ء-يٱ-ۓ]/;
 const textOf = (d: any) => {
   const t = String(d?.choices?.[0]?.message?.content ?? '').replace(/<think>[\s\S]*?<\/think>/g, '').trim();
   if (/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(t)) return '';
-  if (GLUED_LATIN.test(t)) return '';
+  if (gluedLatin(t)) return '';
   return t;
 };
 
 /** موديل على OpenRouter: حتى 3 محاولات لو مشغول (بعد 1.5 ثم 3.5 ثانية) */
 async function tryOpenRouter(model: string, messages: Msg[], key: string, tries = 3): Promise<{ text?: string; status: number; d: any }> {
-  const body = { model, messages, temperature: 0.3, max_tokens: 600, reasoning: { enabled: false } };
+  /* التفكير الداخليّ يُطفأ لأنه يأكل حدَّ الردّ فيعود مقطوعًا. لكن بعض
+     الموديلات تفرضه وترفض الطلب كلّه («Reasoning is mandatory for this
+     endpoint») — فكنّا نستبعدها ونحن نظنّها معطّلة، وهي تعمل. فإن قالتها،
+     يُعاد الطلب بلا الحقل وبحدٍّ أوسع يتّسع للتفكير وللردّ معًا. */
+  let noThink = true;
+  const bodyNow = () => (noThink
+    ? { model, messages, temperature: 0.3, max_tokens: 600, reasoning: { enabled: false } }
+    : { model, messages, temperature: 0.3, max_tokens: 2200 });
   let last = { status: 0, d: {} as any };
   for (let i = 0; i < tries; i++) {
     if (i) await new Promise((r) => setTimeout(r, i === 1 ? 1500 : 3500));
     try {
-      last = await call('https://openrouter.ai/api/v1/chat/completions', key, body, false);
+      last = await call('https://openrouter.ai/api/v1/chat/completions', key, bodyNow(), false);
     } catch (e: any) {
       last = { status: 0, d: { error: { message: e?.name === 'AbortError' ? 'انتهت المهلة' : 'تعذّر الاتصال' } } };
+    }
+    if (noThink && /reasoning is mandatory/i.test(String(last.d?.error?.message ?? ''))) {
+      noThink = false;
+      tries = Math.max(tries, i + 2);   // محاولةٌ إضافية بالشكل الآخر
+      continue;
     }
     const text = last.status === 200 ? textOf(last.d) : '';
     /* الموديل المجاني يقطع الرد أحيانًا («لوحة التزام»): أقل من 25 حرفًا = فشل يُعاد */

@@ -13,6 +13,10 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { Readable } from 'node:stream';
 import { uploadRoot } from '@/lib/uploads';
+import { q1 } from '@/lib/db';
+import { currentCustomer } from '@/lib/customerAuth';
+import { currentUser } from '@/lib/auth';
+import { can } from '@/lib/permissions';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,6 +24,9 @@ export const dynamic = 'force-dynamic';
 const MIME: Record<string, string> = {
   jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif',
   mp4: 'video/mp4', webm: 'video/webm', pdf: 'application/pdf',
+  /* الرسائل الصوتية: weba وm4a وعاؤهما وعاءُ webm وmp4، والامتداد وحده هو
+     ما يميّزهما — ولولا ذلك لصُرِفا بنوع فيديو فلم يُشغّلهما <audio>. */
+  weba: 'audio/webm', m4a: 'audio/mp4', ogg: 'audio/ogg', mp3: 'audio/mpeg',
 };
 
 type Ctx = { params: Promise<{ path: string[] }> };
@@ -61,14 +68,46 @@ function parseRange(h: string | null, size: number): { start: number; end: numbe
   return start <= end && start < size ? { start, end } : false;
 }
 
+/**
+ * مرفقات المحادثات لا تُصرَف إلا لأصحابها أو لموظفٍ يتابعها.
+ *
+ * ما سواها من المكتبة عامٌّ بطبعه: صور المنتجات والكتالوجات يراها الزائر.
+ * أمّا صورةٌ يبعثها عميلٌ من موقع عمله فلا — وكانت تُصرَف لكل من يملك
+ * الرابط لأنها كانت تُحفَظ في المكتبة نفسها.
+ *
+ * ويردّ 404 لا 403: وجودُ الملف نفسه خبرٌ لا يُعطى لمن ليس له.
+ */
+async function allowed(parts: string[]): Promise<boolean> {
+  if (parts[0] !== 'chat') return true;
+  const rel = `media/${parts.join('/')}`;
+
+  const acc = await currentCustomer();
+  if (acc) {
+    const mine = await q1<{ n: number }>(
+      'SELECT COUNT(*) n FROM chat_files WHERE path = ? AND account_id = ?', [rel, acc.id]
+    );
+    if (Number(mine?.n ?? 0) > 0) return true;
+  }
+  /* الموظف يتابع المحادثات، فيفتح ما فيها */
+  const u = await currentUser();
+  if (u && can(u, 'chat.handle')) return true;
+  return false;
+}
+
 async function serve(req: Request, ctx: Ctx, head: boolean) {
-  const f = await locate((await ctx.params).path);
+  const parts = (await ctx.params).path;
+  if (!(await allowed(parts))) return notFound();
+  const f = await locate(parts);
   if (!f) return notFound();
 
+  /* الخاصّ لا يُخزَّن إلا في متصفّح صاحبه، ولا يُفهرَس: وسيطٌ مشترك يخزّنه
+     «عامًّا» يصرفه بعد ذلك لغير صاحبه. */
+  const own = parts[0] === 'chat';
   const headers = new Headers({
     'Content-Type': f.type,
     'X-Content-Type-Options': 'nosniff',
-    'Cache-Control': 'public, max-age=31536000, immutable',
+    ...(own ? { 'X-Robots-Tag': 'noindex, nofollow' } : {}),
+    'Cache-Control': own ? 'private, max-age=600' : 'public, max-age=31536000, immutable',
     'Accept-Ranges': 'bytes',
     'Last-Modified': f.mtime.toUTCString(),
   });

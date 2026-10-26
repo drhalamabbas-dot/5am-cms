@@ -254,11 +254,21 @@ try {
 
   /* ============================================================ صفحات الموقع */
   step('صفحات الموقع وحساب العميل');
-  for (const p of ['/?lang=ar', '/?lang=en', '/account?lang=ar', '/account?lang=en', '/quote.html?lang=ar', '/sitemap.xml']) {
+  for (const p of ['/?lang=ar', '/?lang=en', '/login?lang=ar', '/login?lang=en', '/quote.html?lang=ar', '/sitemap.xml']) {
     const r = await html(p); check(r.status === 200 && noError(r.text), `${p}: ${r.status}`);
   }
-  const acc = await html('/account?lang=ar');
-  check(acc.text.includes('برمز على البريد') && acc.text.includes('بالموبايل وكلمة مرور'), 'صفحة الحساب بلا طريقتي الدخول');
+  /* الدخول صفحةٌ وحدها والحساب وحده: من لا جلسة له يُحوَّل إلى الدخول */
+  for (const p of ['/account?lang=ar', '/account?lang=en']) {
+    const r = await html(p);
+    check(r.status === 307 || r.status === 302, `${p} لازم يحوّل الزائر للدخول: ${r.status}`);
+  }
+  /* الدخول باسم المستخدم أو البريد، والتسجيل في تبويب مستقلّ */
+  const acc = await html('/login?lang=ar');
+  check(acc.text.includes('اسم المستخدم أو البريد') && acc.text.includes('كلمة المرور'),
+    'صفحة الدخول بلا نموذج الدخول');
+  const reg = await html('/login?lang=ar&tab=new');
+  check(['الاسم', 'اسم المستخدم', 'البريد الإلكتروني', 'كلمة المرور'].every((f) => reg.text.includes(f)),
+    'تبويب الحساب الجديد ناقص حقولًا');
   log.ok('صفحات');
 } catch (e) {
   bad++; log.fail(`توقف الاختبار: ${e?.stack ?? e}`);

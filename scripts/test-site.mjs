@@ -42,6 +42,21 @@ const crashed = (html) => /id="__next_error__"|Application error|Internal Server
 /* ================================================================ الزائر */
 log.step('صفحات الموقع كما يراها الزائر');
 const pages = await q('SELECT slug, template, published, redirect_to FROM pages ORDER BY position, id');
+
+/* الصفحة الرئيسية تُفحص صراحةً لا ضمن القائمة: باقي الفحوص تمرّ على المنشور
+   وحده، فلو سُحبت الرئيسية من النشر لم يشتكِ أحد — تُعدّ «مسوّدة مخفية بنجاح»
+   وينتهي الأمر. وقد حدث: سُحبت فصار «/» يردّ 404 ولم يظهر الخلل إلا كرابط
+   مكسور من صفحة أخرى. وواجهة الموقع ليست صفحةً كغيرها. */
+{
+  const home = pages.find((p) => p.slug === 'index');
+  if (!home) fail('لا توجد صفحة رئيسية (slug = index) في القاعدة');
+  else if (!home.published) fail('الصفحة الرئيسية غير منشورة — «/» يردّ 404 لكل زائر');
+  else {
+    const r = await get('/?lang=ar');
+    if (r.status === 200 && !crashed(r.text)) pass();
+    else fail(`الصفحة الرئيسية «/» ردّت ${r.status}`);
+  }
+}
 /* صفحة المتجر منشورة دائمًا، لكنها تحوّل الزائر حين يقفل صاحب الموقع متجره —
    وذلك سلوك مقصود لا عطل. فتُفحص كصفحة تحويل ما دام المتجر مقفولًا. */
 const storeRow = (await q("SELECT `value` FROM settings WHERE `key` = 'store'"))[0]?.value;
@@ -158,7 +173,9 @@ for (const [href, from] of links) {
     ok = r.status === 200; why = `ملف ${r.status}`;
   } else {
     const r = await get('/' + href);
-    ok = r.status === 200; why = `${r.status}`;
+    /* التحويل ليس كسرًا: ‎/account‎ يردّ 307 إلى ‎/login‎ لمن لا جلسة له،
+       وهو ما يُراد. الكسر أن يردّ 404 أو خطأ خادم. */
+    ok = r.status === 200 || (r.status >= 300 && r.status < 400); why = `${r.status}`;
   }
   nLinks++;
   if (ok) pass();

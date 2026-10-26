@@ -6,7 +6,7 @@ import { q, q1, when } from '@/lib/db';
 import { Shell } from '@/components/admin/Shell';
 import { AgentChat } from '@/components/admin/AgentChat';
 import { can } from '@/lib/permissions';
-import { CHAT_STATUS, messages } from '@/lib/chat/conv';
+import { CHAT_STATUS, messages, answerPending } from '@/lib/chat/conv';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +18,23 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
        FROM chat_conversations c LEFT JOIN users u ON u.id = c.assigned_to
        LEFT JOIN customers cu ON cu.id = c.customer_id LEFT JOIN customer_accounts a ON a.id = c.account_id WHERE c.id = ?`, [id]
   );
-  if (!c) notFound();
+  /* محادثةٌ لم تعد موجودة: صفحةُ 404 فارغة تترك الموظف يظنّ العطب في
+     اللوحة. ويُنظَّف ما بقي يشير إليها — تنبيهٌ يقود إلى لا شيء يُضغَط
+     ثانيةً وثالثة. */
+  if (!c) {
+    await q('DELETE FROM notifications WHERE link = ?', [`/admin/chats/${id}`]);
+    return (
+      <Shell title="محادثة" user={me} here="/admin/chats">
+        <div className="card" style={{ textAlign: 'center', padding: '40px 24px' }}>
+          <h2 style={{ marginTop: 0 }}>المحادثة دي مش موجودة</h2>
+          <p className="field__hint" style={{ maxWidth: 440, margin: '8px auto 20px' }}>
+            يمكن تكون اتمسحت، أو العميل مسح حسابه وبياناته. شِلنا التنبيه اللي كان بيوصّل لها.
+          </p>
+          <a className="btn" href="/admin/chats">كل المحادثات</a>
+        </div>
+      </Shell>
+    );
+  }
   const [initial, req] = await Promise.all([
     messages(id),
     q1<any>("SELECT id FROM requests WHERE kind = 'chat' AND page = ? ORDER BY id DESC LIMIT 1", [`/admin/chats/${id}`]),
@@ -39,6 +55,10 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
         [id, to === 'close' ? (clang === 'en' ? 'This conversation was closed. Write again any time to start a new one.' : 'اتقفلت المحادثة. اكتب لنا في أي وقت تبدأ محادثة جديدة.')
                             : (clang === 'en' ? 'You are back with the assistant.' : 'رجعت للمساعد الآلي.')]);
     }
+    /* سؤال وصل والمحادثة مع موظف يبقى بلا جواب: البوت يصمت عمدًا كي لا يقاطع
+       الموظف، فإن أعادها الموظف إلى البوت ولم يكن ردّ، ظلّ العميل ينتظر ردًّا
+       لن يأتي. فيُجاب هنا على آخر سؤال لم يُجَب. */
+    if (to === 'bot') await answerPending(id, clang);
     redirect(`/admin/chats/${id}`);
   }
 

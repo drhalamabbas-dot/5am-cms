@@ -18,7 +18,7 @@ import crypto from 'node:crypto';
 import { q, q1 } from './db';
 import { MEDIA_PREFIX, uploadRoot, uploadFile, insideApp } from './uploads';
 
-export type MediaKind = 'image' | 'video' | 'document';
+export type MediaKind = 'image' | 'video' | 'audio' | 'document';
 
 export type MediaRow = {
   id: number; path: string; kind: MediaKind;
@@ -37,6 +37,20 @@ const TYPES: Record<string, { kind: MediaKind; dir: string; max: number; magic: 
   mp4: { kind: 'video', dir: 'video', max: 200, magic: (b) => b.toString('ascii', 4, 8) === 'ftyp' },
   webm: { kind: 'video', dir: 'video', max: 200, magic: (b) => b.toString('hex', 0, 4) === '1a45dfa3' },
   pdf: { kind: 'document', dir: 'docs', max: 40, magic: (b) => b.toString('ascii', 0, 5) === '%PDF-' },
+
+  /* الصوت — الرسائل الصوتية في المحادثة.
+
+     المسجّل في المتصفّح يُخرج ما يدعمه: كروم وفَيَرفُكس يعطيان Opus في وعاء
+     WebM، وسَفاري يعطي AAC في وعاء MP4. و«weba» و«m4a» امتدادان يميّزان
+     الصوت عن الفيديو مع أن وعاءهما نفسه، فلا يظهر صوتٌ في شاشة الفيديو.
+     وبصمة البايتات واحدة لأن الوعاء واحد — وهذا ما يُفحَص. */
+  weba: { kind: 'audio', dir: 'audio', max: 25, magic: (b) => b.toString('hex', 0, 4) === '1a45dfa3' },
+  m4a: { kind: 'audio', dir: 'audio', max: 25, magic: (b) => b.toString('ascii', 4, 8) === 'ftyp' },
+  ogg: { kind: 'audio', dir: 'audio', max: 25, magic: (b) => b.toString('ascii', 0, 4) === 'OggS' },
+  mp3: {
+    kind: 'audio', dir: 'audio', max: 25,
+    magic: (b) => b.toString('ascii', 0, 3) === 'ID3' || (b[0] === 0xff && (b[1] & 0xe0) === 0xe0),
+  },
 };
 
 export const ACCEPT = Object.keys(TYPES).map((e) => '.' + e).join(',');
@@ -142,7 +156,17 @@ async function processImage(buf: Buffer, ext: string): Promise<Processed | { err
 
 export type UploadResult = { ok: true; row: MediaRow } | { ok: false; error: string };
 
-export async function saveUpload(file: File): Promise<UploadResult> {
+/**
+ * يحفظ ملفًا مرفوعًا.
+ *
+ * `owner` يجعله خاصًّا: يُكتَب في «chat/» ويُسجَّل صاحبُه، فلا يصرفه
+ * ‎/media‎ إلا له أو لموظفٍ يتابع المحادثات. وبدونه يدخل مكتبةَ الموقع
+ * العامّة — وهي عامّةٌ بطبعها: صورُ المنتجات والكتالوجات يراها الزائر.
+ *
+ * الصورةُ التي يبعثها عميلٌ من موقع عمله ليست من ذلك: كانت تُحفَظ في
+ * المكتبة نفسها فيفتحها كلُّ من يملك الرابط.
+ */
+export async function saveUpload(file: File, owner?: { accountId: number }): Promise<UploadResult> {
   const { base, ext } = safeName(file.name);
   const spec = TYPES[ext];
   if (!spec) {
@@ -174,7 +198,10 @@ export async function saveUpload(file: File): Promise<UploadResult> {
     ({ data, width, height, webp } = p);
   }
 
-  const dir = path.join(root, spec.dir);
+  /* مرفقات المحادثات في مجلدها، فيكفي المسارُ وحده ليعرف ‎/media‎ أنها
+     خاصّةٌ تُحرَس، ولا تختلط بصور الموقع في شاشة المكتبة. */
+  const sub = owner ? `chat/${spec.dir}` : spec.dir;
+  const dir = path.join(root, ...sub.split('/'));
   await fs.mkdir(dir, { recursive: true });
 
   /* 1) الملفات على القرص. لا ملف بلا صفّ: ما كُتب يُحذف إن فشل ما بعده. */
@@ -200,14 +227,19 @@ export async function saveUpload(file: File): Promise<UploadResult> {
   }
 
   /* 2) التسجيل. بعد نجاحه الملفات ملك الصفّ، فلا تُحذف مهما حدث بعده. */
-  const rel = `${MEDIA_PREFIX}${spec.dir}/${name}`;
+  const rel = `${MEDIA_PREFIX}${sub}/${name}`;
   let id: number;
   try {
     const res = await q(
       'INSERT INTO media (path, kind, bytes, folder, width, height) VALUES (?,?,?,?,?,?)',
-      [rel, spec.kind, data.length, spec.dir, width, height]
+      [rel, spec.kind, data.length, sub, width, height]
     ) as unknown as { insertId: number };
     id = res.insertId;
+    /* صاحب الملف: عليه يقوم الحارس في ‎/media‎ */
+    if (owner) {
+      await q('INSERT INTO chat_files (path, account_id) VALUES (?,?) ON DUPLICATE KEY UPDATE account_id = VALUES(account_id)',
+        [rel, owner.accountId]);
+    }
   } catch (e) {
     await cleanup();
     console.error('[media] تعذّر التسجيل:', e);
@@ -264,12 +296,24 @@ export async function usedBy(p: string): Promise<{ where: string; what: string }
 }
 
 export async function listMedia(opts: { kind?: string; q?: string; limit?: number } = {}) {
-  const where: string[] = [];
+  /* مرفقات المحادثات ليست من مكتبة الموقع: يرفعها العملاء في محادثاتهم —
+     صورُ أعطالهم وأوراقهم ووجوههم أحيانًا، وفيها إيصالُ دفعٍ وُجد بينها.
+     وكانت تظهر هنا بين صور الموقع، فيراها كل من يفتح لوحة اختيار صورة،
+     وقد تُوضع على صفحةٍ عامة بغلطة ضغطة.
+
+     والاستثناء بجدول chat_files لا بالمسار وحده: المرفقات القديمة سبقت
+     مجلد ‎media/chat‎ فهي في ‎media/img‎ و‎media/audio‎ بين صور الموقع،
+     وجدولُ المالكين وحده يعرفها. وصفُّها يبقى في media: المحادثة تقرأ
+     منه حجم الملف ومقاسه. */
+  const where: string[] = [
+    "path NOT LIKE 'media/chat/%'",
+    'NOT EXISTS (SELECT 1 FROM chat_files f WHERE f.path = media.path)',
+  ];
   const args: any[] = [];
   if (opts.kind && opts.kind !== 'all') { where.push('kind = ?'); args.push(opts.kind); }
   if (opts.q) { where.push('path LIKE ?'); args.push(`%${opts.q}%`); }
   const sql = `SELECT id, path, kind, width, height, bytes, alt_en, alt_ar, folder FROM media
-    ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
+    WHERE ${where.join(' AND ')}
     ORDER BY id DESC LIMIT ${Math.min(Number(opts.limit) || 400, 1000)}`;
   return q<MediaRow>(sql, args);
 }

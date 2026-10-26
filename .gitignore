@@ -67,6 +67,9 @@ yarn-error.log*
 *.log
 *.bak
 
+# بيانات التدريب — تُصدَّر من القاعدة ولا تُشارَك على GitHub
+/training-data/
+
 # vercel
 .vercel
 

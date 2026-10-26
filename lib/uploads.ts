@@ -77,17 +77,53 @@ function diskPath(src: string): string | null {
   return full.startsWith(pub + path.sep) ? full : null;
 }
 
-/* الإجابة لا تتغيّر: ملفات public ثابتة في الإصدار، وأسماء المرفوعات لا تُعاد
-   أبدًا. فتُحفظ كي لا يُسأل القرص عن الصورة نفسها مع كل زائر. */
-const webpKnown = new Map<string, boolean>();
+/* تُحفظ الإجابة كي لا يُسأل القرص عن الصورة نفسها مع كل زائر.
+
+   وتَبلى بعد دقيقة: «لا نسخة لها» كان يُحفظ إلى الأبد، فمن يرفع قَصّة هاتف
+   أو نسخة webp من اللوحة يظلّ الموقع يعرض الصورة القديمة حتى يُعاد تشغيل
+   الخادم — ولا أحد يربط بين الأمرين. والدقيقة تكفي لتوفير الأسئلة على
+   زائرٍ يتصفّح، وتقصر عن أن يُلاحَظ انتظارها. */
+const TTL = 60_000;
+type Cached<T> = { at: number; val: T };
+
+function cached<T>(store: Map<string, Cached<T>>, key: string, make: () => T): T {
+  const hit = store.get(key);
+  if (hit && Date.now() - hit.at < TTL) return hit.val;
+  const val = make();
+  if (store.size > 5000) store.clear();
+  store.set(key, { at: Date.now(), val });
+  return val;
+}
+
+const webpKnown = new Map<string, Cached<boolean>>();
 
 /** هل لهذه الصورة نسخة webp بجانبها؟ */
 export function hasWebp(src: string): boolean {
-  const hit = webpKnown.get(src);
-  if (hit !== undefined) return hit;
-  const file = diskPath(src);
-  const yes = !!file && fs.existsSync(file.replace(/\.jpe?g$/i, '.webp'));
-  if (webpKnown.size > 5000) webpKnown.clear();
-  webpKnown.set(src, yes);
-  return yes;
+  return cached(webpKnown, src, () => {
+    const file = diskPath(src);
+    return !!file && fs.existsSync(file.replace(/\.jpe?g$/i, '.webp'));
+  });
+}
+
+/* ------------------------------------------------- نسخة الهاتف من الصورة
+   صور الهيرو مصوَّرة عريضةً (1920×1080): يملؤها الشاشة الواسعة، وعلى الهاتف
+   إمّا تُقَصّ أطرافها فيضيع نصف المشهد، أو تُصغَّر فيبقى فوقها وتحتها فراغ.
+
+   فتُجهَّز لكلٍّ قَصّةٌ طولية (768×1376) باسم الصورة نفسه + «-mobile.jpg»،
+   كما تُجهَّز نسخة webp بجانب الـjpg. ووجودها اختياري: ما لا نسخة له يظهر
+   كما كان على كل المقاسات. */
+const mobileKnown = new Map<string, Cached<string | null>>();
+
+/** مسار نسخة الهاتف إن وُجدت بجانب الصورة، وإلا null. */
+export function mobileOf(src: string): string | null {
+  if (!src) return null;
+  return cached(mobileKnown, src, () => {
+    const clean = src.replace(/[?#].*$/, '');
+    /* الصورة التي هي نفسها نسخة هاتف لا نسخة لها */
+    const url = /-mobile\.(jpe?g|webp|png)$/i.test(clean)
+      ? null
+      : clean.replace(/\.(webp|jpe?g|png)$/i, '-mobile.jpg');
+    const file = url ? diskPath(url) : null;
+    return file && fs.existsSync(file) ? url : null;
+  });
 }

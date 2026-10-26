@@ -10,10 +10,20 @@ import path from 'node:path';
 import { connect, log } from './lib.mjs';
 
 const out = process.argv[2] || path.join(import.meta.dirname, 'dump.sql');
-const TABLES = ['settings', 'pages', 'sections', 'brands', 'products',
-  'nav_items', 'media', 'translations', 'users', 'revisions'];
 
 const db = await connect();
+
+/* الجداول تُقرأ من القاعدة لا من قائمةٍ مكتوبة: كانت عشرةً من تسعةٍ
+   وعشرين، فكان ما يُنقل إلى الخادم بلا حسابات العملاء ولا محادثاتهم ولا
+   طلباتهم — وما ينقص لا يُفتقَد إلا بعد النشر. وكل جدولٍ جديد يدخل وحده.
+
+   وrows المُستثناة: رموز دخولٍ عمرها عشر دقائق، لا معنى لنقلها. */
+const SKIP_ROWS = new Set(['login_codes']);
+const [found] = await db.query(
+  `SELECT TABLE_NAME t FROM information_schema.TABLES
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_TYPE = 'BASE TABLE' ORDER BY TABLE_NAME`
+);
+const TABLES = found.map((r) => r.t);
 const parts = [
   '-- 5A&M — نسخة قاعدة البيانات',
   `-- ${new Date().toISOString()}`,
@@ -39,8 +49,9 @@ for (const t of TABLES) {
   parts.push(`DROP TABLE IF EXISTS \`${t}\`;`);
   parts.push(create['Create Table'] + ';', '');
 
+  if (SKIP_ROWS.has(t)) { log.ok(`${t.padEnd(20)} (البنية فقط)`); continue; }
   const [rows] = await db.query(`SELECT * FROM \`${t}\``);
-  if (!rows.length) continue;
+  if (!rows.length) { log.ok(`${t.padEnd(20)} فارغ`); continue; }
   const cols = Object.keys(rows[0]);
   /* دفعات لا صفًّا صفًّا: ملف أصغر واستيراد أسرع */
   for (let i = 0; i < rows.length; i += 200) {
@@ -53,7 +64,7 @@ for (const t of TABLES) {
   }
   parts.push('');
   rowsTotal += rows.length;
-  log.ok(`${t.padEnd(14)} ${rows.length} صف`);
+  log.ok(`${t.padEnd(20)} ${rows.length} صف`);
 }
 
 parts.push('SET FOREIGN_KEY_CHECKS = 1;', '');

@@ -98,28 +98,693 @@ html[dir="rtl"] .ux-chat__input button svg{ transform:scaleX(-1); }
 @media (prefers-reduced-motion:reduce){ .ux-chat__fab{ transition:none; } }
 @media print{ .ux-chat, .ux-chat__fab{ display:none !important; } }
 
-/* ---------- حساب العميل (/account) ---------- */
-.acct__wrap{ max-width:980px; }
-.acct__title{ font-family:var(--display); font-size:clamp(28px, 4vw, 42px); margin:0 0 8px; }
+/* ---------- دخول العميل (/login) وحسابه (/account) ----------
+
+   الدخول: عمودان — النموذج أولًا في ترتيب القراءة، وما ينالُه بجانبه لا
+   فوقه، فلا يُدفَع النموذج تحت الطيّ بكلامٍ عنه.
+   الحساب: ترويسةٌ تقول من أنت وأين أنت، ثم عمود الطلبات والمحادثات، وعمودٌ
+   جانبيّ للبيانات وحيّز المسح آخره. */
+
+/* ============================================ صفحة الدخول */
+.signin__wrap{ max-width:1000px; }
+.signin__wrap{ display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr); gap:34px; align-items:start; }
+.signin__card{
+  background:#fff; border:1px solid var(--line); border-radius:var(--radius-lg, 6px);
+  padding:30px 30px 26px; box-shadow:var(--shadow-sm);
+}
+/* تبويبان لا نموذجان متجاوران: لكلٍّ غرضٌ مختلف */
+.signin__tabs{ display:flex; gap:4px; margin:0 0 22px; border-bottom:1px solid var(--line); }
+.signin__tab{
+  flex:1 1 0; text-align:center; padding:11px 10px 12px; font-size:14.5px; font-weight:700;
+  color:var(--muted, #526176); border-bottom:2px solid transparent; margin-bottom:-1px;
+}
+.signin__tab:hover{ color:var(--ink); }
+.signin__tab.is-on{ color:var(--brand-strong, #C2410C); border-bottom-color:var(--brand-strong, #C2410C); }
+
+.signin__title{ font-family:var(--display); font-size:clamp(25px, 3vw, 33px); margin:0 0 7px; line-height:1.35; }
+html[lang="ar"] .signin__title{ font-family:var(--display-ar, var(--display)); }
+.signin__sub{ color:var(--body); margin:0 0 22px; font-size:15px; line-height:1.8; }
+.signin__sent{ margin:0 0 14px; font-size:14.5px; line-height:1.8; }
+.signin__note{
+  margin:0 0 16px; padding:10px 13px; border-radius:6px; font-size:13px; line-height:1.7;
+  background:var(--brand-tint, #FFF7ED); color:var(--body);
+}
+.signin__form{ display:flex; flex-direction:column; gap:7px; }
+.signin__form label{ display:flex; flex-direction:column; gap:6px; }
+.signin__form label span{ font-size:13.5px; font-weight:700; color:var(--ink); }
+.signin__form input{ width:100%; }
+.signin__form small{ color:var(--muted, #526176); font-size:12.5px; line-height:1.7; margin-bottom:5px; }
+.signin__form .btn{ margin-top:4px; }
+/* الرمز يُقرأ رقمًا رقمًا، فيُكبَّر وتُباعَد حروفه */
+.signin__code{ font-size:21px !important; letter-spacing:.42em; text-align:center; font-weight:700; }
+
+.signin__link{
+  background:none; border:0; padding:6px 0; margin-top:10px; cursor:pointer;
+  font:inherit; font-size:13.5px; color:var(--brand-strong, #C2410C); text-decoration:underline;
+  text-underline-offset:3px; display:inline-block;
+}
+.signin__link:hover{ color:var(--ink); }
+
+/* الطريقة الثانية: موجودة لمن يعرفها، ولا تُزاحم الأولى */
+.signin__alt{ margin-top:22px; border-top:1px solid var(--line); padding-top:16px; }
+.signin__alt > summary{
+  cursor:pointer; list-style:none; font-size:13.5px; font-weight:700;
+  color:var(--muted, #526176); display:flex; align-items:center; gap:7px;
+}
+.signin__alt > summary::-webkit-details-marker{ display:none; }
+.signin__alt > summary::after{ content:'+'; margin-inline-start:auto; font-size:17px; line-height:1; }
+.signin__alt[open] > summary::after{ content:'−'; }
+.signin__alt > summary:hover{ color:var(--brand-strong, #C2410C); }
+.signin__alt[open] > summary{ margin-bottom:14px; }
+.signin__alt--in{ margin-top:14px; padding-top:13px; }
+
+.signin__aside{ padding-top:8px; }
+.signin__perks{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:13px; }
+.signin__perks li{ display:flex; gap:10px; align-items:flex-start; font-size:14.5px; line-height:1.8; }
+.signin__perks svg{ flex:0 0 auto; margin-top:4px; color:var(--brand-strong, #C2410C); }
+.signin__privacy{ margin:22px 0 0; font-size:12.5px; line-height:1.8; color:var(--muted, #526176); }
+
+@media (max-width:860px){
+  .signin__wrap{ grid-template-columns:1fr; gap:24px; }
+  .signin__card{ padding:24px 20px 22px; }
+  /* ما يناله يأتي بعد النموذج على الهاتف: النموذج هو سبب الصفحة */
+  .signin__aside{ order:2; padding-top:0; }
+}
+
+/* ============================================ صفحة الحساب */
+.acct__wrap{ max-width:1080px; }
+.acct .formmsg{ display:block; margin-bottom:18px; }
+
+.acct__who{ display:flex; align-items:center; gap:14px; min-width:0; }
+.acct__avatar{
+  flex:0 0 auto; width:52px; height:52px; border-radius:50%;
+  display:grid; place-items:center; font-size:21px; font-weight:700;
+  background:var(--brand-tint, #FFF7ED); color:var(--brand-strong, #C2410C);
+  border:1px solid var(--brand-glow, rgba(194,65,12,.18));
+}
+.acct__title{ font-family:var(--display); font-size:clamp(23px, 2.6vw, 30px); margin:0; line-height:1.35; }
 html[lang="ar"] .acct__title{ font-family:var(--display-ar, var(--display)); }
-.acct__sub{ color:var(--body); margin:0 0 24px; }
-.acct .formmsg{ display:block; margin-bottom:16px; }
-.acct__grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap:20px; }
-.acct__card{ background:#fff; border:1px solid var(--line); border-radius:var(--radius-lg, 6px); padding:22px; box-shadow:var(--shadow-sm); }
-.acct__card--wide{ grid-column:1 / -1; }
-.acct__card h2{ margin:0 0 14px; font-size:19px; }
-.acct__form{ display:flex; flex-direction:column; gap:12px; }
-.acct__form label{ display:flex; flex-direction:column; gap:5px; font-size:13.5px; font-weight:600; color:var(--body); }
-.acct__form input{ font:inherit; font-size:15px; padding:11px 12px; border:1px solid #CBD5E1; border-radius:4px; }
-.acct__form input:focus{ outline:2px solid var(--brand-strong); outline-offset:0; border-color:transparent; }
-.acct__form .btn{ justify-content:center; }
-.acct__reg{ margin-top:18px; border-top:1px solid var(--line); padding-top:14px; }
-.acct__reg summary{ cursor:pointer; font-weight:700; color:var(--brand-strong); margin-bottom:12px; }
-.acct__link{ background:none; border:0; padding:0; margin-top:10px; font:inherit; font-size:13.5px; color:var(--brand-strong); text-decoration:underline; cursor:pointer; }
-.acct__link--bad{ color:#B42318; margin:0; }
-.acct__list{ list-style:none; margin:0 0 14px; padding:0; display:flex; flex-direction:column; }
-.acct__list li{ display:flex; flex-direction:column; gap:3px; padding:10px 0; border-top:1px solid var(--line); font-size:14px; }
-.acct__list small{ color:var(--muted); }
-.acct__actions{ display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
-.acct__note{ font-size:12.5px; color:var(--muted); margin:10px 0 0; }
-.acct__me{ margin:0 0 10px; font-weight:600; }
+.acct__me{ margin:3px 0 0; font-size:13.5px; color:var(--muted, #526176); display:flex; gap:9px; flex-wrap:wrap; }
+.acct__me b{ color:var(--ink); font-weight:700; }
+.acct__head{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+.acct__stat{ font-size:13px; color:var(--muted, #526176); white-space:nowrap; }
+.acct__stat b{ display:block; font-size:20px; font-weight:700; color:var(--ink); line-height:1.3; }
+
+.acct__box{
+  background:#fff; border:1px solid var(--line); border-radius:var(--radius-lg, 6px);
+  padding:22px; box-shadow:var(--shadow-sm);
+}
+.acct__boxhead{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
+.acct__boxhead h2{ margin:0; font-size:18px; display:flex; align-items:center; gap:9px; }
+.acct__boxhead p{ margin:4px 0 0; font-size:13px; line-height:1.75; color:var(--muted, #526176); }
+
+/* ------------------------------------------- الطلبات */
+.acct__list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+.acct__req{
+  display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px;
+  padding:13px 14px; border:1px solid var(--line); border-radius:8px; background:var(--paper, #F8FAFC);
+}
+.acct__req b{ font-size:14.5px; font-weight:700; min-width:0; }
+.acct__req small{ font-size:12px; color:var(--muted, #526176); white-space:nowrap; }
+.acct__req p{ grid-column:1 / -1; margin:0; font-size:13px; line-height:1.75; color:var(--body); overflow-wrap:anywhere; }
+
+/* الحالة لونًا ونصًّا معًا: اللون وحده لا يُقرأ لمن لا يميّز الألوان */
+.acct__pill{
+  display:inline-flex; align-items:center; padding:3px 10px; border-radius:99px;
+  font-size:11.5px; font-weight:700; white-space:nowrap; border:1px solid transparent;
+}
+.acct__pill.is-live{ background:var(--brand-tint, #FFF7ED); color:var(--brand-strong, #C2410C); border-color:var(--brand-glow, rgba(194,65,12,.22)); }
+.acct__pill.is-done{ background:#ECFDF5; color:#047857; border-color:#A7F3D0; }
+.acct__pill.is-off{ background:var(--paper, #F1F5F9); color:var(--muted, #526176); border-color:var(--line); }
+
+/* ------------------------------------------- لا شيء بعد */
+.acct__empty{
+  display:flex; flex-direction:column; align-items:center; gap:11px; text-align:center;
+  padding:26px 18px; border:1px dashed var(--line); border-radius:8px; background:var(--paper, #F8FAFC);
+}
+.acct__empty p{ margin:0; font-size:14px; color:var(--muted, #526176); }
+
+.acct__form{ display:flex; flex-direction:column; gap:11px; }
+.acct__form label{ display:flex; flex-direction:column; gap:5px; }
+.acct__form label span{ font-size:13px; font-weight:700; color:var(--ink); }
+.acct__form input{ width:100%; }
+.acct__form .btn{ align-self:flex-start; margin-top:3px; }
+.acct__note{ margin:14px 0 0; font-size:12px; line-height:1.75; color:var(--muted, #526176); }
+
+/* ------------------------------------------- حيّز المسح */
+.acct__danger{ border-color:#FECACA; background:#FEF2F2; box-shadow:none; }
+.acct__danger h2{ margin:0 0 7px; font-size:16px; color:#B91C1C; }
+.acct__danger p{ margin:0 0 13px; font-size:13px; line-height:1.8; color:var(--body); }
+.acct__link{
+  background:none; border:0; padding:0; cursor:pointer; font:inherit; font-size:13.5px;
+  text-decoration:underline; text-underline-offset:3px; color:var(--brand-strong, #C2410C);
+}
+.acct__link--bad{ color:#B91C1C; font-weight:700; }
+.acct__link--bad:hover{ color:#7F1D1D; }
+
+@media (max-width:560px){
+  .acct__box{ padding:18px 16px; }
+  .acct__req{ grid-template-columns:auto 1fr; }
+  .acct__req small{ grid-column:1 / -1; }
+}
+
+/* ============================================ محادثة الحساب (لوحة كاملة)
+
+   نافذة الركن تصلح لسؤالٍ عابر. وهنا العميل في حسابه قصدًا ليكلّمنا، فللوحة
+   ارتفاعٌ ثابت يُقرأ فيه ما مضى ولا تطول الصفحة بطول المحادثة. */
+.acct__box--chat{ padding-bottom:16px; }
+
+.cuchat{ display:flex; flex-direction:column; gap:12px; }
+.cuchat__thread{
+  display:flex; flex-direction:column; gap:10px;
+  height:clamp(300px, 46vh, 520px); overflow-y:auto; padding:4px 2px;
+  scrollbar-width:thin;
+}
+.cuchat__empty{ margin:auto; max-width:38ch; text-align:center; color:var(--muted, #526176); font-size:14px; line-height:1.8; }
+.cuchat__hint, .cuchat__err{ margin:0; font-size:12.5px; text-align:center; }
+.cuchat__hint{ color:var(--muted, #526176); }
+.cuchat__err{ color:#B91C1C; font-weight:600; }
+
+/* الفقاعة: جهةُ من كتبها تقول من كتبها قبل أن يُقرأ الاسم.
+
+   وهي تضيق على كلامها لا تمتدّ بعرض اللوحة: width:max-content مع حدٍّ أعلى.
+   وبدونه كانت كلمتان تأخذان سطرًا كاملًا فتبدو الصفحة نموذجًا لا محادثة. */
+/* block لا flex: الوقتُ يطفو في آخرها ليجلس في آخر سطر الكلام، والطفوُّ لا
+   أثر له على عناصر flex. والمحاذاةُ يمينًا ويسارًا تبقى — فهي صفةُ الفقاعة
+   بوصفها عنصرًا في الخيط، لا بوصف ما بداخلها. */
+.cuchat__m{
+  display:block; width:max-content; max-width:min(74%, 480px);
+  padding:7px 11px 6px; border-radius:13px; font-size:14px; line-height:1.65;
+}
+/* فقاعةُ مرفقٍ تضيق على مرفقها: التعليقُ الطويل كان يوسّعها فيبقى فراغٌ
+   بجانب الصورة، والصورةُ هي أصل الرسالة لا تعليقُها. */
+.cuchat__m:has(.cuchat__img, .cuchat__clip, .cuchat__voice, .cuchat__file){
+  max-width:min(74%, 292px);
+}
+.cuchat__m > b{ display:block; }
+/* الاقتباس يبقى عمودًا داخل الفقاعة الكتلية: اسمٌ ثم سطر */
+.cuchat__m > .cuchat__qt{ display:flex; flex-direction:column; clear:both; }
+/* اسم المتكلّم: للفريق والمساعد وحدهما وعند تغيّر المتكلّم — ومن يكتب
+   يعرف أنه هو، فلا يُكتَب «أنت» فوق كل رسالة. */
+.cuchat__m b{ font-size:11px; font-weight:700; color:var(--brand-strong, #C2410C); margin-bottom:1px; }
+.cuchat__m--user > b{ display:none; }
+.cuchat__m--agent > b{ color:#1D4ED8; }
+.cuchat__m > span{ white-space:pre-wrap; overflow-wrap:anywhere; }
+.cuchat__m--user{ align-self:flex-end; background:var(--brand-tint, #FFF7ED); }
+.cuchat__m--bot{ align-self:flex-start; background:var(--paper, #F4F6F9); }
+.cuchat__m--agent{ align-self:flex-start; background:#EAF4FF; }
+.cuchat__m--system{
+  align-self:center; max-width:100%; background:none; text-align:center;
+  color:var(--muted, #526176); font-size:12.5px; padding:4px 0;
+}
+
+/* المرفقات داخل الفقاعة */
+/* الصورة تُحدَّد بالارتفاع كما بالعرض: صورةٌ طولية من هاتف كانت تأخذ
+   الخيط كلّه فلا يُرى ما قبلها ولا ما بعدها. والضغطُ يفتحها بحجمها. */
+.cuchat__img{ display:block; border-radius:9px; overflow:hidden; max-width:260px; line-height:0; }
+.cuchat__img img{ display:block; max-width:100%; max-height:300px; width:auto; height:auto; }
+.cuchat__vid{ display:block; width:min(300px, 100%); border-radius:9px; background:#000; }
+.cuchat__aud{ display:flex; flex-direction:column; gap:3px; }
+.cuchat__aud audio{ width:min(260px, 100%); height:38px; }
+.cuchat__aud small{ color:var(--muted, #526176); font-size:11.5px; }
+
+/* شريط الكتابة: قُرصٌ لا مستطيل، وزرُّ الإرسال دائرةٌ بسهم — هيئةٌ تُعرَف
+   بشكلها في كل تطبيق مراسلة، وتأخذ حيّزًا أقلّ على الهاتف. */
+.cuchat__bar{
+  display:flex; align-items:center; gap:4px;
+  border:1px solid var(--line); border-radius:99px; padding:5px 6px; background:#fff;
+  box-shadow:0 1px 2px rgba(6,11,20,.05);
+}
+.cuchat__bar:focus-within{ border-color:var(--brand-strong, #C2410C); }
+.cuchat__input{
+  flex:1 1 auto; min-width:0; border:0 !important; background:none !important;
+  padding:7px 4px !important; font-size:14.5px; box-shadow:none !important;
+}
+.cuchat__input:focus{ outline:none; }
+.cuchat__icon{
+  flex:0 0 auto; width:36px; height:36px; display:grid; place-items:center; cursor:pointer;
+  border:0; background:none; color:var(--muted, #526176); border-radius:8px; padding:0;
+}
+.cuchat__icon:hover{ background:var(--paper, #F4F6F9); color:var(--brand-strong, #C2410C); }
+.cuchat__icon:disabled{ opacity:.45; cursor:default; }
+
+/* أثناء التسجيل: الشريط كلّه يتحوّل، فلا يُكتب وهو يسجّل */
+.cuchat__rec{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  border:1px solid #FECACA; background:#FEF2F2; border-radius:11px; padding:11px 13px;
+}
+.cuchat__rec b{ font-size:14px; color:#B91C1C; }
+.cuchat__rec time{ font-size:13.5px; color:var(--muted, #526176); margin-inline-end:auto; font-variant-numeric:tabular-nums; }
+.cuchat__dot{ width:9px; height:9px; border-radius:50%; background:#DC2626; animation:cuchatPulse 1.1s ease-in-out infinite; }
+@keyframes cuchatPulse{ 0%,100%{ opacity:1 } 50%{ opacity:.25 } }
+@media (prefers-reduced-motion:reduce){ .cuchat__dot{ animation:none } }
+
+.cuchat__foot{ display:flex; justify-content:center; }
+.cuchat__link{
+  background:none; border:0; padding:4px 6px; cursor:pointer; font:inherit; font-size:13px;
+  color:var(--brand-strong, #C2410C); text-decoration:underline; text-underline-offset:3px;
+}
+.cuchat__link:hover{ color:var(--ink); }
+.cuchat__link:disabled{ opacity:.5; cursor:default; }
+.cuchat__with{ font-size:13px; color:var(--muted, #526176); }
+
+/* مرفقات المحادثات السابقة */
+.conv__f{ display:block; max-width:200px; border-radius:7px; overflow:hidden; margin-top:4px; }
+.conv__f img{ display:block; width:100%; height:auto; }
+audio.conv__f{ width:220px; height:36px; }
+
+@media (max-width:560px){
+  .cuchat__m{ max-width:88%; }
+  .cuchat__thread{ height:min(58vh, 430px); }
+  .cuchat__img, .cuchat__vid{ max-width:100%; width:100%; }
+}
+
+/* ============================ المحادثة: ما اعتاده الناس في تطبيقات المراسلة */
+
+.cuchat{ position:relative; }
+.cuchat__row{ display:contents; }
+
+/* فاصل اليوم: شريطٌ في الوسط يُقرأ ولا يُزاحم */
+.cuchat__day{
+  align-self:center; margin:6px 0 2px; padding:3px 12px; border-radius:99px;
+  font-size:11.5px; font-weight:700; color:var(--muted, #526176);
+  background:var(--paper, #F1F5F9); border:1px solid var(--line);
+}
+
+/* الفقاعة تحتاج موضعًا نسبيًّا لزرّ الردّ، ومساحةً للوقت */
+.cuchat__m{ position:relative; }
+.cuchat__tx{ white-space:pre-wrap; overflow-wrap:anywhere; }
+
+/* الوقت وعلامة القراءة: يطفوان في آخر الفقاعة فيلتفّ الكلام حولهما ويجلسان
+   في آخر سطره — لا في سطرٍ مستقلٍّ تحته يُطيل الفقاعة ويباعد الوقت عن كلامه.
+
+   والنصّ يسبقهما في الترتيب، فـfloat يحتاج أن يأتيا قبله في الرسم: يُرفعان
+   بـorder إلى الأعلى ثم يُطفَوان، فيبقى ترتيبُ القراءة للصوت كما هو. */
+.cuchat__meta{
+  float:inline-end; display:inline-flex; align-items:center; gap:4px;
+  margin-inline-start:10px; margin-top:6px;
+  font-size:10.5px; color:var(--muted, #8A97A8); line-height:1;
+}
+/* المرفقات تُنهي الالتفاف: الوقت بعدها لا بجانبها */
+.cuchat__img, .cuchat__shot, .cuchat__clip, .cuchat__voice, .cuchat__file, .cuchat__vid{
+  clear:both;
+}
+.cuchat__meta time{ font-variant-numeric:tabular-nums; }
+.cuchat__tick{ color:var(--muted, #8A97A8); }
+/* المقروءة زرقاء كما اعتادها الناس، والواصلة رمادية */
+.cuchat__tick.is-read{ color:#2563EB; }
+
+/* الاقتباس داخل الفقاعة: شريطٌ على الجنب يقول على أيّ رسالةٍ هذا الردّ */
+.cuchat__qt{
+  display:flex; flex-direction:column; gap:1px; margin-bottom:4px;
+  padding:6px 9px; border-radius:7px; font-size:12.5px; line-height:1.6;
+  background:rgba(15,27,45,.055); border-inline-start:3px solid var(--brand-strong, #C2410C);
+}
+.cuchat__qt b{ font-size:11px; color:var(--brand-strong, #C2410C); }
+.cuchat__qt span{ color:var(--body); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* زرّ الردّ يظهر عند المرور، ويبقى ظاهرًا للمس */
+.cuchat__replybtn{
+  position:absolute; inset-block-start:4px; inset-inline-end:-30px;
+  width:25px; height:25px; display:grid; place-items:center; padding:0;
+  border:1px solid var(--line); border-radius:50%; background:#fff; cursor:pointer;
+  color:var(--muted, #526176); opacity:0; transition:opacity .13s;
+}
+.cuchat__m--user .cuchat__replybtn{ inset-inline-end:auto; inset-inline-start:-30px; }
+.cuchat__m:hover .cuchat__replybtn, .cuchat__replybtn:focus-visible{ opacity:1; }
+.cuchat__replybtn:hover{ color:var(--brand-strong, #C2410C); border-color:var(--brand-strong, #C2410C); }
+@media (hover:none){ .cuchat__replybtn{ opacity:.55; } }
+
+/* شريط «بتردّ على» فوق الكتابة */
+.cuchat__quote{
+  display:flex; align-items:center; gap:10px;
+  padding:9px 12px; border:1px solid var(--line); border-inline-start:3px solid var(--brand-strong, #C2410C);
+  border-radius:9px; background:var(--paper, #F8FAFC);
+}
+.cuchat__quote > div{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.cuchat__quote b{ font-size:11.5px; color:var(--brand-strong, #C2410C); }
+.cuchat__quote span{ font-size:13px; color:var(--body); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cuchat__quote button{
+  flex:0 0 auto; width:26px; height:26px; border:0; background:none; cursor:pointer;
+  font-size:19px; line-height:1; color:var(--muted, #526176); border-radius:50%;
+}
+.cuchat__quote button:hover{ background:#fff; color:#B91C1C; }
+
+/* «بيكتب الآن»: ثلاث نقاط في فقاعةٍ مكان الردّ القادم */
+.cuchat__typing{ display:flex; flex-direction:row; gap:4px; padding:12px 15px; width:max-content; }
+.cuchat__typing i{ width:7px; height:7px; border-radius:50%; background:var(--muted, #8A97A8); animation:cuDot 1.3s infinite; }
+.cuchat__typing i:nth-child(2){ animation-delay:.18s } .cuchat__typing i:nth-child(3){ animation-delay:.36s }
+@keyframes cuDot{ 0%,60%,100%{ opacity:.3; transform:translateY(0) } 30%{ opacity:1; transform:translateY(-3px) } }
+@media (prefers-reduced-motion:reduce){ .cuchat__typing i{ animation:none; opacity:.6 } }
+
+/* زرّ النزول للجديد: لا يُنتزع القارئ من مكانه، بل يُعدّ له */
+.cuchat__down{
+  position:absolute; inset-block-end:118px; inset-inline-end:14px; z-index:3;
+  display:flex; align-items:center; gap:6px; padding:7px 13px; border-radius:99px;
+  border:1px solid var(--line); background:#fff; cursor:pointer; font:inherit; font-size:12.5px; font-weight:700;
+  color:var(--ink); box-shadow:0 3px 12px rgba(6,11,20,.14);
+}
+.cuchat__down span{
+  min-width:18px; height:18px; padding:0 5px; border-radius:99px; display:grid; place-items:center;
+  background:var(--brand-strong, #C2410C); color:#fff; font-size:11px;
+}
+
+/* لوحة الرموز */
+.cuchat__emoji{
+  display:flex; flex-wrap:wrap; gap:4px; padding:9px;
+  border:1px solid var(--line); border-radius:11px; background:#fff;
+}
+.cuchat__emoji button{
+  width:36px; height:36px; border:0; background:none; cursor:pointer; font-size:20px; border-radius:8px; padding:0;
+}
+.cuchat__emoji button:hover{ background:var(--paper, #F1F5F9); }
+
+/* زرّ المايك أثناء الضغط */
+.cuchat__icon--mic{ touch-action:none; }
+.cuchat__icon--mic:active{ background:#FEE2E2; color:#B91C1C; }
+
+/* الملف المرفق */
+.cuchat__file{
+  display:flex; align-items:center; gap:9px; padding:9px 12px; border-radius:9px;
+  background:rgba(15,27,45,.05); color:var(--ink); max-width:280px;
+}
+.cuchat__file span{ flex:1 1 auto; min-width:0; font-size:13.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cuchat__file small{ flex:0 0 auto; font-size:11.5px; color:var(--muted, #526176); }
+.cuchat__file:hover{ background:var(--brand-tint, #FFF7ED); }
+
+/* الصورة زرٌّ يفتح التكبير */
+button.cuchat__img{ border:0; padding:0; background:none; cursor:zoom-in; }
+
+/* السحب والإفلات */
+.cuchat.is-drop{ outline:2px dashed var(--brand-strong, #C2410C); outline-offset:5px; border-radius:10px; }
+.cuchat__drop{
+  position:absolute; inset:0; z-index:4; display:grid; place-items:center; pointer-events:none;
+  background:rgba(255,247,237,.9); border-radius:10px; font-weight:700; color:var(--brand-strong, #C2410C);
+}
+
+/* تكبير الصورة */
+.cuchat__zoom{
+  position:fixed; inset:0; z-index:200; display:grid; place-items:center; padding:24px;
+  background:rgba(6,11,20,.9); cursor:zoom-out;
+}
+.cuchat__zoom img{ max-width:min(1100px, 94vw); max-height:88vh; border-radius:8px; }
+.cuchat__zoom button{
+  position:absolute; inset-block-start:16px; inset-inline-end:18px;
+  width:40px; height:40px; border-radius:50%; border:0; cursor:pointer;
+  background:rgba(255,255,255,.16); color:#fff; font-size:24px; line-height:1;
+}
+.cuchat__zoom button:hover{ background:rgba(255,255,255,.3); }
+
+@media (max-width:560px){
+  .cuchat__replybtn{ inset-inline-end:-26px; width:22px; height:22px; }
+  .cuchat__m--user .cuchat__replybtn{ inset-inline-start:-26px; }
+  .cuchat__down{ inset-block-end:124px; }
+}
+
+/* اختيار من يكلّمه في بداية المحادثة: زرّان لا كلمةٌ تُكتَب فتُخمَّن */
+.cuchat__pick{ margin:auto; width:min(460px,100%); display:flex; flex-direction:column; gap:10px; padding:6px 0; }
+.cuchat__pick > b{ text-align:center; font-size:15px; margin-bottom:2px; }
+.cuchat__pick button{
+  display:flex; align-items:flex-start; gap:12px; text-align:start; cursor:pointer;
+  padding:14px 16px; border:1px solid var(--line); border-radius:11px; background:#fff; font:inherit;
+  color:var(--ink); transition:border-color .13s, background .13s;
+}
+.cuchat__pick button:hover{ border-color:var(--brand-strong, #C2410C); background:var(--brand-tint, #FFF7ED); }
+.cuchat__pick svg{ flex:0 0 auto; margin-top:2px; color:var(--brand-strong, #C2410C); }
+.cuchat__pick span{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+.cuchat__pick span b{ font-size:14.5px; }
+.cuchat__pick small{ font-size:12.5px; line-height:1.7; color:var(--muted, #526176); }
+
+/* ============================ مرفقات المحادثة: مشغّلٌ مكتوب لا افتراضيّ
+
+   مشغّل المتصفّح الافتراضي عريضٌ ثابت العرض، فيُزنَق في فقاعةٍ ضيّقة ويختلف
+   شكله من متصفّحٍ لآخر. وهذا بعرض ما يتاح له وشكلُه واحد. */
+
+.cuchat__voice{
+  display:flex; align-items:center; gap:9px; min-width:0;
+  width:min(260px, 100%); padding:7px 10px 7px 7px;
+  border-radius:99px; background:rgba(15,27,45,.055);
+}
+.cuchat__m--user .cuchat__voice{ background:rgba(255,255,255,.55); }
+.cuchat__voice audio{ display:none; }
+
+.cuchat__pbtn{
+  flex:0 0 auto; width:32px; height:32px; border-radius:50%; border:0; cursor:pointer; padding:0;
+  display:grid; place-items:center; background:var(--brand-strong, #C2410C); color:#fff;
+}
+.cuchat__pbtn:hover{ filter:brightness(1.08); }
+
+/* شريط التقدّم: قضيبٌ يمتلئ — لا شريطُ تمريرٍ يُجَرّ، فالرسالة ثوانٍ */
+.cuchat__wave{
+  flex:1 1 auto; min-width:28px; height:4px; border-radius:99px;
+  background:rgba(15,27,45,.16); overflow:hidden;
+}
+.cuchat__wave i{ display:block; height:100%; background:var(--brand-strong, #C2410C); transition:width .2s linear; }
+.cuchat__voice time{ flex:0 0 auto; font-size:11.5px; color:var(--muted, #526176); font-variant-numeric:tabular-nums; }
+
+
+/* الصورة والمقطع: حاويةٌ بعرض محتواها */
+.cuchat__shot, .cuchat__clip{ position:relative; display:block; width:max-content; max-width:100%; }
+
+/* ملصق المقطع: صورةٌ من المقطع نفسه، فلا تبقى مصغّرةٌ مكسورة */
+.cuchat__play{
+  position:relative; display:block; padding:0; border:0; background:#000; cursor:pointer;
+  border-radius:9px; overflow:hidden; width:min(300px, 100%); line-height:0;
+}
+.cuchat__play img{ display:block; width:100%; height:auto; opacity:.88; }
+.cuchat__play i{
+  position:absolute; inset:0; margin:auto; width:52px; height:52px; border-radius:50%;
+  display:grid; place-items:center; background:rgba(6,11,20,.62); color:#fff;
+  transition:background .14s, transform .14s;
+}
+.cuchat__play:hover i{ background:var(--brand-strong, #C2410C); transform:scale(1.06); }
+.cuchat__clip .cuchat__vid{ display:block; }
+
+@media (max-width:560px){
+  .cuchat__voice{ width:100%; }
+  .cuchat__play{ width:100%; }
+}
+
+/* مرفقٌ في نافذة الركن: النافذة ضيّقة وعابرة، فالصورة مصغّرةٌ تفتح على
+   حجمها. والاسم att لا f، لأن ‎.ux-chat__fab‎ موجود وبادئةٌ منه تُربك البحث
+   وتجعل فحصَ التصادم يقول «موجود» وهو ليس هو. */
+.ux-chat__att{ display:block; max-width:190px; margin-top:6px; border-radius:8px; overflow:hidden; }
+.ux-chat__att img{ display:block; width:100%; height:auto; }
+video.ux-chat__att{ width:190px; background:#000; }
+.ux-chat__att--aud{ width:190px; height:36px; border-radius:99px; }
+.ux-chat__att--doc{
+  display:inline-flex; align-items:center; gap:7px; max-width:100%;
+  padding:7px 11px; border-radius:8px; background:rgba(15,27,45,.06);
+  font-size:12.5px; color:var(--ink); overflow-wrap:anywhere;
+}
+.ux-chat__att--doc:hover{ background:var(--brand-tint, #FFF7ED); }
+
+/* ما رُفع ولم يُرسَل: يُرى قبل أن يصل، ويُشال ما اختير بالخطأ */
+.cuchat__pend{ display:flex; flex-wrap:wrap; gap:8px; }
+.cuchat__pend > span{
+  position:relative; display:flex; align-items:center; gap:8px; max-width:230px;
+  padding:6px 10px 6px 6px; border:1px solid var(--line); border-radius:9px; background:var(--paper, #F8FAFC);
+}
+.cuchat__pend img{ width:36px; height:36px; object-fit:cover; border-radius:6px; display:block; }
+.cuchat__pend b{ font-size:12px; color:var(--brand-strong, #C2410C); padding-inline-start:4px; }
+.cuchat__pend small{ flex:1 1 auto; min-width:0; font-size:12px; color:var(--muted, #526176);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cuchat__pend button{ flex:0 0 auto; width:21px; height:21px; border:0; border-radius:50%; cursor:pointer;
+  background:rgba(15,27,45,.14); color:var(--ink); font-size:14px; line-height:1; padding:0; }
+.cuchat__pend button:hover{ background:#B91C1C; color:#fff; }
+
+/* ============================ هيئة المحادثة كما اعتادها الناس
+
+   ثلاثةٌ تصنع الإحساس: أرضيّةٌ تحت الفقاعات تفصل المحادثة عمّا حولها،
+   وذيلٌ يشير إلى صاحب الكلام، وتجميعُ المتتاليات فلا يتكرّر الاسم ولا
+   تتباعد رسالتان من واحد. */
+
+.cuchat__thread{
+  /* أرضيّةٌ هادئة بنقشٍ خفيف: تفصل المحادثة عن بياض الصفحة بلا صورة تُحمَّل */
+  background:
+    radial-gradient(circle at 18% 22%, rgba(194,65,12,.035) 0 1.6px, transparent 1.7px),
+    radial-gradient(circle at 68% 72%, rgba(15,27,45,.030) 0 1.6px, transparent 1.7px),
+    var(--paper, #F7F5F3);
+  background-size:34px 34px, 46px 46px, auto;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:14px 12px;
+  gap:3px;                       /* التباعد صار من المجموعات لا من كل رسالة */
+}
+
+/* المجموعة: أولى المتتاليات تبدأ بمسافة، وما بعدها ملاصق */
+.cuchat__m{ margin-top:9px; }
+.cuchat__m.is-cont{ margin-top:2px; }
+
+/* الذيل على آخر المجموعة وحدها — كما في كل تطبيق مراسلة */
+.cuchat__m{ border-radius:13px; }
+.cuchat__m--user{ border-end-end-radius:13px; }
+.cuchat__m--user.is-last{ border-end-end-radius:4px; }
+.cuchat__m--bot.is-last, .cuchat__m--agent.is-last{ border-end-start-radius:4px; }
+.cuchat__m--bot, .cuchat__m--agent{ border-end-start-radius:13px; }
+
+.cuchat__m--user.is-last::after,
+.cuchat__m--bot.is-last::after,
+.cuchat__m--agent.is-last::after{
+  content:''; position:absolute; inset-block-end:0; width:9px; height:13px;
+}
+/* المثلث يُرسَم بقصٍّ لا بحدود: يتبع لون الفقاعة ولا يُعاد تعريفه لكلٍّ */
+.cuchat__m--user.is-last::after{
+  inset-inline-end:-7px; background:inherit;
+  clip-path:polygon(0 0, 100% 100%, 0 100%);
+}
+html[dir="rtl"] .cuchat__m--user.is-last::after{ clip-path:polygon(100% 0, 100% 100%, 0 100%); }
+.cuchat__m--bot.is-last::after, .cuchat__m--agent.is-last::after{
+  inset-inline-start:-7px; background:inherit;
+  clip-path:polygon(100% 0, 100% 100%, 0 100%);
+}
+html[dir="rtl"] .cuchat__m--bot.is-last::after,
+html[dir="rtl"] .cuchat__m--agent.is-last::after{ clip-path:polygon(0 0, 100% 100%, 0 100%); }
+
+/* النظام وفاصل اليوم لا ذيل لهما ولا تجميع */
+.cuchat__m--system::after{ display:none; }
+.cuchat__m--system{ margin-top:10px; }
+
+/* الفقاعة ظلٌّ خفيف يرفعها عن الأرضيّة */
+.cuchat__m--user, .cuchat__m--bot, .cuchat__m--agent{
+  box-shadow:0 1px 1px rgba(6,11,20,.06);
+}
+.cuchat__m--user{ background:#FFF1E6; }
+.cuchat__m--bot{ background:#fff; }
+.cuchat__m--agent{ background:#EAF4FF; }
+
+/* زرّ النزول يعلو الأرضيّة لا يختفي فيها */
+.cuchat__down{ box-shadow:0 4px 14px rgba(6,11,20,.2); }
+
+/* زرّ الإرسال */
+.cuchat__go{
+  flex:0 0 auto; width:38px; height:38px; border-radius:50%; border:0; padding:0; cursor:pointer;
+  display:grid; place-items:center; background:var(--brand-strong, #C2410C); color:#fff;
+  transition:filter .13s, transform .13s;
+}
+.cuchat__go:hover{ filter:brightness(1.08); transform:scale(1.04); }
+.cuchat__go:disabled{ opacity:.5; cursor:default; transform:none; }
+/* السهم يشير إلى جهة الإرسال في كل اتجاه */
+html[dir="rtl"] .cuchat__go svg{ transform:scaleX(-1); }
+
+/* الأيقونات داخل القرص تصير دائريّة هي الأخرى */
+.cuchat__icon{ border-radius:50%; }
+
+/* ============================ حساب العميل: قائمةٌ جانبية ومحتوى
+
+   كانت الأقسام كروتًا مرصوصة في عمودين، فتطول الصفحة بطول ما فيها ويُبحَث
+   عن القسم بالتمرير. وهنا تُختار من قائمةٍ ثابتة ويُفتَح واحدٌ في المتّسع.
+
+   وهي روابط ?tab= لا تبويبات في المتصفّح: يُحفَظ الرابط، ويعمل زرّ الرجوع،
+   وتُرسَم في الخادم بلا سكربت — فتظهر قبل أن يصل أي جافاسكريبت. */
+
+.acct__shell{
+  display:grid; grid-template-columns:238px minmax(0,1fr); gap:22px; align-items:start;
+}
+.acct__body{ display:flex; flex-direction:column; gap:18px; min-width:0; }
+
+/* ------------------------------------------------- القائمة */
+.acct__nav{
+  position:sticky; top:calc(var(--header-h, 88px) + 14px);
+  display:flex; flex-direction:column; gap:4px;
+  background:#fff; border:1px solid var(--line); border-radius:var(--radius-lg, 10px);
+  padding:14px 12px; box-shadow:var(--shadow-sm);
+}
+
+.acct__who{
+  display:flex; align-items:center; gap:11px; min-width:0;
+  padding:4px 6px 14px; margin-bottom:6px; border-bottom:1px solid var(--line);
+}
+.acct__who > div{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.acct__who b{ font-size:14.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.acct__who small{ font-size:12px; color:var(--muted, #526176); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.acct__avatar{
+  flex:0 0 auto; width:40px; height:40px; border-radius:50%;
+  display:grid; place-items:center; font-size:17px; font-weight:700;
+  background:var(--brand-tint, #FFF7ED); color:var(--brand-strong, #C2410C);
+  border:1px solid var(--brand-glow, rgba(194,65,12,.18));
+}
+
+.acct__menu{ display:flex; flex-direction:column; gap:2px; }
+.acct__menu a{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 11px; border-radius:8px; font-size:14px; color:var(--body);
+  transition:background .12s, color .12s;
+}
+.acct__menu a span{ flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.acct__menu svg{ flex:0 0 auto; color:var(--muted, #8A97A8); }
+.acct__menu a:hover{ background:var(--paper, #F6F3F1); color:var(--ink); }
+.acct__menu a:hover svg{ color:var(--ink); }
+/* المختار: أرضيّةٌ ولونٌ وخطٌّ أثقل — ثلاثةٌ تُقرأ ولو لم يُميَّز اللون */
+.acct__menu a.is-on{
+  background:var(--brand-strong, #C2410C); color:#fff; font-weight:700;
+}
+.acct__menu a.is-on svg{ color:#fff; }
+/* عدّاد القسم */
+.acct__menu u{
+  flex:0 0 auto; min-width:20px; height:20px; padding:0 6px; border-radius:99px;
+  display:grid; place-items:center; font-size:11px; font-weight:700; font-style:normal;
+  text-decoration:none; background:var(--paper, #EEE9E6); color:var(--muted, #526176);
+}
+.acct__menu a.is-on u{ background:rgba(255,255,255,.26); color:#fff; }
+/* حيّز المسح في آخر القائمة وبلونه، فلا يُضغط سهوًا وهو لا يُستردّ */
+.acct__menu a:last-child{ margin-top:8px; border-top:1px solid var(--line); padding-top:13px; border-radius:0 0 8px 8px; }
+.acct__menu a:last-child:hover{ background:#FEF2F2; color:#B91C1C; }
+.acct__menu a:last-child:hover svg{ color:#B91C1C; }
+.acct__menu a:last-child.is-on{ background:#B91C1C; }
+
+.acct__out{ margin-top:8px; padding-top:10px; border-top:1px solid var(--line); }
+.acct__out button{
+  width:100%; display:flex; align-items:center; gap:10px; cursor:pointer;
+  padding:10px 11px; border:0; border-radius:8px; background:none; font:inherit;
+  font-size:14px; color:var(--muted, #526176);
+}
+.acct__out button:hover{ background:var(--paper, #F6F3F1); color:var(--ink); }
+
+/* ------------------------------------------------- شريط الأرقام */
+.acct__stats{
+  display:flex; gap:10px; flex-wrap:wrap;
+}
+.acct__stats .acct__stat{
+  flex:1 1 120px; padding:13px 16px; border-radius:var(--radius-lg, 10px);
+  background:#fff; border:1px solid var(--line); box-shadow:var(--shadow-sm);
+  font-size:12.5px; color:var(--muted, #526176);
+}
+.acct__stats .acct__stat b{ display:block; font-size:22px; font-weight:700; color:var(--ink); line-height:1.25; }
+
+@media (max-width:860px){
+  /* على الهاتف: القائمة شريطٌ أفقيّ فوق المحتوى لا عمودٌ يأكل العرض */
+  .acct__shell{ grid-template-columns:1fr; gap:16px; }
+  .acct__nav{ position:static; padding:12px; }
+  .acct__menu{
+    flex-direction:row; overflow-x:auto; gap:6px; padding-bottom:3px;
+    scrollbar-width:thin; scroll-snap-type:x proximity;
+  }
+  .acct__menu a{ flex:0 0 auto; scroll-snap-align:start; padding:9px 13px; }
+  .acct__menu a span{ overflow:visible; }
+  .acct__menu a:last-child{ margin-top:0; border-top:0; padding-top:9px; border-radius:8px; }
+  .acct__out{ margin-top:10px; }
+  .acct__stats .acct__stat{ flex:1 1 90px; padding:11px 13px; }
+  .acct__stats .acct__stat b{ font-size:19px; }
+}
+
+/* عرضُ المساعد على من ينتظر موظفًا: بطاقةٌ في الخيط لا رسالةٌ تُحفَظ —
+   فهي اقتراحٌ يمضي، لا كلامٌ قيل في المحادثة. */
+.cuchat__wait{
+  align-self:center; width:min(420px, 100%); margin:10px 0 4px;
+  padding:14px 16px; border-radius:11px; text-align:center;
+  background:#fff; border:1px solid var(--brand-glow, rgba(194,65,12,.25));
+  box-shadow:0 2px 8px rgba(6,11,20,.07);
+}
+.cuchat__wait b{ display:block; font-size:14.5px; color:var(--ink); }
+.cuchat__wait p{ margin:5px 0 11px; font-size:13px; line-height:1.75; color:var(--muted, #526176); }
+.cuchat__wait span{ display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; }
+
+/* زرّ «كلّم موظف» الثابت في نافذة الركن */
+.ux-chat__ask{ display:flex; justify-content:center; padding:0 12px 8px; background:#fff; }
+.ux-chat__ask button{
+  width:100%; padding:9px 12px; cursor:pointer; font:inherit; font-size:13px; font-weight:700;
+  border:1px solid var(--line); border-radius:99px; background:#fff; color:var(--brand-strong, #C2410C);
+}
+.ux-chat__ask button:hover{ background:var(--brand-tint, #FFF7ED); border-color:var(--brand-strong, #C2410C); }
+.ux-chat__ask button:disabled{ opacity:.5; cursor:default; }

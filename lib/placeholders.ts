@@ -59,6 +59,13 @@ export function withHoles(fields: Field[], content: any, lang: 'ar' | 'en') {
 /** حقول أعلى الصفحة كما يحرّرها المحرّر. */
 export const HERO_FIELDS: Field[] = [
   { name: 'img', label: 'الصورة الكبيرة', kind: 'image' },
+  /* الصورة العريضة تُقَصّ على الهاتف فيضيع نصف المشهد. واترك الحقل فارغًا
+     فيُبحث تلقائيًّا عن «اسم‑الصورة-mobile.jpg» بجانبها — وهي موجودة لصور
+     الهيرو كلها. فلا يُملأ إلا حين تريد قَصّةً غير المعتادة. */
+  {
+    name: 'imgMobile', label: 'صورة الهاتف', kind: 'image', advanced: true,
+    hint: 'تظهر بدل الصورة الكبيرة على الشاشات الضيقة. اتركها فارغة ليُستعمل الموجود تلقائيًّا.',
+  },
   { name: 'kicker', label: 'سطر صغير فوق العنوان', kind: 'dual', advanced: true },
   { name: 'title', label: 'العنوان الرئيسي', kind: 'dual' },
   { name: 'lede', label: 'سطر أو سطران تحته', kind: 'long' },

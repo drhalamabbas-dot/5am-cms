@@ -108,6 +108,25 @@ export function Shell({
 
   return (
     <div className="shell">
+      {/* القائمة على الشاشات الصغيرة: درجٌ ينزلق بدل صفٍّ يأكل نصف الشاشة.
+          مربّعُ اختيارٍ مخفيّ بصريًّا لا بـhidden: يبقى في شجرة الوصول
+          فيُبلَغ عنه ويُطوى بالمسافة، والزرُّ المرئيّ ملصقُه. وبلا جافاسكريبت
+          فيعمل قبل أن تُحمَّل أيّ حزمة. */}
+      <input type="checkbox" id="adminnav" className="shell__q" aria-label="إظهار قائمة الأقسام" />
+      <header className="shell__bar">
+        <label className="shell__burger" htmlFor="adminnav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+               strokeLinecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+          {/* اللوحة تسمّيه sr-only، والموقع يسمّيه sr — فكان النصّ يظهر
+              داخل الزرّ مقطوعًا بدل أن يُخفى للقارئ وحده */}
+          <span className="sr-only">القائمة</span>
+        </label>
+        <b>5A&amp;M</b>
+        <span>{title}</span>
+      </header>
+      {/* الضغط خارج الدرج يغلقه */}
+      <label className="shell__scrim" htmlFor="adminnav" aria-hidden="true" />
+
       <nav className="side" aria-label="أقسام لوحة التحكم">
         <div className="side__brand"><b>5A&amp;M</b><span>لوحة التحكم</span></div>
         <Bell />

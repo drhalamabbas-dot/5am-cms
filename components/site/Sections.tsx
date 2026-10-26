@@ -20,6 +20,8 @@ export type Ctx = {
   /** رابط نموذج عرض السعر محمّلًا ببيانات الصفحة الحالية. */
   quoteHref: string;
   company: any;
+  /** عناوين أقسام الصفحة ومعرّفاتها — يبني منها قسمُ «محتويات الصفحة» روابطه */
+  jump?: { id: string; label: string }[];
 };
 
 
@@ -48,7 +50,9 @@ export function PageHero({
 }) {
   return (
     <section className="phero">
-      <Pic src={hero?.img} alt={t.tx(crumb)} priority />
+      {/* أعلى الصفحة وحده يملؤه صندوقٌ طوليّ على الهاتف، فهو وحده يطلب
+          القَصّة التلقائية. والبطاقات والصفوف تبقى على الصورة العريضة. */}
+      <Pic src={hero?.img} mobile={hero?.imgMobile} autoMobile alt={t.tx(crumb)} priority />
       <div className="wrap phero__in">
         <nav className="crumbs" aria-label="Breadcrumb">
           <a href={t.href('index.html')}>{t.ar ? 'الرئيسية' : 'Home'}</a>
@@ -82,8 +86,8 @@ export function PageHero({
 }
 
 /* شريط محتويات الصفحة — كان يُبنى في المتصفح من عناوين السكاشن. */
-export function JumpNav({ items, t }: { items: { id: string; label: string }[]; t: T }) {
-  if (items.length < 2) return null;
+export function JumpNav({ items, least = 2, t }: { items: { id: string; label: string }[]; least?: number; t: T }) {
+  if (items.length < least) return null;
   return (
     <nav className="ux-jump" aria-label={t.ar ? 'محتويات الصفحة' : 'On this page'}>
       <div className="wrap">
@@ -91,6 +95,25 @@ export function JumpNav({ items, t }: { items: { id: string; label: string }[]; 
       </div>
     </nav>
   );
+}
+
+/**
+ * الشريط نفسه قسمًا في الصفحة، فيُخفى ويُحذف ويُحرَّك ويُعدَّل من الكانفاز
+ * كأي قسم. كان يُرسَم خارج قائمة الأقسام فلا يراه المحرّر أصلًا.
+ *
+ * الروابط الفارغة تعني «ابنِه من عناوين الأقسام» كما كان يفعل دائمًا — وهو
+ * السلوك الذي يتابع الصفحة: يُضاف قسم أو يتغيّر عنوانه فيظهر هنا بلا عمل.
+ * وأول رابط يُكتب يدويًّا يتولّى المكتوبُ الأمرَ كاملًا.
+ */
+export function JumpSection({ s, auto, t }: { s: Any; auto: { id: string; label: string }[]; t: T }) {
+  const manual = (Array.isArray(s?.links) ? s.links : [])
+    .map((l: Any) => ({ id: String(l?.href ?? '').replace(/^#/, ''), label: t.tx(l?.label) || '' }))
+    .filter((l: { id: string; label: string }) => l.id && l.label);
+  /* شريطٌ آليٌّ برابطٍ واحد لا معنى له فيُسكت عنه؛ أمّا المكتوب باليد فيظهر
+     كما كُتب ولو رابطًا واحدًا — وإلّا اختفى القسم بلا سبب ظاهر لمن كتبه. */
+  return manual.length
+    ? <JumpNav items={manual} least={1} t={t} />
+    : <JumpNav items={auto} t={t} />;
 }
 
 /* «وصول مباشر للخدمات» — الصفحات المقترحة أسفل الصفحة. */
@@ -798,6 +821,7 @@ function Callout({ s, anchor, ctx }: { s: Any; anchor: string | null; ctx: Ctx }
 export function Section({ s, ctx, storyIndex }: { s: { type: string; anchor: string | null; content: Any }; ctx: Ctx; storyIndex: number }) {
   const c = s.content, a = s.anchor, { t } = ctx;
   switch (s.type) {
+    case 'jump':     return <JumpSection s={c} auto={ctx.jump ?? []} t={t} />;
     case 'cards':    return <Cards s={c} t={t} />;
     case 'feature':  return <Feature s={c} anchor={a} ctx={ctx} />;
     case 'list':     return <List s={c} t={t} />;

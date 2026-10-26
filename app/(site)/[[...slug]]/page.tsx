@@ -15,10 +15,12 @@ import {
   getPageLabels, getSetting, getSearchIndex, getProductParent, type Product,
 } from '@/lib/content';
 import { getNav, getFooterColumns, buildNav } from '@/lib/nav';
+import { currentCustomer } from '@/lib/customerAuth';
+import { unreadForCustomer } from '@/lib/chat/conv';
 import { getDict, makeT, pickLang, type Lang, type T } from '@/lib/i18n';
 import { Header } from '@/components/site/Header';
 import { Footer } from '@/components/site/Footer';
-import { PageHero, JumpNav, RelatedPages, Section, type Ctx } from '@/components/site/Sections';
+import { PageHero, RelatedPages, Section, type Ctx } from '@/components/site/Sections';
 import { HomeSection } from '@/components/site/HomeSections';
 import { ProductPage, pName } from '@/components/site/Product';
 import { Linecard, LinecardJump, CtaBandWide } from '@/components/site/Linecard';
@@ -194,12 +196,18 @@ export default async function Page(
 
   const homeHero = page.template === 'onepage' && page.sections[0]?.type === 'heroSlider';
 
+  /* ردُّ الموظف يصل والعميل يتصفّح صفحةً أخرى: نقطةٌ على زرّ «حسابي» تقول
+     له. والسؤال لا يُطرَح إلا لمن دخل بحسابه، فالزائر لا يكلّف شيئًا. */
+  const me = await currentCustomer();
+  const unreadChat = me ? await unreadForCustomer(me.id) : 0;
+
   const shell = (body: React.ReactNode) => (
     <>
       {fontLink ? <link rel="stylesheet" href={fontLink} /> : null}
       {siteCss ? <style data-theme="">{siteCss}</style> : null}
       <Header nav={nav} company={company} t={t} page={`${slug}.html`} quoteHref={pageQuote}
               homeHero={homeHero}
+              unread={unreadChat}
               hideAdminLink={slug === 'index' && Boolean(editor)}
               before={preview ? <Mark id="nav" /> : null} />
       <main id="main">{body}</main>
@@ -362,17 +370,21 @@ export default async function Page(
   ]);
   const products: Record<string, Product> = Object.fromEntries(productList.map((p) => [p.ref, p]));
   const quoteHref = quoteUrl(slug, page.quote_solution, lang);
-  const ctx: Ctx = { t, brands, products, quoteHref, company };
+  /* معرّف كل قسم: المكتوب، وإلا رقمه بالطريقة التي كان ux.js يتبعها
+     (section-1، section-2 …). والعدّ يتخطّى قسم «محتويات الصفحة» نفسه، فلا
+     تتغيّر معرّفات الأقسام بإضافته أو حذفه — وهي أهدافُ روابط الشريط. */
+  let secN = 0;
+  const ids = page.sections.map((s) => (s.type === 'jump' ? null : s.anchor || `section-${++secN}`));
 
-  /* شريط المحتويات: كل سيكشن له عنوان ظاهر. المعرّف يُستكمل عند غيابه
-     بالطريقة نفسها التي كان ux.js يتبعها (section-1، section-2 …). */
   const jump = page.sections
     .map((s, i) => ({
-      id: s.anchor || `section-${i + 1}`,
+      id: ids[i] ?? '',
       label: t.tx(s.content?.title) || '',
       has: Boolean(s.content?.title) && s.type !== 'contact',
     }))
-    .filter((x) => x.has && x.label);
+    .filter((x) => x.has && x.label && x.id);
+
+  const ctx: Ctx = { t, brands, products, quoteHref, company, jump };
 
   const related = (page.related ?? [])
     .filter((r) => labels[r])
@@ -398,7 +410,6 @@ export default async function Page(
         phoneIntl={company.phoneIntl}
         t={t}
       />
-      <JumpNav items={jump} t={t} />
       {page.sections.map((s, i) => (
         <Fragment key={s.id}>
           {ctaAt === i && related.length ? <RelatedPages items={related} t={t} /> : null}
@@ -409,7 +420,7 @@ export default async function Page(
                          label={t.tx(s.content?.title) || typeName(s.type)} />
           ) : null}
           <Section
-            s={{ ...s, anchor: s.anchor || `section-${i + 1}` }}
+            s={{ ...s, anchor: ids[i] }}
             ctx={ctx}
             storyIndex={s.type === 'story' ? ++storyN : 0}
           />

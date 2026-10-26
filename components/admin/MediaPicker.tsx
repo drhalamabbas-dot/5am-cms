@@ -15,6 +15,9 @@ const kb = (n: number | null) => (n == null ? '' : n > 1e6 ? (n / 1e6).toFixed(1
 
 /* ترتيب الصور المختارة معًا قبل إضافتها */
 const ORDERS: [string, string][] = [['click', 'بترتيب الضغط'], ['name', 'بالاسم'], ['new', 'الأحدث أولًا']];
+/* ملفات الموقع الأصلية تُختار ولا تُحذف: حذفها يكسر صفحات منقولة
+   (مثل MediaLibrary، والتحقّق مكرّر هنا لأن lib/media يتصل بالقاعدة). */
+const own = (p: string) => p.startsWith('media/');
 /** مقارنة أسماء بأرقامها (صورة-2 قبل صورة-10) — أسماء صور الهاتف تحمل الوقت، فالاسم ترتيب زمني */
 export const byName = (a: string, b: string) => {
   /* بلا اللاحقة العشوائية التي يضيفها الرفع (lib/media.ts) — كانت تؤخّر أول صورة
@@ -96,6 +99,24 @@ export function MediaPicker({
     xhr.send(fd);
   }
 
+  /* الحذف من اللوحة نفسها: كان على المحرّر أن يغادرها إلى شاشة المكتبة
+     ليمسح ملفًا رآه الآن، فيفقد ما كان فيه. ويُسأل أولًا أين يُستعمل الملف
+     فلا تختفي صورة من صفحة دون أن يدري. */
+  async function removeItem(it: Item) {
+    const r = await fetch(`/api/admin/media?used=${encodeURIComponent(it.path)}`);
+    const used = (await r.json()).used ?? [];
+    const where = used.length
+      ? `\n\nمستعمل في:\n${[...new Set(used.map((u: any) => u.where))].slice(0, 8).join('\n')}`
+      : '\n\nغير مستعمل في أي صفحة.';
+    if (!confirm(`حذف «${it.path.split('/').pop()}»؟${where}`)) return;
+    const d = await fetch(`/api/admin/media?id=${it.id}`, { method: 'DELETE' });
+    const j = await d.json().catch(() => ({}));
+    if (!j.ok) { setMsg(j.error ?? 'تعذّر الحذف'); return; }
+    setMsg('حُذف الملف');
+    setChosen((c) => c.filter((p) => p !== it.path));
+    load();
+  }
+
   if (!open) return null;
 
   return (
@@ -169,12 +190,16 @@ export function MediaPicker({
               {items.map((it) => {
                 const n = multi ? chosen.indexOf(it.path) + 1 : 0;
                 return (
-                <button key={it.id} type="button" title={it.path} aria-pressed={multi ? n > 0 : undefined}
+                /* الغلاف لأن زرّ الحذف أخٌ للمصغّرة لا ابنٌ لها: زرٌّ داخل
+                   زرٍّ ترفضه المتصفّحات ولا يصل إليه الضغط. */
+                <div key={it.id} style={{ position: 'relative' }}>
+                <button type="button" title={it.path} aria-pressed={multi ? n > 0 : undefined}
                         onClick={() => { if (multi) toggle(it.path); else { onPick(it.path); onClose(); } }}
                         style={{
                           border: n ? '2px solid var(--brand)' : '1px solid var(--line)', borderRadius: 8,
                           background: n ? '#fff7f1' : '#fff', position: 'relative',
                           padding: n ? 5 : 6, cursor: 'pointer', textAlign: 'start', font: 'inherit',
+                          width: '100%', display: 'block',
                         }}>
                   {n ? (
                     <b style={{
@@ -200,6 +225,17 @@ export function MediaPicker({
                     <br />{kb(it.bytes)}
                   </div>
                 </button>
+                {own(it.path) ? (
+                  <button type="button" className="pick__del" title="احذف الملف"
+                          aria-label={`احذف ${it.path.split('/').pop()}`}
+                          onClick={(e) => { e.stopPropagation(); removeItem(it); }}>
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"
+                         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
+                    </svg>
+                  </button>
+                ) : null}
+                </div>
                 );
               })}
             </div>

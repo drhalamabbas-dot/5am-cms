@@ -204,3 +204,158 @@
 .flag__b b{ display:block; font-size:18px; margin-bottom:5px; }
 .flag__b p{ margin:0; color:var(--body); }
 .flag__b .tlink{ margin-top:10px; }
+
+
+/* =============================================== تدوير حوافّ الصور
+   كانت الصور بحوافّ حادّة (2px على صورة بعرض 710) بينما العنوان بجانبها
+   42px، فتبدو الصورة مقصوصةً بالمسطرة لا جزءًا من التصميم.
+
+   والنصف يتدرّج مع حجم النصّ على الكتلة: الصورة الكبيرة 14 والكارت 10
+   والمصغّرة 6. رقمٌ واحد للجميع يجعل الكبيرة حادّة أو المصغّرة حبّة دواء.
+
+   واللوجوهات مستثناة كلّها: انحناء اللوجو يقصّ حرفًا من اسم الماركة. */
+
+/* --- الصور الكبيرة: بجانب عنوان 40px فأكبر --- */
+.prow__media,
+.story__media,
+.about2__media,
+.pdp__main:not(.pdp__main--plate),
+.ba,
+.pggallery figure,
+.repow__panel img,
+.phero img,
+.vhero__img{
+  border-radius:var(--radius-media, 14px);
+  overflow:hidden;
+}
+.prow__media > img, .prow__media > picture > img,
+.story__media img, .story__media picture,
+.about2__media img,
+.pdp__main:not(.pdp__main--plate) img,
+.ba img,
+.pggallery img{ border-radius:inherit; }
+
+/* --- صور الكروت: بعنوان 18-22px --- */
+.card__fig:not(.card__fig--plate),
+.pcard__fig-wrap,
+.fscard__fig,
+.scard__fig,
+.tile__fig,
+.pgcard__fig,
+.findus__card img,
+.dlist__a .dlist__ext{
+  border-radius:var(--radius-card, 10px);
+  overflow:hidden;
+}
+.card__fig:not(.card__fig--plate) img, .card__fig:not(.card__fig--plate) picture,
+.pcard__fig-wrap img, .pcard__fig-wrap picture,
+.fscard__fig img,
+.scard__fig img,
+.tile__fig img,
+.pgcard__fig img{ border-radius:inherit; }
+
+/* --- المصغّرات --- */
+.pdp__thumbs img, .pdp__thumbs button,
+.ux-thumbnails img, .ux-thumbnails button,
+.mshot img,
+.vslide__hit img{ border-radius:var(--radius-thumb, 6px); overflow:hidden; }
+
+/* --- الصورة المكبّرة في العارض --- */
+.ux-lightbox > img, .plb__img{ border-radius:var(--radius-card, 10px); }
+
+/* --- اللوجوهات تبقى حادّة عمدًا --- */
+.hdr__logo img, .ftr__logo img,
+.logostrip__item img,
+.brandcell img, .lbrand__mark img,
+.prow__brand img, .pdp__brandrow img,
+.about2__badge img{ border-radius:0; }
+
+
+/* ============================ سلايدر الرئيسية على الهاتف
+   تسع ماركات في صفّ الشاشة الواسعة تُقرأ دفعةً واحدة. وعلى الهاتف تنكمش
+   إلى أعمدة بعرض سبعين بكسل تُقصّ فيها الأسماء، وتأكل نصف الصورة.
+
+   فتُعرض واحدة: الماركة الحالية في كارت واسد بين السهمين، والسهمان ينقلان
+   إلى ما قبلها وما بعدها — وهو ما يفعلانه أصلًا في الشاشة الواسعة. ولا
+   جديد في الجافاسكريبت: هو يعلّم الكارت الحالي بـis-active، وهنا يُخفى ما
+   عداه. فإن تعطّل تظهر البطاقات كلها لا شيء.
+
+   والكل شفّاف فوق الصورة في أسفلها كما في الشاشة الواسعة، لا شريطًا منفصلًا.
+   و768 هي نفسها نقطة تبديل صورة الهاتف في Pic.tsx. */
+@media (max-width:768px){
+  /* الفوتر ينزل إلى أسفل القسم بالمسافة الفارغة قبله، لا بخلفية تفصله */
+  .vhero__foot{
+    background:transparent;
+    border-top:0;
+    margin-top:auto;
+    padding-top:0;
+    display:flex;
+    flex-direction:row !important;
+    align-items:center;
+    gap:10px;
+  }
+
+  /* display:contents يذيب الحاوية فيصير الزرّان عنصرين مباشرين في الصفّ،
+     فيمكن وضع كلٍّ على جهة بـorder بلا تغيير في بنية الصفحة. */
+  .vhero__nav{ display:contents; }
+  #heroPrev{ order:-1; }
+  #heroNext{ order:1; }
+
+  .vhero__tabs{
+    order:0;
+    flex:1 1 auto;
+    min-width:0;
+    width:auto !important;
+    margin:0;
+    display:flex !important;
+    justify-content:center;
+    overflow:visible !important;
+  }
+  .vhero__tab{ display:none !important; }
+  .vhero__tab.is-active{
+    display:flex !important;
+    width:100%;
+    min-width:0 !important;
+    justify-content:center;
+    padding:11px 12px !important;
+  }
+  /* الكارت وحده الآن، فله متّسع: يعود السطر الشارح وحجم الاسم الطبيعي */
+  .vhero__tab-title{ font-size:13px !important; letter-spacing:.04em; }
+  .vhero__tab-sub{ display:block !important; font-size:10.5px; }
+  .vhero__tab-info{ text-align:center; }
+
+  /* السهمان فوق صورة مزدحمة: أرضية أغمق وحدّ أوضح ليُقرآ زرّين لا ظلّين */
+  .vhero__navbtn{
+    flex:0 0 42px; width:42px; height:42px;
+    background:rgba(6,11,20,.80);
+    border-color:rgba(255,255,255,.45);
+    color:#fff;
+  }
+}
+
+/* ============================ باب حساب العميل في الهيدر
+   .iconbtn مربّعٌ لأيقونةٍ وحدها، وهذا معه نصّ — فيتّسع ويصطفّ صفًّا. ويُكتب
+   تحت .hdr__tools لا وحده: ux.css يقول ‎.hdr__tools .iconbtn{width:44px}‎
+   وتخصيصها أعلى، فلا يكفي ترتيبُ الملفات ما لم يتساويا.
+
+   والنصّ هو ما يفرّقه عن قفل الموظفين المجاور: قفلان متجاوران لا يُقرآن. */
+.hdr__tools .hdr__acct{
+  width:auto; min-width:0; gap:7px; padding-inline:12px;
+  display:inline-flex; align-items:center; white-space:nowrap;
+}
+.hdr__acct span{ font-size:13.5px; font-weight:600; letter-spacing:.01em }
+/* الشريط يضيق قبل الهاتف، والنصّ نفسه في المنيو — فتكفي الأيقونة هنا */
+@media (max-width:1080px){
+  .hdr__tools .hdr__acct{ width:44px; padding-inline:0; gap:0 }
+  .hdr__acct span{ display:none }
+}
+
+/* نقطة الرسائل الجديدة على زرّ الحساب */
+.hdr__tools .hdr__acct{ position:relative }
+.hdr__acct u{
+  position:absolute; inset-block-start:-3px; inset-inline-end:-3px;
+  min-width:17px; height:17px; padding:0 4px; border-radius:99px;
+  display:grid; place-items:center; font-size:10.5px; font-weight:700; font-style:normal;
+  text-decoration:none; background:var(--brand-strong, #C2410C); color:#fff;
+  border:1.5px solid #0F1B2D; line-height:1;
+}

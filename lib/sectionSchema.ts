@@ -625,7 +625,10 @@ export const SECTION_TYPES: Record<string, TypeSpec> = {
       {
         name: 'slides', label: 'الصور', kind: 'repeat', item: 'صورة', keyBy: 'img',
         of: [
-          { name: 'img', label: 'الصورة', kind: 'image' },
+          { name: 'img', label: 'صورة الشاشة الواسعة', kind: 'image' },
+          /* قَصّة الهاتف: تُختار من لوحة الصور في المحرّر. وتركها فارغة يجعل
+             الموقع يبحث عن «الاسم-mobile.jpg» بجانب الصورة (lib/uploads.ts). */
+          { name: 'imgMobile', label: 'صورة الهاتف', kind: 'image', advanced: true },
           { name: 'group', label: 'المجموعة', kind: 'text', hint: 'تربط الصورة بتبويبها، مثل elgin.' },
           { name: 'alt', label: 'وصف الصورة', kind: 'dual' },
         ],
@@ -771,6 +774,25 @@ export const SECTION_TYPES: Record<string, TypeSpec> = {
       },
       { name: 'brandCells', label: 'لوجوهات أسفل القسم', kind: 'texts', advanced: true, hint: 'اسم ماركة في كل سطر.' },
       { name: 'deciding', label: 'حقول التفرقة بين الموديلات', kind: 'texts', advanced: true, hint: 'اسم مواصفة في كل سطر، بالترتيب. أول ما يوجد منها يظهر في عمود التفاصيل.' },
+    ],
+  },
+
+  /* ------------------------------------------------ شريط محتويات الصفحة */
+  jump: {
+    label: 'شريط محتويات الصفحة',
+    pick: 'الشريط الملاصق للهيدر برابط لكل قسم',
+    hint: 'سيبه فاضي فيتبنى لوحده من عناوين الأقسام — تضيف قسمًا أو تغيّر عنوانه فيظهر هنا على طول. '
+      + 'وتكتب روابطه بنفسك لو عايز ترتيبًا أو أسماءً غير دي.',
+    addable: true,
+    fields: [
+      {
+        name: 'links', label: 'الروابط', kind: 'repeat', item: 'رابط', keyBy: 'href',
+        hint: 'فاضية = تتبنى لوحدها من عناوين الأقسام. أول ما تضيف رابطًا واحدًا، المكتوب هنا هو اللي يظهر.',
+        of: [
+          { name: 'href', label: 'ينقل إلى', kind: 'text', hint: 'المعرّف المباشر للقسم، مثل: #parts' },
+          { name: 'label', label: 'النص', kind: 'dual' },
+        ],
+      },
     ],
   },
 

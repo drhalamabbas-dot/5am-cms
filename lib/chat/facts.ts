@@ -63,13 +63,13 @@ const link = (p: any, lang: 'ar' | 'en') => `/model.html?p=${encodeURIComponent(
 
 /* الخاتمة: نفس ما نريد أن يقوله البوت — خطوة تالية بلا سعر */
 const CLOSE_AR = [
-  'تحب نجهّزلك عرض سعر؟ اكتب «موظف» أو املأ طلب عرض السعر من الموقع.',
-  'لو حابب التفاصيل كاملة أو عرض سعر، اكتب «موظف».',
-  'عايز عرض سعر على المواصفات دي؟ اكتب «موظف» وفريق المبيعات هيتواصل معاك.',
+  'تحب نجهّزلك عرض سعر؟ اضغط زرّ «كلّم موظف» تحت، أو اطلب عرض سعر من الموقع.',
+  'لو حابب التفاصيل كاملة أو عرض سعر، اضغط زرّ «كلّم موظف» تحت.',
+  'عايز عرض سعر على المواصفات دي؟ اضغط زرّ «كلّم موظف» تحت وفريق المبيعات هيتواصل معاك.',
 ];
 const CLOSE_EN = [
-  'Want a quotation? Type “agent” or use the quote request on the site.',
-  'For full details or a quotation, type “agent”.',
+  'Want a quotation? Tap the “Talk to a person” button below, or use the quote request on the site.',
+  'For full details or a quotation, tap the “Talk to a person” button below.',
 ];
 
 export async function factPairs(): Promise<Pair[]> {

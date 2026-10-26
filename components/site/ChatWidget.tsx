@@ -10,7 +10,8 @@
 ============================================================================= */
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 
-type Msg = { id: number; role: 'user' | 'bot' | 'agent' | 'system'; text: string };
+type File_ = { url: string; kind: 'image' | 'video' | 'audio' | 'file'; name?: string | null; secs?: number | null };
+type Msg = { id: number; role: 'user' | 'bot' | 'agent' | 'system'; text: string; files?: File_[] };
 type Acc = { name: string | null; email: string | null; phone: string | null } | null;
 const ACTIVE = '5am-chat-active';
 
@@ -27,6 +28,7 @@ const TXT = {
     gateWhy: 'عشان فريقنا يعرف يرد عليك، وتلاقي محادثتك في أي وقت ومن أي جهاز.',
     gateBtn: 'دخول أو حساب جديد',
     gateNote: 'بالموبايل وكلمة مرور، أو برمز يوصل على بريدك.',
+    inAccount: 'افتحه في حسابي',
   },
   en: {
     open: 'Chat with us', title: '5A&M assistant', bot: 'Replies instantly', human: 'With our team', close: 'Close',
@@ -40,6 +42,7 @@ const TXT = {
     gateWhy: 'So our team can reply to you, and you can pick the chat up any time from any device.',
     gateBtn: 'Sign in or create an account',
     gateNote: 'With a mobile and password, or a code sent to your email.',
+    inAccount: 'Open it in my account',
   },
 };
 
@@ -59,6 +62,27 @@ function Rich({ text: raw }: { text: string }) {
   }
   if (last < text.length) parts.push(text.slice(last));
   return <>{parts.map((p, i) => (typeof p === 'string' ? <Fragment key={`t${i}`}>{p}</Fragment> : p))}</>;
+}
+
+/**
+ * مرفقٌ في نافذة الركن.
+ *
+ * النافذة ضيّقة وعابرة، فالصورة تُعرَض مصغّرةً تفتح على حجمها، والفيديو
+ * والصوت يُشغَّلان بسيطَين. وما يحتاج لوحةً أوسع يُحال إلى الحساب.
+ */
+function Clip({ f, more, href }: { f: File_; more: string; href: string }) {
+  const src = '/' + String(f?.url ?? '').replace(/^\//, '');
+  if (!f?.url) return null;
+  if (f.kind === 'image') {
+    return <a className="ux-chat__att" href={src} target="_blank" rel="noreferrer"><img src={src} alt={f.name ?? ''} loading="lazy" /></a>;
+  }
+  if (f.kind === 'video') return <video className="ux-chat__att" src={src} controls preload="metadata" playsInline />;
+  if (f.kind === 'audio') return <audio className="ux-chat__att ux-chat__att--aud" src={src} controls preload="metadata" />;
+  return (
+    <a className="ux-chat__att ux-chat__att--doc" href={src} target="_blank" rel="noreferrer">
+      {f.name || more}
+    </a>
+  );
 }
 
 export function ChatWidget({ lang, greeting }: { lang: 'ar' | 'en'; greeting: string }) {
@@ -190,7 +214,11 @@ export function ChatWidget({ lang, greeting }: { lang: 'ar' | 'en'; greeting: st
             {msgs.map((m) => (
               <div key={m.id} className={`ux-chat__msg ux-chat__msg--${m.role}`}>
                 {m.role === 'agent' ? <small className="ux-chat__by">{t.agent}</small> : null}
-                <Rich text={m.text} />
+                {/* المحادثة واحدة أينما فُتحت: ما بُعث في الحساب يُرى هنا.
+                    والمرفق أولًا والكلام تحته تعليقًا عليه، كما في الحساب.
+                    والإرسال من هنا نصٌّ فقط — المرفقات لها لوحةُ الحساب. */}
+                {(m.files ?? []).map((f, i) => <Clip key={i} f={f} more={t.inAccount} href={accountHref} />)}
+                {m.text ? <Rich text={m.text} /> : null}
               </div>
             ))}
             {busy && !handoff ? <p className="ux-chat__msg ux-chat__msg--bot ux-chat__typing">{t.typing}</p> : null}
@@ -224,6 +252,17 @@ export function ChatWidget({ lang, greeting }: { lang: 'ar' | 'en'; greeting: st
               </button>
             </form>
           )}
+          {/* زرٌّ ثابت لا كلمةٌ تُكتب: كان الاقتراح يختفي بعد أول رسالة فلا
+              يبقى أمام العميل سبيلٌ إلى موظفٍ إلا أن يُخمّن كلمةً. وهو
+              يختفي وحده حين تصير المحادثة مع موظفٍ فعلًا. */}
+          {!needLogin && !handoff && status !== 'human' ? (
+            <div className="ux-chat__ask">
+              <button type="button" onClick={() => send(t.chips[t.chips.length - 1])} disabled={busy}>
+                {t.chips[t.chips.length - 1]}
+              </button>
+            </div>
+          ) : null}
+
           <p className="ux-chat__foot">
             {acc ? <a href={accountHref}>{t.accountIn}</a> : <a href={accountHref}>{t.account}</a>}
             <span> · {t.privacy}</span>

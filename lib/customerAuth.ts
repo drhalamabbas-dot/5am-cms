@@ -28,7 +28,25 @@ function key() {
 }
 const hmac = (v: string) => createHmac('sha256', process.env.AUTH_SECRET ?? '').update(`code|${v}`).digest('hex');
 
-export type Account = { id: number; customer_id: number | null; name: string | null; email: string | null; phone_norm: string | null };
+export type Account = {
+  id: number; customer_id: number | null; name: string | null;
+  username: string | null; email: string | null; phone_norm: string | null;
+};
+
+/* ------------------------------------------------- اسم المستخدم وكلمة المرور
+
+   الحساب يُعرَف باسمٍ يختاره صاحبه أو ببريده، وكلاهما يدخل به. والحروف
+   مقصورة على اللاتينية والأرقام و«._-»: الاسم يُملى في التليفون ويُكتب في
+   رسالة، فلا يحتمل خلط اتجاهين ولا محارف تتشابه صورتها.
+
+   ويُقارَن صغيرًا دائمًا: من سجّل Ahmed لا يُحرَم الدخول بـahmed. */
+const USERNAME = /^[a-z0-9](?:[a-z0-9._-]{1,38})[a-z0-9]$/;
+export const normUser = (v: string) => v.trim().toLowerCase();
+export const okUser = (v: string) => USERNAME.test(normUser(v));
+
+/* أسماء لا تُترك لمن يسبق: تنتحل صفةً أو تُربك قراءة رابطٍ أو رسالة */
+const TAKEN = new Set(['admin', 'administrator', 'root', 'support', 'help', 'system',
+  'superadmin', 'super', 'staff', 'team', '5am', 'fiveam', 'account', 'login', 'null', 'undefined']);
 
 export async function currentCustomer(): Promise<Account | null> {
   const t = (await cookies()).get(COOKIE)?.value;
@@ -36,9 +54,9 @@ export async function currentCustomer(): Promise<Account | null> {
   try {
     const { payload } = await jwtVerify(t, key());
     if (payload.typ !== 'cust') return null;
-    const a = await q1<any>('SELECT id, customer_id, name, email, phone_norm, session_ver FROM customer_accounts WHERE id = ?', [Number(payload.sub)]);
+    const a = await q1<any>('SELECT id, customer_id, name, username, email, phone_norm, session_ver FROM customer_accounts WHERE id = ?', [Number(payload.sub)]);
     if (!a || Number(payload.sv) !== Number(a.session_ver)) return null;
-    return { id: a.id, customer_id: a.customer_id, name: a.name, email: a.email, phone_norm: a.phone_norm };
+    return { id: a.id, customer_id: a.customer_id, name: a.name, username: a.username, email: a.email, phone_norm: a.phone_norm };
   } catch { return null; }
 }
 
@@ -112,6 +130,66 @@ export async function verifyCode(emailRaw: string, codeRaw: string): Promise<{ o
     return r.insertId;
   });
   await startSession(id);
+  return { ok: true };
+}
+
+/**
+ * حساب جديد: اسمٌ واسمُ مستخدم وبريدٌ وكلمة مرور.
+ *
+ * البريد يُسجَّل غير موثَّق (email_verified_at يبقى NULL): ملكيّتُه تُثبَت
+ * برمزٍ يصله، لا بكتابته. وهو كافٍ للتواصل ولاستعادة كلمة المرور.
+ */
+export async function registerAccount(
+  input: { name: string; username: string; email: string; password: string }, ip: string
+): Promise<{ ok: boolean; error?: string }> {
+  const username = normUser(input.username);
+  const email = input.email.trim().toLowerCase();
+  const name = input.name.trim().slice(0, 120);
+
+  if (!okUser(username) || TAKEN.has(username)) return { ok: false, error: 'username' };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 160) return { ok: false, error: 'email' };
+  if (input.password.length < 8) return { ok: false, error: 'short' };
+  if (blocked(`reg:${ip}`, 5, 60, true)) return { ok: false, error: 'wait' };
+
+  if (await q1('SELECT id FROM customer_accounts WHERE username = ?', [username])) return { ok: false, error: 'userTaken' };
+  if (await q1('SELECT id FROM customer_accounts WHERE email = ?', [email])) return { ok: false, error: 'mailTaken' };
+
+  const hash = await bcrypt.hash(input.password, 12);
+  const id = await tx(async (db) => {
+    /* السباق بين طلبين بالاسم نفسه يكسره القيد الفريد لا هذا الفحص */
+    const cust = await findOrCreateCustomer(db, { name: name || null, phone: null, email, company: null, city: null, source: 'account' });
+    const r = await db.q('INSERT INTO customer_accounts (name, username, email, password_hash, customer_id) VALUES (?,?,?,?,?)',
+      [name || null, username, email, hash, cust]) as unknown as { insertId: number };
+    return r.insertId;
+  }).catch((e: any) => (String(e?.code) === 'ER_DUP_ENTRY' ? null : Promise.reject(e)));
+  if (!id) return { ok: false, error: 'userTaken' };
+
+  await startSession(id);
+  return { ok: true };
+}
+
+/**
+ * الدخول بما يدلّ على الحساب: اسم المستخدم أو البريد — وكذلك الموبايل، فمن
+ * فتح حسابه به قبل اسم المستخدم لا يُغلَق دونه بابُه.
+ */
+export async function loginAccount(idRaw: string, password: string, ip: string): Promise<{ ok: boolean; error?: string }> {
+  const who = idRaw.trim();
+  const key = normUser(who);
+  if (blocked(`id:${key}`, 5, 15, false) || blocked(`idip:${ip}`, 15, 15, false)) return { ok: false, error: 'wait' };
+
+  const a = await q1<any>(
+    `SELECT id, password_hash FROM customer_accounts
+      WHERE username = ? OR email = ? OR phone_norm = ? LIMIT 1`,
+    [key, key, normPhone(who) ?? '\u0000']
+  );
+  /* المقارنة تجري ولو لم يوجد حساب: زمنُ الردّ لا يفشي أيُّ اسمٍ مسجَّل */
+  const good = await bcrypt.compare(password, a?.password_hash ?? '$2b$12$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalidinv');
+  if (!a || !a.password_hash || !good) {
+    blocked(`id:${key}`, 5, 15, true); blocked(`idip:${ip}`, 15, 15, true);
+    return { ok: false, error: 'wrong' };
+  }
+  tries.delete(`id:${key}`);
+  await startSession(a.id);
   return { ok: true };
 }
 

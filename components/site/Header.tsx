@@ -9,9 +9,11 @@ import { ASSET_V } from '@/lib/version';
 
 
 export function Header({
-  nav, company, t, page, quoteHref, before, hideAdminLink = false, homeHero = false,
+  nav, company, t, page, quoteHref, before, hideAdminLink = false, homeHero = false, unread = 0,
 }: {
   nav: NavItem[]; company: Company; t: T; page: string; quoteHref: string;
+  /** رسائل تنتظر العميل: نقطةٌ على زرّ «حسابي» في كل صفحة */
+  unread?: number;
   /** اخفِ رابط الدخول حين يكون صاحب الموقع مسجلًا بالفعل. */
   hideAdminLink?: boolean;
   /** الشفافية مرتبطة بهيرو مرسوم خلف الهيدر من أول تحميل. */
@@ -104,6 +106,28 @@ export function Header({
               <Icon name="globe" />{' '}
               <span className="lang__code">{other === 'ar' ? 'العربية' : 'EN'}</span>
             </button>
+            {/* باب العميل إلى حسابه. كانت الصفحة مبنيّةً كاملةً ولا رابط لها في
+                الموقع إلا داخل نافذة المحادثة، فلا يصلها من لم يفتحها.
+
+                نصٌّ لا أيقونةً وحدها: القفل المجاور باب الموظفين، وقفلان
+                متجاوران لا يُفرَّق بينهما. وهو يسبقه لأنه للزائر لا للموظف.
+                و/account يعرض الدخول أو الحساب بحسب الجلسة، فرابط واحد يكفي
+                الحالتين ولا يُسأل الخادم عن الجلسة في كل صفحة. */}
+            <a className="iconbtn hdr__acct" href={`/account?lang=${t.ar ? 'ar' : 'en'}`} rel="nofollow"
+               title={unread
+                 ? (t.ar ? `حسابي — ${unread} رسالة جديدة` : `My account — ${unread} new message(s)`)
+                 : (t.ar ? 'حسابي — طلباتي ومحادثاتي' : 'My account — requests and chats')}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="8" r="3.6" />
+                <path d="M4.8 20a7.2 7.2 0 0 1 14.4 0" />
+              </svg>
+              <span>{t.ar ? 'حسابي' : 'Account'}</span>
+              {/* ردُّ الموظف يصل والعميل في صفحةٍ أخرى، فلا يعلم به حتى يفتح
+                  حسابه. نقطةٌ بعددها على الزرّ تقول له في كل صفحة. */}
+              {unread ? <u aria-label={t.ar ? 'رسايل جديدة' : 'new messages'}>{unread > 9 ? '9+' : unread}</u> : null}
+            </a>
+
             {/* مدخل لوحة التحكم. أيقونته مرسومة هنا لا في lib/icons.ts لأن ذلك
                 الملف مولَّد آليًا من الموقع القديم، ولم يكن فيه مدخل إدارة.
                 nofollow كي لا تتبع محركات البحث الرابط. */}
@@ -189,6 +213,10 @@ export function Header({
         })}
         <a className="btn btn--block mt-24" href={quoteHref}>
           {t.t('cta.requestQuote', 'Request a quote')} <Icon name="arrow" />
+        </a>
+        {/* الشريط العلوي ضيّق على الهاتف، فالباب نفسه هنا بنصّه كاملًا */}
+        <a className="btn btn--ghost btn--block mt-8" href={`/account?lang=${t.ar ? 'ar' : 'en'}`} rel="nofollow">
+          {t.ar ? 'حسابي' : 'My account'}
         </a>
       </div>
     </>
