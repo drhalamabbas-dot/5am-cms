@@ -77,7 +77,29 @@ dialog::backdrop{background:#060b14b3;backdrop-filter:blur(4px)}
 .ux-form .formmsg:not(.is-err):not(.is-ok){display:none}.ux-form .formmsg{grid-column:1/-1}.qlayout{align-items:start}.qlayout aside{position:sticky;top:115px}
 /* Avoid hiding substantive content behind reveal animations. */
 [data-reveal],[data-stagger]{opacity:1!important;visibility:visible!important;transform:none!important}
-@media(min-width:1081px) and (max-width:1250px){.hdr__link,[lang=ar] .hdr__link{font-size:14px!important;padding-inline:6px}.hdr__tools{gap:5px}.hdr__logo img{height:52px}.hdr__tools .btn--sm{padding-inline:12px}}
+/* ---------- الشريط العلوي بين الهاتف والشاشة الواسعة.
+   صفٌّ واحد: شعارٌ 234 وستُّ روابط 863 وأربع أدوات 316 وفواصل 28 = 1441،
+   والمتاح داخل الـwrap على شاشة 1536 هو 1296. فكانت الأدوات تخرج من الصفحة
+   ويظهر شريط تمريرٍ أفقيّ لا يُغلق. وكان المدى 1081–1250 وحده مُعالَجًا،
+   فما بينه وبين 1600 بلا قاعدةٍ أصلًا — وهو مقاس أغلب اللابتوبات.
+   فيُصغَّر الشعار والروابط وتُسقَط كلمة «العربية» عن زرّ اللغة. */
+@media(min-width:1081px) and (max-width:1600px){
+  .hdr__logo img, .hdr--compact .hdr__logo img{ height:48px }
+  .hdr__link, [lang=ar] .hdr__link{ font-size:14.5px; padding-inline:7px }
+  .hdr__nav{ min-width:0 }
+  .hdr__tools{ gap:6px }
+  .hdr__tools .lang .lang__code{ display:none }
+  .hdr__tools .lang{ padding-inline:10px }
+  .hdr__tools .btn--sm{ padding-inline:12px }
+}
+/* وتحت 1300 لا يكفي ذلك، فتُسقَط كلمة Account أيضًا. وأيقونتها شخصٌ
+   لا قفل، فلا تلتبس بباب الموظفين المجاور. */
+@media(min-width:1081px) and (max-width:1300px){
+  .hdr__link, [lang=ar] .hdr__link{ font-size:14px; padding-inline:6px }
+  .hdr__tools{ gap:5px }
+  .hdr__tools .hdr__acct span{ display:none }
+  .hdr__tools .hdr__acct{ width:44px; padding-inline:0; gap:0 }
+}
 @media(max-width:1080px){#fabCards{grid-template-columns:repeat(2,minmax(0,1fr))}.logostrip__group{grid-template-columns:repeat(6,minmax(0,1fr));gap:18px}.ux-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ux-jump{top:var(--header-h)}.qlayout aside{position:static}}
 @media(max-width:760px){
   html{scroll-padding-top:150px}.sec{padding-block:40px}.wrap{padding-inline:20px}
