@@ -13,6 +13,7 @@ import type { T } from '@/lib/i18n';
 import type { Brand } from '@/lib/content';
 import { Icon } from './Icon';
 import { Pic, MOBILE_AT } from './Pic';
+import { mobileOf } from '@/lib/uploads';
 import { ASSET_V } from '@/lib/version';
 
 type Any = Record<string, any>;
@@ -46,13 +47,8 @@ export function HeroSlider({ s, t, underHeader = false }: { s: Any; t: T; underH
                لا بعلامة مخزّنة: الصورة المستبدَلة تفقد علاماتها (هي مربوطة
                بمسار الصورة)، فكانت الأولى تظهر فارغة حتى يصلها السلايدر. */
             const preload = i < 2 || sl.preload === true;
-            /* قَصّة الهاتف: المرفوعة في «صورة الهاتف» وحدها. وكان يُبحث عن
-               «‎-mobile.jpg» بجانب الصورة فتُقَصّ كل صورةٍ عريضة إلى إطارٍ
-               طوليّ بلا طلب — ومن يريد صورةً للهاتف يرفعها هو. */
-            const phone = (sl.imgMobile ?? '').trim();
-            /* data-nophone: شريحةٌ بلا «صورة الهاتف» ينزعها app.js على
-               الهاتف. صورةُ الشاشة الواسعة في إطارٍ طوليّ تُكبَّر حتى لا
-               يظهر من المعدة إلا طرفها. */
+            /* قَصّة الهاتف: المكتوبة في الشريحة، وإلا «‎-mobile.jpg» بجانب الصورة */
+            const phone = (sl.imgMobile ?? '').trim() || mobileOf(sl.img);
             const img = (
               <img
                 {...(preload ? { src: ver(sl.img) } : { 'data-src': ver(sl.img) })}
@@ -64,8 +60,7 @@ export function HeroSlider({ s, t, underHeader = false }: { s: Any; t: T; underH
               />
             );
             return (
-              <div className={`vhero__slide${i === 0 ? ' is-active' : ''}`}
-                   data-index={i} data-group={sl.group} data-nophone={phone ? undefined : ''} key={i}>
+              <div className={`vhero__slide${i === 0 ? ' is-active' : ''}`} data-index={i} data-group={sl.group} key={i}>
                 {phone ? (
                   <picture>
                     {/* srcset يُؤجَّل كالصورة: مصدرٌ مطابق بلا تأجيل ينزّل قَصّات

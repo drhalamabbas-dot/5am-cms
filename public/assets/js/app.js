@@ -392,13 +392,6 @@
      كل تبويب يمثّل مجموعة صور لا صورة واحدة، ولكل مجموعة مدة إجمالية: منتج
      بعشر صور لا يأخذ عشرة أضعاف وقت منتج بصورة. */
   function heroSlider() {
-    /* على الهاتف تُنزَع الشرائح التي لا «صورة هاتف» لها: صورةُ الشاشة
-       الواسعة في إطارٍ طوليّ تُكبَّر فلا يظهر من المعدة إلا طرفها. والنزع
-       من الـDOM لا الإخفاء، كي تكون المجموعات والمُدد على المرئيّ وحده. */
-    if (window.matchMedia('(max-width:768px)').matches) {
-      qsa('.vhero__slide[data-nophone]').forEach(function (el) { el.remove(); });
-    }
-
     const slides = qsa('.vhero__slide');
     const tabs = qsa('.vhero__tab');
     const video = qs('.vhero__video');
@@ -408,23 +401,6 @@
     const tabForSlide = function (i) {
       const g = groupOf(slides[i]);
       return tabs.filter(function (t) { return groupOf(t) === g; })[0] || null;
-    };
-    /* لا شريحة باقية: يبقى الفيديو، ويُنزع شريط التبويبات والسهمان معه. */
-    if (!slides.length) { const foot = qs('.vhero__foot'); if (foot) foot.remove(); return; }
-    /* تبويبٌ لم تبقَ لمجموعته شريحة لا يُعرض: نقرُه كان يرجع إلى الأولى. */
-    tabs.slice().forEach(function (tab) {
-      const g = groupOf(tab);
-      if (!slides.filter(function (s) { return groupOf(s) === g; }).length) {
-        tab.remove();
-        tabs.splice(tabs.indexOf(tab), 1);
-      }
-    });
-    /* هدف التبويب يُحسب من مجموعته لا من data-slide: ذاك رقمٌ في القائمة
-       الكاملة، وقد نُزع منها ما لا صورة هاتف له. */
-    const slideForTab = function (tab) {
-      const g = groupOf(tab);
-      for (let i = 0; i < slides.length; i++) if (groupOf(slides[i]) === g) return i;
-      return 0;
     };
 
     const BASE_INTERVAL = 4300, MAX_GROUP = 20000, MIN_INTERVAL = 2600;
@@ -519,11 +495,11 @@
           : e.key === 'End' ? tabs.length - 1
           : (i + ((e.key === 'ArrowRight') !== rtl() ? 1 : -1) + tabs.length) % tabs.length;
         setPlayingState(false);
-        showSlide(slideForTab(tabs[next]));
+        showSlide(Number(tabs[next].dataset.slide) || 0);
         tabs[next].focus();
       });
       tab.addEventListener('click', function () {
-        showSlide(slideForTab(tab));
+        showSlide(Number(tab.dataset.slide) || 0);
         if (isPlaying) startTimer();
       });
     });
