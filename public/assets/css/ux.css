@@ -83,7 +83,7 @@ dialog::backdrop{background:#060b14b3;backdrop-filter:blur(4px)}
    ويظهر شريط تمريرٍ أفقيّ لا يُغلق. وكان المدى 1081–1250 وحده مُعالَجًا،
    فما بينه وبين 1600 بلا قاعدةٍ أصلًا — وهو مقاس أغلب اللابتوبات.
    فيُصغَّر الشعار والروابط وتُسقَط كلمة «العربية» عن زرّ اللغة. */
-@media(min-width:1081px) and (max-width:1600px){
+@media(min-width:1081px) and (max-width:1680px){
   .hdr__logo img, .hdr--compact .hdr__logo img{ height:48px }
   .hdr__link, [lang=ar] .hdr__link{ font-size:14.5px; padding-inline:7px }
   .hdr__nav{ min-width:0 }
