@@ -94,6 +94,11 @@ html[dir="rtl"] .ux-chat__input button svg{ transform:scaleX(-1); }
   .ux-chat__fab{ inset-inline-start:16px; bottom:86px; padding:13px; }
   .ux-chat__fab span{ display:none; }
   .ux-chat{ inset:auto 8px 8px 8px; width:auto; height:min(78vh, calc(100dvh - 24px)); bottom:8px; z-index:120; }
+
+  /* الزرّ ثابت يطفو فوق ما تحته، وآخر الصفحة سطر الحقوق: فكان يقعد عليه
+     فيحجب نصفه. مِن أسفله 86 بكسلًا وطوله 48، فآخر 134 بكسلًا من الشاشة
+     محجوبة، وحشو الصفحة 76 للشريط السفلي. فتُزاد هنا بقيّتها. */
+  body:has(.ux-chat__fab) .ftr{ padding-bottom:64px; }
 }
 @media (prefers-reduced-motion:reduce){ .ux-chat__fab{ transition:none; } }
 @media print{ .ux-chat, .ux-chat__fab{ display:none !important; } }
